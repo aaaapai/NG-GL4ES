@@ -56,7 +56,7 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 	
 	ARBCONV_DBG_HEAVY(SHUT_LOGD("Generating code for:\n%s\n", codeStart);)
 	
-	sCurStatus curStatus = {0};
+	sCurStatus curStatus = {ST_IDLE};
 	initStatus(&curStatus, codeStart);
 	readNextToken(&curStatus);
 	if ((curStatus.curToken != TOK_NEWLINE) && (curStatus.curToken != TOK_WHITESPACE)) {
@@ -256,23 +256,23 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 			APPEND_OUTPUT("\tgl_FragDepth = gl4es_FragDepthTemp.z;\n", 39)
 		}
 		switch (curStatus.fogType) {
-		case FOG_NONE:
+		case _sCurStatus::FOG_NONE:
 			break;
-		case FOG_EXP:
+		case _sCurStatus::FOG_EXP:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp(exp(-gl_Fog.density * gl_FogFragCoord), 0., 1.));\n",
 				116
 			)
 			break;
-		case FOG_EXP2:
+		case _sCurStatus::FOG_EXP2:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp(exp(-(gl_Fog.density * gl_FogFragCoord)*(gl_Fog.density * gl_FogFragCoord)), 0., 1.));\n",
 				153
 			)
 			break;
-		case FOG_LINEAR:
+		case _sCurStatus::FOG_LINEAR:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0., 1.));\n",
