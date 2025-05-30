@@ -56,7 +56,7 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 	
 	ARBCONV_DBG_HEAVY(SHUT_LOGD("Generating code for:\n%s\n", codeStart);)
 	
-	sCurStatus curStatus = {ST_IDLE};
+	sCurStatus curStatus = {};
 	initStatus(&curStatus, codeStart);
 	readNextToken(&curStatus);
 	if ((curStatus.curToken != TOK_NEWLINE) && (curStatus.curToken != TOK_WHITESPACE)) {
