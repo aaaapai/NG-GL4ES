@@ -9,10 +9,6 @@
 #ifdef DEBUG
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // ARBCONV_DBG - general ArbConverter debug logs
 #define ARBCONV_DBG(a) a
 // ARBCONV_DBG_LP - code loop ArbConverter debug logs
@@ -227,6 +223,11 @@ KHASH_MAP_DECLARE_STR(variables, sVariable*)
 #define kh_str_exist(h, s) kh_truly_exist(h, kh_get(variables, h, s))
 
 #define MAX_OPERANDS 4
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _sInstruction {
 	eInstruction type;
 	int saturated;
