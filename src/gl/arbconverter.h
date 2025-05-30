@@ -1,7 +1,7 @@
 #ifndef _GL4ES_ARBCONVERTER_H_
 #define _GL4ES_ARBCONVERTER_H_
 
-#include <cstdint>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
