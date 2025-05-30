@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -funwind-tables -g -D_THREAD_SAFE -fPIC -stdlib=libc++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fPIC -DPIC -flto=auto")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11 -fPIC -DNO_GBM -DDEFAULT_ES=3 -g -std=gnu99 -funwind-tables -O3 -fvisibility=hidden")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11 -fPIC -DPIC -DNO_GBM -DDEFAULT_ES=3 -std=c17 -O3 -fvisibility=hidden -flto=auto")
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto=auto")
 
 set(CMAKE_ANDROID_STL_TYPE c++_static)
 
@@ -22,7 +22,6 @@ set(C_SRC_FILES
         src/gl/string_utils.c
         src/gl/cJSON.c
         src/gl/config.c
-        src/gl/arbconverter.c
         src/gl/arbgenerator.c
         src/gl/arbhelper.c
         src/gl/arbparser.c
@@ -97,6 +96,7 @@ set(C_SRC_FILES
         )
 
 set(CPP_SRC_FILES
+        src/gl/arbconverter.cpp
         src/glsl/glsl_for_es.cpp
         src/gl/getter.cpp
         )
@@ -110,8 +110,6 @@ add_library(ng_gl4es SHARED ${SRC_FILES})
 target_link_libraries(ng_gl4es
         ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/libglslang.a
         ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/libspirv-cross-c-shared.so
-        c
-        c++_static
         dl
         )
 
