@@ -1,7 +1,7 @@
 #ifndef _GL4ES_ARBPARSER_H_
 #define _GL4ES_ARBPARSER_H_
 
-#include <cstddef>
+#include <stddef.h>
 
 #include "arbhelper.h"
 
