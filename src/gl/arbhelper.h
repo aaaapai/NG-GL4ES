@@ -9,6 +9,10 @@
 #ifdef DEBUG
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // ARBCONV_DBG - general ArbConverter debug logs
 #define ARBCONV_DBG(a) a
 // ARBCONV_DBG_LP - code loop ArbConverter debug logs
@@ -313,5 +317,8 @@ void freeStatus(sCurStatus* curStatus);
 
 int appendString(sCurStatus *curStatusPtr, const char *str, size_t strLen);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GL4ES_ARBHELPER_H_
