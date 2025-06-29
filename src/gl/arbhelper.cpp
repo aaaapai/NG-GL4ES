@@ -37,23 +37,23 @@ int pushArray(sArray* arr, void* obj) {
 }
 void* popArray(sArray* arr) {
 	if (!arr->size) {
-		return NULL;
+		return nullptr;
 	}
 	
 	--arr->size;
 	void *ret = arr->objs[arr->size];
-	arr->objs[arr->size] = NULL;
+	arr->objs[arr->size] = nullptr;
 	return ret;
 }
 void* popFIFO(sArray* arr) {
 	if (!arr->size) {
-		return NULL;
+		return nullptr;
 	}
 	
 	--arr->size;
 	void *ret = arr->objs[0];
 	memmove(arr->objs, arr->objs + 1, arr->size * sizeof(void*));
-	arr->objs[arr->size] = NULL;
+	arr->objs[arr->size] = nullptr;
 	return ret;
 }
 void freeArray(sArray* arr) {
@@ -62,7 +62,7 @@ void freeArray(sArray* arr) {
 		free(arr->objs[arr->size]);
 	}
 	free(arr->objs);
-	arr->objs = NULL;
+	arr->objs = nullptr;
 }
 
 #define TST_STR_VAL_PREF(str, pref, inst) (!strncmp(str, #inst, strlen(#inst))) ? pref##inst :
@@ -233,12 +233,12 @@ void deleteVariable(sVariable **var) {
 	}
 	freeArray((sArray*)&(*var)->init);
 	free(*var);
-	*var = NULL;
+	*var = nullptr;
 }
 
 sInstruction *copyInstruction(const sInstruction *orig) {
 	sInstruction *dup = (sInstruction*)malloc(sizeof(sInstruction));
-	memcpy(dup, orig, sizeof(sInstruction));
+	std::memcpy(dup, orig, sizeof(sInstruction));
 	return dup;
 }
 
@@ -278,7 +278,7 @@ void initStatus(sCurStatus* curStatus, const char* code) {
 	curStatus->fogType = FOG_NONE;
 	
 	initArray((sArray*)&curStatus->_fixedNewVar);
-	curStatus->_fixedNewVar.var = NULL;
+	curStatus->_fixedNewVar.var = nullptr;
 }
 
 void freeStatus(sCurStatus* curStatus) {
