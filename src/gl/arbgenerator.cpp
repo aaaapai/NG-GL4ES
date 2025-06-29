@@ -120,7 +120,7 @@ void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg,
 		if (instPtr->vars[i].sign != 0) {                                                                  \
 			FAIL("Variable is not a valid masked destination register");                                   \
 		}                                                                                                  \
-		if (instPtr->vars[i].floatArrAddr != NULL) {                                                       \
+		if (instPtr->vars[i].floatArrAddr != nullptr) {                                                       \
 			FAIL("Variable is not a valid masked destination register");                                   \
 		}                                                                                                  \
 		for (int sw = 0; (sw < 3) && (SWIZ(i, sw + 1) != SWIZ_NONE); ++sw) {                               \
@@ -247,7 +247,7 @@ void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg,
 		} else {                                                  \
 			APPEND_OUTPUT2(instPtr->vars[i].var->names[0])        \
 		}                                                         \
-		if (instPtr->vars[i].floatArrAddr != NULL) {              \
+		if (instPtr->vars[i].floatArrAddr != nullptr) {              \
 			APPEND_OUTPUT("[", 1)                                 \
 			APPEND_OUTPUT2(instPtr->vars[i].floatArrAddr)         \
 			APPEND_OUTPUT("]", 1)                                 \
