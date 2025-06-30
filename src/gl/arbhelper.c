@@ -1,5 +1,5 @@
 #include "arbhelper.h"
-#include <cstring>
+#include <string.h>
 #include "../config.h"
 
 #define SIZE_THRESHOLD 0x40
