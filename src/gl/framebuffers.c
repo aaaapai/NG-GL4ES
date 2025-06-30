@@ -1241,7 +1241,7 @@ void createMainFBO(int width, int height) {
     // switch to texture unit 0 if needed
     if (glstate->texture.active != 0)
         gles_glActiveTexture(GL_TEXTURE0);
-    if (glstate->texture.client != 0 && gles_glClientActiveTexture)
+    if (glstate->texture.client != 0 && gl4es_glClientActiveTexture)
         gl4es_glClientActiveTexture(GL_TEXTURE0);
         
     glstate->fbo.mainfbo_width = width;
@@ -1291,7 +1291,7 @@ void createMainFBO(int width, int height) {
     gles_glBindTexture(GL_TEXTURE_2D, glstate->texture.bound[0][ENABLED_TEX2D]->glname);
     if (glstate->texture.active != 0)
         gles_glActiveTexture(GL_TEXTURE0 + glstate->texture.active);
-    if (glstate->texture.client != 0 && gles_glClientActiveTexture)
+    if (glstate->texture.client != 0 && gl4es_glClientActiveTexture)
         gl4es_glClientActiveTexture(GL_TEXTURE0 + glstate->texture.client);
     GLuint current_rb = glstate->fbo.current_rb->renderbuffer;
     gles_glBindRenderbuffer(GL_RENDERBUFFER, current_rb);
