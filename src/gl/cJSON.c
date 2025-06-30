@@ -2096,7 +2096,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_AddItemReferenceToObject(cJSON *object, const cha
 
 CJSON_PUBLIC(cJSON*) cJSON_AddNullToObject(cJSON * const object, const char * const name)
 {
-    cJSON *nullptr = cJSON_CreateNull();
+    cJSON *NULL = cJSON_CreateNull();
     if (add_item_to_object(object, name, nullptr, &global_hooks, false))
     {
         return nullptr;
