@@ -1,5 +1,5 @@
 #include "arbhelper.h"
-
+#include <cstring>
 #include "../config.h"
 
 #define SIZE_THRESHOLD 0x40
@@ -20,7 +20,7 @@ void *resize(void** obj, size_t* cap, size_t esize) {
 }
 
 void initArray(sArray* arr) {
-	arr->objs = calloc(DEFAULT_MALLOC_COUNT, sizeof(void*));
+	arr->objs = (void**)calloc(DEFAULT_MALLOC_COUNT, sizeof(void*));
 	arr->size = 0;
 	arr->cap = DEFAULT_MALLOC_COUNT;
 }
@@ -228,7 +228,7 @@ void deleteVariable(sVariable **var) {
 	freeArray((sArray*)*var);
 	
 	char *stringPtr;
-	while ((stringPtr = popArray((sArray*)&(*var)->init))) {
+	while ((stringPtr = (char*)popArray((sArray*)&(*var)->init))) {
 		free(stringPtr);
 	}
 	freeArray((sArray*)&(*var)->init);
@@ -248,7 +248,7 @@ void initStatus(sCurStatus* curStatus, const char* code) {
 	curStatus->codePtr = code;
 	curStatus->endOfToken = code;
 	
-	curStatus->outputString = malloc(DEFAULT_STRING_MALLOC_SIZE);
+	curStatus->outputString = (char*)malloc(DEFAULT_STRING_MALLOC_SIZE);
 	curStatus->outputString[0] = '\0';
 	curStatus->outputEnd = curStatus->outputString;
 	curStatus->outLen = 0;
