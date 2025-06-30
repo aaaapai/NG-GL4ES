@@ -8,7 +8,7 @@ extern "C" {
 #include "gl4es.h"
 #include "gles.h"
 #include "logs.h"
-#include "pack/load.h"
+#include "vgpu/load.h"
 
 #ifndef NOEGL
 //Typedef for egl to be able to call LOAD_EGL...
