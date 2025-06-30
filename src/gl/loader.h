@@ -190,8 +190,8 @@ EXPORT extern void *egl;
 #define LOAD_LIB_SILENT(lib, name) DEFINE_RAW(lib, name); LOAD_RAW_SILENT(lib, name, proc_address(lib, #name))
 #define LOAD_LIB_ALT(lib, alt, name) DEFINE_RAW(lib, name); LOAD_RAW_ALT(lib, alt, name, proc_address(lib, #name))
 
-+//#define LOAD_GLES2(name) if(loaded == 0){loaded=load_all();}
-+#define LOAD_GLES(name)         LOAD_GLES2(name)
+//#define LOAD_GLES2(name) if(loaded == 0){loaded=load_all();}
+#define LOAD_GLES(name)         LOAD_GLES2(name)
 #define LOAD_GLES2(name)        LOAD_LIB(gles, name)
 #define LOAD_GLES3(name)        LOAD_LIB(gles, name)
 #define LOAD_GLES_OR_FPE(name)  LOAD_LIB_ALT(gles, fpe, name)
