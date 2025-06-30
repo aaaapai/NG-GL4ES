@@ -768,7 +768,7 @@ void realize_1texture(GLenum target, int wantedTMU, gltexture_t* tex, glsampler_
 {
     DBG(SHUT_LOGD("realize_1texture(%s, %d, %p[%u], %p)\n", PrintEnum(target), wantedTMU, tex, tex->glname, sampler);)
     LOAD_GLES(glActiveTexture);
-    void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
+    //void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
     LOAD_GLES(glBindTexture);
     // check sampler stuff
     if(!sampler) sampler = &tex->sampler;
@@ -853,7 +853,7 @@ void realize_textures(int drawing) {
     LOAD_GLES(glDisable);
     LOAD_GLES(glBindTexture);
     LOAD_GLES(glActiveTexture);
-    void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
+    //void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
 #ifdef TEXSTREAM
     DBG(SHUT_LOGD("realize_textures(%d), glstate->bound_changed=%d, glstate->enable.texture[0]=%X glsate->actual_tex2d[0]=%u / glstate->bound_stream[0]=%u\n", drawing, glstate->bound_changed, glstate->enable.texture[0], glstate->actual_tex2d[0], glstate->bound_stream[0]);)
 #else
