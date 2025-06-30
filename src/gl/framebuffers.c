@@ -436,7 +436,7 @@ void APIENTRY_GL4ES gl4es_glFramebufferTexture2D(GLenum target, GLenum attachmen
     LOAD_GLES_(glTexImage2D);
     LOAD_GLES_(glBindTexture);
     LOAD_GLES_(glActiveTexture);
-    void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
+    //void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
 
     glframebuffer_t *fb = get_framebuffer(target);
     if(!fb) {
@@ -447,7 +447,7 @@ void APIENTRY_GL4ES gl4es_glFramebufferTexture2D(GLenum target, GLenum attachmen
     ( !(attachment>=GL_COLOR_ATTACHMENT0 && attachment<(GL_COLOR_ATTACHMENT0+31))
      && attachment!=GL_DEPTH_ATTACHMENT 
      && attachment!=GL_STENCIL_ATTACHMENT 
-     && attachment!=GL_DEPTH_STENCIL_ATTACHMENT) {
+     && attachment!=GL_DEPTH_STENCIL_ATTACHMENT); {
          errorShim(GL_INVALID_ENUM);
          return;
      }
