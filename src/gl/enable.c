@@ -341,7 +341,7 @@ GLboolean APIENTRY_GL4ES gl4es_glIsEnabled(GLenum cap) {
     // should flush for now... but no need if it's just a pending list...
     if (glstate->list.active && !glstate->list.pending)
         gl4es_flush();
-    GLboolean gles_glIsEnabled(glIsEnabled_ARG_EXPAND); //LOAD_GLES(glIsEnabled);
+    //GLboolean gles_glIsEnabled(glIsEnabled_ARG_EXPAND); //LOAD_GLES(glIsEnabled);
     noerrorShim();
     switch (cap) {
         isenabled(GL_AUTO_NORMAL, auto_normal);
