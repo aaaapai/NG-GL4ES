@@ -38,7 +38,7 @@ void APIENTRY_GL4ES gl4es_Stub(void *x) {}
 void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     DBG(SHUT_LOGD("glGetProcAddress(\"%s\")", name);)
     
-    #include "pack/packEX.h"
+    #include "vgpu/packEX.h"
     
 	/*
     // generated gles wrappers
