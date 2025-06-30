@@ -238,7 +238,7 @@ void deleteVariable(sVariable **var) {
 
 sInstruction *copyInstruction(const sInstruction *orig) {
 	sInstruction *dup = (sInstruction*)malloc(sizeof(sInstruction));
-	std::memcpy(dup, orig, sizeof(sInstruction));
+	memcpy(dup, orig, sizeof(sInstruction));
 	return dup;
 }
 
