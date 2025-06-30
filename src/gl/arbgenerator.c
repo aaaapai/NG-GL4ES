@@ -123,7 +123,7 @@ void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg,
 		if (instPtr->vars[i].floatArrAddr != nullptr) {                                                       \
 			FAIL("Variable is not a valid masked destination register");                                   \
 		}                                                                                                  \
-		for (int sw = 0; (sw < 3) && (SWIZ(i, sw + 1) != _sInstruction::_sInstruction_Vars::SWIZ_NONE); ++sw) {                               \
+		for (int sw = 0; (sw < 3) && (SWIZ(i, sw + 1) != SWIZ_NONE); ++sw) {                               \
 			if ((SWIZ(i, sw) >= SWIZ(i, sw + 1))) {                                                        \
 				FAIL("Variable is not a valid masked destination register");                               \
 			}                                                                                              \
@@ -137,7 +137,7 @@ void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg,
 		 && (instPtr->vars[i].var->type != VARTYPE_PARAM_MULT)) {                                          \
 			FAIL("Variable is not a valid vector source register");                                        \
 		}                                                                                                  \
-		if ((SWIZ(i, 1) != SWIZ_NONE) && (SWIZ(i, 3) == _sInstruction::_sInstruction_Vars::SWIZ_NONE)) {                                      \
+		if ((SWIZ(i, 1) != SWIZ_NONE) && (SWIZ(i, 3) == SWIZ_NONE)) {                                      \
 			FAIL("Variable is not a valid vector source register");                                        \
 		}
 #define ASSERT_SCALSRC(i) \
@@ -189,7 +189,7 @@ void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg,
 	// Misc pushing
 /* Append a DeSTination MASK (i is destination index, b is base swizzle vector or destination) */
 #define PUSH_DSTMASK(i, b) \
-		if (((b == i) || (SWIZ(b, 0) == SWIZ_NONE)) && (SWIZ(i, 0) != _sInstruction::_sInstruction_Vars::SWIZ_NONE)) {      \
+		if (((b == i) || (SWIZ(b, 0) == SWIZ_NONE)) && (SWIZ(i, 0) != SWIZ_NONE)) {      \
 			APPEND_OUTPUT(".", 1)                                                        \
 			for (int sw = 0; (sw < 4) && (SWIZ(i, sw) != SWIZ_NONE); ++sw) {             \
 				PUSH_SWIZZLE(SWIZ(i, sw))                                                \
