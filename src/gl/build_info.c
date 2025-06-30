@@ -6,5 +6,5 @@
 
 void print_build_infos()
 {
-      SHUT_LOGD("%d.%d.%d kw %d.%d.%d built on %s %s\n", MAJOR_, MINOR_, REVISION_, MAJOR, MINOR, REVISION, __DATE__, __TIME__);
+	SHUT_LOGD("v%d.%d.%d built on %s %s\n", MAJOR, MINOR, REVISION, __DATE__, __TIME__);
 }
