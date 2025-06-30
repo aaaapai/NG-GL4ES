@@ -23,7 +23,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         src/gl/string_utils.c
         src/gl/cJSON.c
         src/gl/config.c
-        src/gl/arbgenerator.cpp
+        src/gl/arbgenerator.c
         src/gl/arbhelper.c
         src/gl/arbparser.c
         src/gl/array.c
