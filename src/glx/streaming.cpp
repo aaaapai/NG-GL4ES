@@ -14,9 +14,9 @@
 #include "../gl/loader.h"
 #include "../gl/gles.h"
 
-PFNGLTEXBINDSTREAMIMGPROC *glTexBindStreamIMG = NULL;
-PFNGLGETTEXSTREAMDEVICEATTRIBUTEIVIMGPROC *glGetTexAttrIMG = NULL;
-PFNGLGETTEXSTREAMDEVICENAMEIMGPROC *glGetTexDeviceIMG = NULL;
+PFNGLTEXBINDSTREAMIMGPROC *glTexBindStreamIMG = nullptr;
+PFNGLGETTEXSTREAMDEVICEATTRIBUTEIVIMGPROC *glGetTexAttrIMG = nullptr;
+PFNGLGETTEXSTREAMDEVICENAMEIMGPROC *glGetTexDeviceIMG = nullptr;
 
 //extern void* eglGetProcAddress(const char*);
 
@@ -127,7 +127,7 @@ int alloc_buff(int buff, int width, int height) {
 		return 0;
 	} else {
 		buf_paddr[buff] = ioctl_var.output;
-		buf_vaddr[buff] = (char *)mmap(NULL, width*height*2,
+		buf_vaddr[buff] = (char *)mmap(nullptr, width*height*2,
 						  PROT_READ | PROT_WRITE, MAP_SHARED,
 						  bc_cat[buff], buf_paddr[buff]);
 
@@ -187,11 +187,11 @@ int InitStreamingCache() {
 void* GetStreamingBuffer(int buff) {
 //printf("GetStreamingBuffer(%i)\n", buff);
 	if (!gl_streaming)
-		return NULL;
+		return nullptr;
 	if ((buff<0) || (buff>9))
-		return NULL;
+		return nullptr;
 	if (tex_free[buff])
-		return NULL;
+		return nullptr;
 	stream_cache[buff].last = frame_number;
 	return buf_vaddr[buff];
 }

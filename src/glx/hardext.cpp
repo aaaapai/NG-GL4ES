@@ -27,7 +27,7 @@ int testGenericShader(struct shader_s* shader_source) {
     LOAD_GLES2(glDeleteShader);
 
     GLuint shad = gles_glCreateShader(shader_source->type);
-    gles_glShaderSource(shad, 1, (const GLchar *const *)(&shader_source->converted), NULL);
+    gles_glShaderSource(shad, 1, (const GLchar *const *)(&shader_source->converted), nullptr);
     gles_glCompileShader(shad);
     GLint compiled;
     gles_glGetShaderiv(shad, GL_COMPILE_STATUS, &compiled);
@@ -35,7 +35,7 @@ int testGenericShader(struct shader_s* shader_source) {
     if(!compiled) {
         LOAD_GLES2(glGetShaderInfoLog)
         char buff[500];
-        gles_glGetShaderInfoLog(shad, 500, NULL, buff);
+        gles_glGetShaderInfoLog(shad, 500, nullptr, buff);
         SHUT_LOGD("LIBGL: \"%s\" failed, message:\n%s\n", version, buff);
     }
     */
@@ -62,7 +62,7 @@ static int testGLSL(const char* version, int uniformLoc) {
             " gl_Position = matMVP * vecPos;\n"
             "}\n"
     };
-    gles_glShaderSource(shad, 4, shadTest, NULL);
+    gles_glShaderSource(shad, 4, shadTest, nullptr);
     gles_glCompileShader(shad);
     GLint compiled;
     gles_glGetShaderiv(shad, GL_COMPILE_STATUS, &compiled);
@@ -70,7 +70,7 @@ static int testGLSL(const char* version, int uniformLoc) {
     if(!compiled) {
         LOAD_GLES2(glGetShaderInfoLog)
         char buff[500];
-        gles_glGetShaderInfoLog(shad, 500, NULL, buff);
+        gles_glGetShaderInfoLog(shad, 500, nullptr, buff);
         printf("LIBGL: \"%s\" failed, message:\n%s\n", version, buff);
     }
     */
@@ -98,7 +98,7 @@ static int testTextureCubeLod() {
         " gl_FragColor = textureCubeLod(samCube, coordCube, 0.0);\n"
         "}\n"
     };
-    gles_glShaderSource(shad, 3, shadTest, NULL);
+    gles_glShaderSource(shad, 3, shadTest, nullptr);
     gles_glCompileShader(shad);
     GLint compiled;
     gles_glGetShaderiv(shad, GL_COMPILE_STATUS, &compiled);
@@ -226,7 +226,7 @@ void GetHardwareExtensions(int notest)
         eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
     egl_eglBindAPI(EGL_OPENGL_ES_API);
-    if (egl_eglInitialize(eglDisplay, NULL, NULL) != EGL_TRUE) {
+    if (egl_eglInitialize(eglDisplay, nullptr, nullptr) != EGL_TRUE) {
         LOGE("Error while gathering supported extension (eglInitialize: %s), default to none\n", PrintEGLError(0));
         egl_eglTerminate(eglDisplay);
         return;
@@ -295,7 +295,7 @@ void GetHardwareExtensions(int notest)
     /*if(hardext.blendcolor==0) {
         // try by just loading the function
         LOAD_GLES_OR_OES(glBlendColor);
-        if(gles_glBlendColor != NULL) {
+        if(gles_glBlendColor != nullptr) {
             hardext.blendcolor = 1;
 	        SHUT_LOGD("Extension glBlendColor found and used\n");
 	    }

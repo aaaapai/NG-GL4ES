@@ -30,13 +30,13 @@
 // for GBM
 #define GBMFUNC(ret, name, args) \
     typedef ret (*PFN##name) args; \
-    static PFN##name gbmdrm_##name = NULL;
+    static PFN##name gbmdrm_##name = nullptr;
 #include "gbmfunc.h"
 #undef GBMFUNC
 // for DRM
 #define DRMFUNC(ret, name, args) \
     typedef ret (*PFN##name) args; \
-    static PFN##name gbmdrm_##name = NULL;
+    static PFN##name gbmdrm_##name = nullptr;
 #include "drmfunc.h"
 #undef DRMFUNC
 
@@ -46,12 +46,12 @@ struct drm_fb {
 };
 
 static int drm_fd = -1; // drm handle
-static drmModeModeInfo *drm_mode = NULL;
+static drmModeModeInfo *drm_mode = nullptr;
 static uint32_t drm_crtc_id = 0;
 static uint32_t drm_connector_id = 0;
-static struct gbm_device *gbmdev = NULL;
-static struct gbm_surface *gbmsurf = NULL;
-static struct gbm_bo *gbm_bo = NULL;
+static struct gbm_device *gbmdev = nullptr;
+static struct gbm_surface *gbmsurf = nullptr;
+static struct gbm_bo *gbm_bo = nullptr;
 static uint32_t fb_id = 0;
 
 // code here from icecream95 https://gitlab.com/icecream95/drmegl-wrapper
@@ -101,25 +101,25 @@ static void CancelGBM()
     if(gbm)
         dlclose(gbm);
     #define GBMFUNC(ret, name, args) \
-        gbmdrm_##name = NULL;
+        gbmdrm_##name = nullptr;
     #include "gbmfunc.h"
     #undef GBMFUNC
     if(drm)
         dlclose(drm);
     #define DRMFUNC(ret, name, args) \
-        gbmdrm_##name = NULL;
+        gbmdrm_##name = nullptr;
     #include "drmfunc.h"
     #undef DRMFUNC
 
-    gbm = NULL;
+    gbm = nullptr;
     globals4es.usegbm = 0;
 }
 
 static int init_drm_and_gbm()
 {
     drmModeRes *resources;
-    drmModeConnector *connector = NULL;
-    drmModeEncoder *encoder = NULL;
+    drmModeConnector *connector = nullptr;
+    drmModeEncoder *encoder = nullptr;
     int i, area;
 
     drm_fd = open(globals4es.drmcard, O_RDWR | O_CLOEXEC);
@@ -141,7 +141,7 @@ static int init_drm_and_gbm()
             break;
         }
         gbmdrm_drmModeFreeConnector(connector);
-        connector = NULL;
+        connector = nullptr;
     }
     if (!connector) {
         /* we could be fancy and listen for hotplug events and wait for
@@ -174,7 +174,7 @@ static int init_drm_and_gbm()
         if (encoder->encoder_id == connector->encoder_id)
             break;
         gbmdrm_drmModeFreeEncoder(encoder);
-        encoder = NULL;
+        encoder = nullptr;
     }
     if (encoder) {
         drm_crtc_id = encoder->crtc_id;
@@ -238,7 +238,7 @@ static struct drm_fb * drm_fb_get_from_bo(struct gbm_bo *bo)
     if (ret) {
         SHUT_LOGD("failed to create fb: %s\n", strerror(errno));
         free(fb);
-        return NULL;
+        return nullptr;
     }
 
     gbmdrm_gbm_bo_set_user_data(bo, fb, drm_fb_destroy_callback);
@@ -299,7 +299,7 @@ void CloseGBMFunctions()
 {
     if(gbmdev) {
         gbmdrm_gbm_device_destroy(gbmdev);
-        gbmdev = NULL;
+        gbmdev = nullptr;
     }
     if (drm_fd >= 0) {
         close(drm_fd);
@@ -312,7 +312,7 @@ void* OpenGBMDisplay(void* display)
 {
     LOAD_EGL_EXT(eglGetPlatformDisplay);
     if(egl_eglGetPlatformDisplay) {
-        return egl_eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, gbmdev, NULL);
+        return egl_eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, gbmdev, nullptr);
     } else {
         LOAD_EGL(eglGetDisplay);
         return egl_eglGetDisplay((EGLNativeDisplayType)gbmdev);
@@ -355,7 +355,7 @@ EGLBoolean GBMMakeCurrent(EGLDisplay eglDisp, EGLSurface draw, EGLSurface read, 
 
     EGLBoolean res = egl_eglMakeCurrent(eglDisp, draw, read, ctx);
 
-    if(ctx==EGL_NO_CONTEXT || draw==NULL) {
+    if(ctx==EGL_NO_CONTEXT || draw==nullptr) {
         // clean up gbm/drm stuff?
         return res;
     }
@@ -364,7 +364,7 @@ EGLBoolean GBMMakeCurrent(EGLDisplay eglDisp, EGLSurface draw, EGLSurface read, 
     struct gbm_bo *bo = gbmdrm_gbm_surface_lock_front_buffer(gbmsurf);
     if(!bo) {
         // probably a PBuffer
-        //printf("LIBGL: gbm BO is NULL\n");
+        //printf("LIBGL: gbm BO is nullptr\n");
         return EGL_TRUE;
     }
     struct drm_fb *fb = drm_fb_get_from_bo(bo);
@@ -394,12 +394,12 @@ void CloseGBMFunctions()
 
 void* OpenGBMDisplay(void* display)
 {
-    return NULL;
+    return nullptr;
 }
 
 void* CreateGBMWindow(int w, int h)
 {
-    return NULL;
+    return nullptr;
 }
 
 void DeleteGBMWindow(void* win)
