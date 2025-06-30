@@ -1,7 +1,7 @@
 #include "arbgenerator.h"
 
 #include <stdlib.h>
-#include <cstring>
+#include <string.h>
 #include <stdio.h>
 
 #include "arbhelper.h"
