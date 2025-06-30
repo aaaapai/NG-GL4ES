@@ -56,8 +56,8 @@ static const colorlayout_t *get_color_map(GLenum format) {
             SHUT_LOGD("LIBGL: unknown pixel format %s\n", PrintEnum(format));
             break;
     }
-    static colorlayout_t nullptr = {0};
-    return &nullptr;
+    static colorlayout_t null = {0};
+    return &null;
     #undef map
 }
 
