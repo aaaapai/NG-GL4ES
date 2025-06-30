@@ -1225,7 +1225,7 @@ void createMainFBO(int width, int height) {
     LOAD_GLES_(glGenTextures);
     LOAD_GLES_(glBindTexture);
     LOAD_GLES_(glActiveTexture);
-    void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
+    //void gles_glTexParameteri(glTexParameteri_ARG_EXPAND); //LOAD_GLES(glTexParameteri);
     LOAD_GLES2_(glClientActiveTexture);
     LOAD_GLES_(glClear);
 
@@ -1242,7 +1242,7 @@ void createMainFBO(int width, int height) {
     if (glstate->texture.active != 0)
         gles_glActiveTexture(GL_TEXTURE0);
     if (glstate->texture.client != 0 && gles_glClientActiveTexture)
-        gles_glClientActiveTexture(GL_TEXTURE0);
+        gl4es_glClientActiveTexture(GL_TEXTURE0);
         
     glstate->fbo.mainfbo_width = width;
     glstate->fbo.mainfbo_height = height;
@@ -1292,7 +1292,7 @@ void createMainFBO(int width, int height) {
     if (glstate->texture.active != 0)
         gles_glActiveTexture(GL_TEXTURE0 + glstate->texture.active);
     if (glstate->texture.client != 0 && gles_glClientActiveTexture)
-        gles_glClientActiveTexture(GL_TEXTURE0 + glstate->texture.client);
+        gl4es_glClientActiveTexture(GL_TEXTURE0 + glstate->texture.client);
     GLuint current_rb = glstate->fbo.current_rb->renderbuffer;
     gles_glBindRenderbuffer(GL_RENDERBUFFER, current_rb);
     // Final check, and bind the fbo for future use
