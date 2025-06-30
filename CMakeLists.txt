@@ -18,7 +18,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_SOURCE_DIR}/include )
 
-set(C_SRC_FILES
+add_library(${CMAKE_PROJECT_NAME} SHARED
         src/gl/string_utils.cpp
         src/gl/cJSON.cpp
         src/gl/config.cpp
@@ -96,19 +96,12 @@ set(C_SRC_FILES
         src/gl/vgpu/load.cpp
         src/gl/vgpu/pack.cpp
         src/gl/samplers.cpp
-        )
-
-set(CPP_SRC_FILES
         src/gl/arbconverter.cpp
         src/glsl/glsl_for_es.cpp
         src/gl/getter.cpp
         )
 
-set(SRC_FILES ${CPP_SRC_FILES} ${C_SRC_FILES})
-
 find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/)
-
-add_library(ng_gl4es SHARED ${SRC_FILES})
 
 target_link_libraries(ng_gl4es
         ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/libglslang.a
