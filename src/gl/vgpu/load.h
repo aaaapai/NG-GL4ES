@@ -3,6 +3,10 @@
 
 #define GLESAPI_P extern
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 GLESAPI_P int loaded;
 
 GLESAPI_P void load_all(void);
@@ -383,3 +387,7 @@ GLESAPI_P PTR_glGetSamplerParameterIuiv gles_glGetSamplerParameterIuiv; // = (PT
 GLESAPI_P PTR_glTexBuffer gles_glTexBuffer; // = (PTR_glTexBuffer)load("glTexBuffer");
 GLESAPI_P PTR_glTexBufferRange gles_glTexBufferRange; // = (PTR_glTexBufferRange)load("glTexBufferRange");
 GLESAPI_P PTR_glTexStorage3DMultisample gles_glTexStorage3DMultisample; // = (PTR_glTexStorage3DMultisample)load("glTexStorage3DMultisample");
+
+#ifdef __cplusplus
+}
+#endif
