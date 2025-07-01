@@ -667,13 +667,13 @@ extern "C" {
 /* GLAPI void */    EX(glVertexAttrib3fv);    /* (GLuint index, const GLfloat *v); */
 /* GLAPI void */    EX(glVertexAttrib3s);    /* (GLuint index, GLshort x, GLshort y, GLshort z); */
 /* GLAPI void */    EX(glVertexAttrib3sv);    /* (GLuint index, const GLshort *v); */
-/* GLAPI void */    EX(glVertexAttrib4Nbv);    /* (GLuint index, const GLbyte *v); */
-/* GLAPI void */    EX(glVertexAttrib4Niv);    /* (GLuint index, const GLint *v); */
-/* GLAPI void */    EX(glVertexAttrib4Nsv);    /* (GLuint index, const GLshort *v); */
-/* GLAPI void */    EX(glVertexAttrib4Nub);    /* (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); */
-/* GLAPI void */    EX(glVertexAttrib4Nubv);    /* (GLuint index, const GLubyte *v); */
-/* GLAPI void */    EX(glVertexAttrib4Nuiv);    /* (GLuint index, const GLuint *v); */
-/* GLAPI void */    EX(glVertexAttrib4Nusv);    /* (GLuint index, const GLushort *v); */
+///* GLAPI void */    EX(glVertexAttrib4Nbv);    /* (GLuint index, const GLbyte *v); */
+///* GLAPI void */    EX(glVertexAttrib4Niv);    /* (GLuint index, const GLint *v); */
+///* GLAPI void */    EX(glVertexAttrib4Nsv);    /* (GLuint index, const GLshort *v); */
+//* GLAPI void */    EX(glVertexAttrib4Nub);    /* (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w); */
+//* GLAPI void */    EX(glVertexAttrib4Nubv);    /* (GLuint index, const GLubyte *v); */
+//* GLAPI void */    EX(glVertexAttrib4Nuiv);    /* (GLuint index, const GLuint *v); */
+//* GLAPI void */    EX(glVertexAttrib4Nusv);    /* (GLuint index, const GLushort *v); */
 /* GLAPI void */    EX(glVertexAttrib4bv);    /* (GLuint index, const GLbyte *v); */
 /* GLAPI void */    EX(glVertexAttrib4d);    /* (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w); */
 /* GLAPI void */    EX(glVertexAttrib4dv);    /* (GLuint index, const GLdouble *v); */
