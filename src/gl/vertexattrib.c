@@ -396,7 +396,7 @@ void APIENTRY_GL4ES gl4es_glVertexAttribDivisor(GLuint index, GLuint divisor) {
 }
 
 
-VISIBLE void glVertexAttribI1i(GLuint index, GLint x) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI1i(GLuint index, GLint x) {
     DBG(SHUT_LOGD("glVertexAttribI1i(%d, %d)\n", index, x);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -406,7 +406,7 @@ VISIBLE void glVertexAttribI1i(GLuint index, GLint x) {
     glstate->vavalue[index][0] = (GLfloat)x;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI2i(GLuint index, GLint x, GLint y) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI2i(GLuint index, GLint x, GLint y) {
     DBG(SHUT_LOGD("glVertexAttribI2i(%d, %d, %d)\n", index, x, y);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -417,7 +417,7 @@ VISIBLE void glVertexAttribI2i(GLuint index, GLint x, GLint y) {
     glstate->vavalue[index][1] = (GLfloat)y;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI3i(GLuint index, GLint x, GLint y, GLint z) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI3i(GLuint index, GLint x, GLint y, GLint z) {
     DBG(SHUT_LOGD("glVertexAttribI3i(%d, %d, %d, %d)\n", index, x, y, z);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -429,7 +429,7 @@ VISIBLE void glVertexAttribI3i(GLuint index, GLint x, GLint y, GLint z) {
     glstate->vavalue[index][2] = (GLfloat)z;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w) {
     DBG(SHUT_LOGD("glVertexAttribI4i(%d, %d, %d, %d, %d)\n", index, x, y, z, w);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -442,7 +442,7 @@ VISIBLE void glVertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w)
     glstate->vavalue[index][3] = (GLfloat)w;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI1ui(GLuint index, GLuint x) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI1ui(GLuint index, GLuint x) {
     DBG(SHUT_LOGD("glVertexAttribI1ui(%d, %u)\n", index, x);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -452,7 +452,7 @@ VISIBLE void glVertexAttribI1ui(GLuint index, GLuint x) {
     glstate->vavalue[index][0] = (GLfloat)x;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI2ui(GLuint index, GLuint x, GLuint y) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI2ui(GLuint index, GLuint x, GLuint y) {
     DBG(SHUT_LOGD("glVertexAttribI2ui(%d, %u, %u)\n", index, x, y);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -463,7 +463,7 @@ VISIBLE void glVertexAttribI2ui(GLuint index, GLuint x, GLuint y) {
     glstate->vavalue[index][1] = (GLfloat)y;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI3ui(GLuint index, GLuint x, GLuint y, GLuint z) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI3ui(GLuint index, GLuint x, GLuint y, GLuint z) {
     DBG(SHUT_LOGD("glVertexAttribI3ui(%d, %u, %u, %u)\n", index, x, y, z);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -475,7 +475,7 @@ VISIBLE void glVertexAttribI3ui(GLuint index, GLuint x, GLuint y, GLuint z) {
     glstate->vavalue[index][2] = (GLfloat)z;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w) {
     DBG(SHUT_LOGD("glVertexAttribI4ui(%d, %u, %u, %u, %u)\n", index, x, y, z, w);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -488,7 +488,7 @@ VISIBLE void glVertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLui
     glstate->vavalue[index][3] = (GLfloat)w;
     noerrorShim();
 }
-VISIBLE void glVertexAttribI1iv(GLuint index, const GLint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI1iv(GLuint index, const GLint* v) {
     DBG(SHUT_LOGD("glVertexAttribI1iv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -498,7 +498,7 @@ VISIBLE void glVertexAttribI1iv(GLuint index, const GLint* v) {
     glstate->vavalue[index][0] = (GLfloat)v[0];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI2iv(GLuint index, const GLint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI2iv(GLuint index, const GLint* v) {
     DBG(SHUT_LOGD("glVertexAttribI2iv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -509,7 +509,7 @@ VISIBLE void glVertexAttribI2iv(GLuint index, const GLint* v) {
     glstate->vavalue[index][1] = (GLfloat)v[1];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI3iv(GLuint index, const GLint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI3iv(GLuint index, const GLint* v) {
     DBG(SHUT_LOGD("glVertexAttribI3iv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -521,7 +521,7 @@ VISIBLE void glVertexAttribI3iv(GLuint index, const GLint* v) {
     glstate->vavalue[index][2] = (GLfloat)v[2];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI4iv(GLuint index, const GLint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI4iv(GLuint index, const GLint* v) {
     DBG(SHUT_LOGD("glVertexAttribI4iv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -534,7 +534,7 @@ VISIBLE void glVertexAttribI4iv(GLuint index, const GLint* v) {
     glstate->vavalue[index][3] = (GLfloat)v[3];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI1uiv(GLuint index, const GLuint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI1uiv(GLuint index, const GLuint* v) {
     DBG(SHUT_LOGD("glVertexAttribI1uiv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -544,7 +544,7 @@ VISIBLE void glVertexAttribI1uiv(GLuint index, const GLuint* v) {
     glstate->vavalue[index][0] = (GLfloat)v[0];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI2uiv(GLuint index, const GLuint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI2uiv(GLuint index, const GLuint* v) {
     DBG(SHUT_LOGD("glVertexAttribI2uiv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -555,7 +555,7 @@ VISIBLE void glVertexAttribI2uiv(GLuint index, const GLuint* v) {
     glstate->vavalue[index][1] = (GLfloat)v[1];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI3uiv(GLuint index, const GLuint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI3uiv(GLuint index, const GLuint* v) {
     DBG(SHUT_LOGD("glVertexAttribI3uiv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -567,7 +567,7 @@ VISIBLE void glVertexAttribI3uiv(GLuint index, const GLuint* v) {
     glstate->vavalue[index][2] = (GLfloat)v[2];
     noerrorShim();
 }
-VISIBLE void glVertexAttribI4uiv(GLuint index, const GLuint* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribI4uiv(GLuint index, const GLuint* v) {
     DBG(SHUT_LOGD("glVertexAttribI4uiv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
     if (index < 0 || index >= hardext.maxvattrib) {
@@ -580,7 +580,7 @@ VISIBLE void glVertexAttribI4uiv(GLuint index, const GLuint* v) {
     glstate->vavalue[index][3] = (GLfloat)v[3];
     noerrorShim();
 }
-VISIBLE void glVertexAttribP1ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP1ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
     DBG(SHUT_LOGD("glVertexAttribP1ui(%d, %s, %d, %u)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -598,7 +598,7 @@ VISIBLE void glVertexAttribP1ui(GLuint index, GLenum type, GLboolean normalized,
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP2ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP2ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
     DBG(SHUT_LOGD("glVertexAttribP2ui(%d, %s, %d, %u)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -616,7 +616,7 @@ VISIBLE void glVertexAttribP2ui(GLuint index, GLenum type, GLboolean normalized,
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP3ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP3ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
     DBG(SHUT_LOGD("glVertexAttribP3ui(%d, %s, %d, %u)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -634,7 +634,7 @@ VISIBLE void glVertexAttribP3ui(GLuint index, GLenum type, GLboolean normalized,
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP4ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP4ui(GLuint index, GLenum type, GLboolean normalized, GLuint value) {
     DBG(SHUT_LOGD("glVertexAttribP4ui(%d, %s, %d, %u)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -652,7 +652,7 @@ VISIBLE void glVertexAttribP4ui(GLuint index, GLenum type, GLboolean normalized,
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP1uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP1uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
     DBG(SHUT_LOGD("glVertexAttribP1uiv(%d, %s, %d, %p)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -670,7 +670,7 @@ VISIBLE void glVertexAttribP1uiv(GLuint index, GLenum type, GLboolean normalized
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP2uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP2uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
     DBG(SHUT_LOGD("glVertexAttribP2uiv(%d, %s, %d, %p)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -688,7 +688,7 @@ VISIBLE void glVertexAttribP2uiv(GLuint index, GLenum type, GLboolean normalized
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP3uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP3uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
     DBG(SHUT_LOGD("glVertexAttribP3uiv(%d, %s, %d, %p)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -706,7 +706,7 @@ VISIBLE void glVertexAttribP3uiv(GLuint index, GLenum type, GLboolean normalized
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribP4uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
+void APIENTRY_GL4ES gl4es_glVertexAttribP4uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint* value) {
     DBG(SHUT_LOGD("glVertexAttribP4uiv(%d, %s, %d, %p)\n", index, PrintEnum(type), normalized, value);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -724,7 +724,7 @@ VISIBLE void glVertexAttribP4uiv(GLuint index, GLenum type, GLboolean normalized
     }
     noerrorShim();
 }
-VISIBLE void glVertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer) {
+void APIENTRY_GL4ES gl4es_glVertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer) {
     DBG(SHUT_LOGD("glVertexAttribLPointer(%d, %d, %s, %d, %p)\n", index, size, PrintEnum(type), stride, pointer);)
         FLUSH_BEGINEND;
     if (index >= hardext.maxvattrib) {
@@ -740,7 +740,7 @@ VISIBLE void glVertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsiz
     attrib->normalized = 0;
     noerrorShim();
 }
-VISIBLE void glGetVertexAttribLdv(GLuint index, GLenum pname, GLdouble* params) {
+void APIENTRY_GL4ES gl4es_glGetVertexAttribLdv(GLuint index, GLenum pname, GLdouble* params) {
     DBG(SHUT_LOGD("glGetVertexAttribLdv(%d, %s, %p)\n", index, PrintEnum(pname), params);)
         if (index >= hardext.maxvattrib) {
             errorShim(GL_INVALID_VALUE);
@@ -766,7 +766,7 @@ VISIBLE void glGetVertexAttribLdv(GLuint index, GLenum pname, GLdouble* params) 
     }
     noerrorShim();
 }
-VISIBLE void glGetVertexAttribIiv(GLuint index, GLenum pname, GLint* params) {
+void APIENTRY_GL4ES gl4es_glGetVertexAttribIiv(GLuint index, GLenum pname, GLint* params) {
     DBG(SHUT_LOGD("glGetVertexAttribIiv(%d, %s, %p)\n", index, PrintEnum(pname), params);)
         if (index >= hardext.maxvattrib) {
             errorShim(GL_INVALID_VALUE);
@@ -792,7 +792,7 @@ VISIBLE void glGetVertexAttribIiv(GLuint index, GLenum pname, GLint* params) {
     }
     noerrorShim();
 }
-VISIBLE void glGetVertexAttribIuiv(GLuint index, GLenum pname, GLuint* params) {
+void APIENTRY_GL4ES gl4es_glGetVertexAttribIuiv(GLuint index, GLenum pname, GLuint* params) {
     DBG(SHUT_LOGD("glGetVertexAttribIuiv(%d, %s, %p)\n", index, PrintEnum(pname), params);)
         if (index >= hardext.maxvattrib) {
             errorShim(GL_INVALID_VALUE);
