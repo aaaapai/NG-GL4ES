@@ -26,8 +26,8 @@ KHASH_MAP_IMPL_INT(attribloclist, attribloc_t *);
 KHASH_MAP_IMPL_INT(uniformlist, uniform_t *);
 KHASH_MAP_IMPL_INT(programlist, program_t *);
 
-void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GLchar* name) {
-    DBG(SHUT_LOGD("glBindFragDataLocation(%d, %d, \"%s\")\n", program, colorNumber, name))
+void APIENTRY_GL4ES gl4es_glBindFragDataLocation(GLuint program, GLuint colorNumber, const GLchar* name) {
+    DBG(SHUT_LOGD("gl4es_glBindFragDataLocation(%d, %d, \"%s\")\n", program, colorNumber, name))
     FLUSH_BEGINEND;
     CHECK_PROGRAM(void, program)
     if (glprogram->last_frag) {
