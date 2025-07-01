@@ -757,12 +757,8 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     #define THUNK(suffix) \
     _EX(glVertexAttrib4##suffix##v); \
     _EX(glVertexAttrib4u##suffix##v); \
-    _EX(glVertexAttrib4N##suffix##v); \
-    _EX(glVertexAttrib4Nu##suffix##v);\
     _EXT(glVertexAttrib4##suffix##v); \
     _EXT(glVertexAttrib4u##suffix##v); \
-    _EXT(glVertexAttrib4N##suffix##v); \
-    _EXT(glVertexAttrib4Nu##suffix##v);
     THUNK(b);
     THUNK(s);
     THUNK(i);
@@ -770,9 +766,9 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     _EX(glGetVertexAttribdv);
     _EXT(glGetVertexAttribdv);
     _ARB(glGetVertexAttribdv);
-    _EX(glVertexAttrib4Nub);
-    _EXT(glVertexAttrib4Nub);
-    _ARB(glVertexAttrib4Nub);
+    //_EX(glVertexAttrib4Nub);
+    //_EXT(glVertexAttrib4Nub);
+    //_ARB(glVertexAttrib4Nub);
     // arb version of shader stuffs
     //  GL_ARB_vertex_shader
     _ARB(glVertexAttrib1f);
@@ -787,7 +783,7 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     _ARB(glVertexAttrib4f);
     _ARB(glVertexAttrib4s);
     _ARB(glVertexAttrib4d);
-    _ARB(glVertexAttrib4Nub);
+    //_ARB(glVertexAttrib4Nub);
     _ARB(glVertexAttrib1fv);
     _ARB(glVertexAttrib1sv);
     _ARB(glVertexAttrib1dv);
@@ -805,12 +801,14 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     _ARB(glVertexAttrib4ubv);
     _ARB(glVertexAttrib4usv);
     _ARB(glVertexAttrib4uiv);
+/*
     _ARB(glVertexAttrib4Nbv);
     _ARB(glVertexAttrib4Nsv);
     _ARB(glVertexAttrib4Niv);
     _ARB(glVertexAttrib4Nubv);
     _ARB(glVertexAttrib4Nusv);
     _ARB(glVertexAttrib4Nuiv);
+*/
     _ARB(glVertexAttribPointer);
     _ARB(glEnableVertexAttribArray);
     _ARB(glDisableVertexAttribArray);
