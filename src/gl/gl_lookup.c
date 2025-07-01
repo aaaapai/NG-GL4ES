@@ -485,7 +485,6 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
         _EXT(glFogCoordfv);
         _EXT(glFogCoordPointer);
     }
-    */
 	/*STUB(glEdgeFlagPointerEXT);
     STUB(glIndexPointerEXT);*/
 	
