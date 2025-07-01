@@ -7,6 +7,9 @@
 
 #include "pack.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // GL_VERSION_1_0
 // typedef void GLvoid;
@@ -1030,3 +1033,6 @@
 /* GLAPI void */    EX(glGenVertexArrays);    /* (GLsizei n, GLuint *arrays); */
 /* GLAPI GLboolean */    EX(glIsVertexArray);    /* (GLuint array); */
 
+#ifdef __cplusplus
+}
+#endif
