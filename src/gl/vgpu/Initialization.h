@@ -1,6 +1,10 @@
 #include "pack.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 GLAPI void Initialization_(void);
 
 GLAPI int MaxDrawBuffers;
@@ -13,3 +17,7 @@ GLAPI GLint ClearStencilValue[4];
 GLAPI GLenum Attachs[8];
 GLAPI int DrawBufs_Num;
 GLAPI GLenum DrawBufs[8];
+
+#ifdef __cplusplus
+}
+#endif
