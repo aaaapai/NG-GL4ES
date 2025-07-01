@@ -15,15 +15,63 @@ void glXStub(void *x, ...) {
 }
 void *gl4es_glXGetProcAddress(const char *name) __attribute__((visibility("default")));
 void *gl4es_glXGetProcAddress(const char *name) {
-    void* proc = dlsym(RTLD_DEFAULT, (const char*)name);
 
-    if (!proc) {
-        fprintf(stderr, "Failed to get OpenGL function %s: %s\n", name, dlerror());
-        SHUT_LOGD("[WARNING] Failed to get OpenGL function: %s", (const char*)name);
-        return nullptr;
-    }
+#ifndef NOX11
+    // glX calls
+    _EX(glXChooseVisual);
+    _EX(glXCopyContext);
+    _EX(glXCreateContext);
+    _EX(glXCreateNewContext);
+    _EX(glXCreateContextAttribsARB);
+    _EX(glXDestroyContext);
+    _EX(glXGetConfig);
+    _EX(glXGetCurrentDisplay);
+    _EX(glXGetCurrentDrawable);
+    _EX(glXIsDirect);
+    _EX(glXMakeCurrent);
+    _EX(glXMakeContextCurrent);
+    _EX(glXQueryExtensionsString);
+    _EX(glXQueryServerString);
+    _EX(glXSwapBuffers);
+    _EX(glXSwapIntervalEXT);
+#endif //NOX11
+    MAP("glXSwapIntervalMESA", gl4es_glXSwapInterval);
+    MAP("glXSwapIntervalSGI", gl4es_glXSwapInterval);
+#ifndef NOX11
+    _EX(glXUseXFont);
+    _EX(glXWaitGL);
+    _EX(glXWaitX);
+    _EX(glXGetCurrentContext);
+    _EX(glXQueryExtension);
+    _EX(glXQueryDrawable);
+    _EX(glXQueryVersion);
+    _EX(glXGetClientString);
+    _EX(glXGetFBConfigs);
+    _EX(glXChooseFBConfig);
+    MAP("glXChooseFBConfigSGIX", gl4es_glXChooseFBConfig);
+    _EX(glXGetFBConfigAttrib);
+    _EX(glXQueryContext);
+    _EX(glXGetVisualFromFBConfig);
+    _EX(glXCreateWindow);
+    _EX(glXDestroyWindow);
+    
+    _EX(glXCreatePbuffer);
+    _EX(glXDestroyPbuffer);
+    _EX(glXCreatePixmap);
+    _EX(glXDestroyPixmap);
+    _EX(glXCreateGLXPixmap);
+    _EX(glXDestroyGLXPixmap);
+    STUB(glXGetCurrentReadDrawable);
+    STUB(glXGetSelectedEvent);
+    STUB(glXSelectEvent);
 
-    return proc;
+    _EX(glXCreateContextAttribs);
+    _ARB(glXCreateContextAttribs);
+#endif //NOX11
+    _EX(glXGetProcAddress);
+    _ARB(glXGetProcAddress);
+
+    return gl4es_GetProcAddress(name);
 }
 #ifdef AMIGAOS4
 //AliasExport(void*,aglGetProcAddress,,(const char* name));
