@@ -4,17 +4,17 @@
 #include "skips.h"
 
 // emulation of 'glTexParameteri' (for internal use only)
-void gles_glTexParameteri(glTexParameteri_ARG_EXPAND)
+/*void gles_glTexParameteri(glTexParameteri_ARG_EXPAND)
 {
     LOAD_GLES(glTexParameteri); if (gles_glTexParameteri) return gles_glTexParameteri(target, pname, param);
 
     LOAD_GLES(glTexParameterx);
 
     return gles_glTexParameterx(target, pname, param);
-}
+}*/
 
 // emulation of 'glGetBooleanv' (for internal use only)
-void gles_glGetBooleanv(glGetBooleanv_ARG_EXPAND)
+/*void gles_glGetBooleanv(glGetBooleanv_ARG_EXPAND)
 {
     LOAD_GLES(glGetBooleanv); if (gles_glGetBooleanv) return gles_glGetBooleanv(pname, params);
 
@@ -23,10 +23,10 @@ void gles_glGetBooleanv(glGetBooleanv_ARG_EXPAND)
     GLint result = GL_FALSE;
     gles_glGetIntegerv(pname, &result);
     if (params) *params = (result == GL_TRUE ? GL_TRUE : GL_FALSE);
-}
+}*/
 
 // emulation of 'glIsEnabled' (for internal use only)
-GLboolean gles_glIsEnabled(glIsEnabled_ARG_EXPAND)
+/*GLboolean gles_glIsEnabled(glIsEnabled_ARG_EXPAND)
 {
     LOAD_GLES(glIsEnabled); if (gles_glIsEnabled) return gles_glIsEnabled(cap);
 
@@ -34,7 +34,7 @@ GLboolean gles_glIsEnabled(glIsEnabled_ARG_EXPAND)
 
     gles_glGetBooleanv(cap, &result);
     return result;
-}
+}*/
 
 #ifndef skip_glActiveTexture
 void APIENTRY_GL4ES gl4es_glActiveTexture(GLenum texture) {
@@ -878,7 +878,7 @@ AliasExport(GLint,glGetAttribLocation,,(GLuint program, const GLchar * name));
 #endif
 #ifndef skip_glGetBooleanv
 void APIENTRY_GL4ES gl4es_glGetBooleanv(GLenum pname, GLboolean * params) {
-    void gles_glGetBooleanv(glGetBooleanv_ARG_EXPAND); //LOAD_GLES(glGetBooleanv);
+    LOAD_GLES(glGetBooleanv);
 #ifndef direct_glGetBooleanv
     PUSH_IF_COMPILING(glGetBooleanv)
 #endif
