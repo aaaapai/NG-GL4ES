@@ -40,7 +40,6 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     
     #include "vgpu/packEX.h"
     
-	/*
     // generated gles wrappers
     #include "glesfuncs.inc"
 
