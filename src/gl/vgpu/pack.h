@@ -5,6 +5,10 @@
 
 #define GLAPI extern
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* glcorearb.h is for use with OpenGL core profile implementations.
 ** It should should be placed in the same directory as gl.h and
@@ -1053,3 +1057,6 @@ GLAPI void glDeleteVertexArrays (GLsizei n, const GLuint *arrays);
 GLAPI void glGenVertexArrays (GLsizei n, GLuint *arrays);
 GLAPI GLboolean glIsVertexArray (GLuint array);
 
+#ifdef __cplusplus
+}
+#endif
