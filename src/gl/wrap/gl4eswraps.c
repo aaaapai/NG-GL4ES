@@ -738,13 +738,14 @@ AliasExport(GLvoid,glVertexAttrib4ubv,ARB,(GLuint index, const GLubyte *v));
 AliasExport(GLvoid,glVertexAttrib4usv,ARB,(GLuint index, const GLushort *v));
 AliasExport(GLvoid,glVertexAttrib4uiv,ARB,(GLuint index, const GLuint *v));
 
+/*
 AliasExport(GLvoid,glVertexAttrib4Nbv,ARB,(GLuint index, const GLbyte *v));
 AliasExport(GLvoid,glVertexAttrib4Nsv,ARB,(GLuint index, const GLshort *v));
 AliasExport(GLvoid,glVertexAttrib4Niv,ARB,(GLuint index, const GLint *v));
 AliasExport(GLvoid,glVertexAttrib4Nubv,ARB,(GLuint index, const GLubyte *v));
 AliasExport(GLvoid,glVertexAttrib4Nusv,ARB,(GLuint index, const GLushort *v));
 AliasExport(GLvoid,glVertexAttrib4Nuiv,ARB,(GLuint index, const GLuint *v));
-
+*/
 
 //Direct wrapper
 //AliasExport_D(void,glClearDepth,,(GLdouble depth));
