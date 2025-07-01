@@ -70,7 +70,7 @@ void APIENTRY_GL4ES gl4es_glStencilFunc(GLenum func, GLint ref, GLuint mask) {
     glstate->stencil.f_mask[0] = glstate->stencil.f_mask[1] = mask;
     gles_glStencilFunc(func, ref, mask);
 }
-AliasExport(void,glStencilFunc,,(GLenum func, GLint ref, GLuint mask));
+//AliasExport(void,glStencilFunc,,(GLenum func, GLint ref, GLuint mask));
 
 void APIENTRY_GL4ES gl4es_glStencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) {
     if(face!=GL_FRONT && face!=GL_BACK && face!=GL_FRONT_AND_BACK) {
