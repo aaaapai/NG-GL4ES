@@ -28,6 +28,10 @@
 
 #include "../gl4es.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void _math_init_eval( void );
 
 
@@ -99,5 +103,9 @@ _math_de_casteljau_surf(GLfloat *cn, GLfloat *out, GLfloat *du, GLfloat *dv,
 			GLfloat u, GLfloat v, GLuint dim,
 			GLuint uorder, GLuint vorder);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
