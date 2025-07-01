@@ -438,6 +438,7 @@ void APIENTRY_GL4ES gl4es_glReleaseShaderCompiler(void) {
 
 // ========== GL_ARB_shader_objects ==============
 
+/*
 AliasExport(GLuint,glCreateShader,,(GLenum shaderType));
 AliasExport(void,glDeleteShader,,(GLuint shader));
 AliasExport(void,glCompileShader,,(GLuint shader));
@@ -449,7 +450,7 @@ AliasExport(void,glGetShaderiv,,(GLuint shader, GLenum pname, GLint *params));
 AliasExport(void,glGetShaderPrecisionFormat,,(GLenum shaderType, GLenum precisionType, GLint *range, GLint *precision));
 AliasExport(void,glShaderBinary,,(GLsizei count, const GLuint *shaders, GLenum binaryFormat, const void *binary, GLsizei length));
 AliasExport_V(void,glReleaseShaderCompiler);
-
+*/
 
 GLhandleARB APIENTRY_GL4ES gl4es_glCreateShaderObject(GLenum shaderType) {
     return gl4es_glCreateShader(shaderType);
