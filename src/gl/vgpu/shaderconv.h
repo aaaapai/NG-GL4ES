@@ -7,6 +7,10 @@
 
 #include "../shader.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void set_uniforms_default_value(GLuint program, uniforms_declarations uniformVector, int uniformCount);
 char* process_uniform_declarations(char* glslCode, uniforms_declarations uniformVector, int* uniformCount);
 char* ConvertShaderVgpu(struct shader_s* shader_source);
@@ -45,5 +49,9 @@ char* ProcessSwitchCases(char* source, int* length);
 
 
 char* GetOperandFromOperator(char* source, int operatorIndex, int rightOperand, int * limit);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //UNTITLED_SHADERCONV_H
