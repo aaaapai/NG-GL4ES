@@ -1076,41 +1076,6 @@ void glVertexAttrib3sv (GLuint index, const GLshort *v){    _LOAD_GLES
 
 }
 
-void glVertexAttrib4Nbv (GLuint index, const GLbyte *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nbv (index, v);
-
-}
-
-void glVertexAttrib4Niv (GLuint index, const GLint *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Niv (index, v);
-
-}
-
-void glVertexAttrib4Nsv (GLuint index, const GLshort *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nsv (index, v);
-
-}
-
-void glVertexAttrib4Nub (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nub (index, x, y, z, w);
-
-}
-
-void glVertexAttrib4Nubv (GLuint index, const GLubyte *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nubv (index, v);
-
-}
-
-void glVertexAttrib4Nuiv (GLuint index, const GLuint *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nuiv (index, v);
-
-}
-
-void glVertexAttrib4Nusv (GLuint index, const GLushort *v){    _LOAD_GLES    
- gl4es_glVertexAttrib4Nusv (index, v);
-
-}
-
 void glVertexAttrib4bv (GLuint index, const GLbyte *v){    _LOAD_GLES    
  gl4es_glVertexAttrib4bv (index, v);
 
