@@ -759,9 +759,6 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     _EX(glVertexAttrib4u##suffix##v); \
     _EXT(glVertexAttrib4##suffix##v); \
     _EXT(glVertexAttrib4u##suffix##v); \
-    THUNK(b);
-    THUNK(s);
-    THUNK(i);
     #undef THUNK
     _EX(glGetVertexAttribdv);
     _EXT(glGetVertexAttribdv);
