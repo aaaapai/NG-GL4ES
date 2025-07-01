@@ -6,6 +6,9 @@
 //int load_all(void);
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // GL_ES_VERSION_2_0
 PTR_glActiveTexture gles_glActiveTexture; // = (PTR_glActiveTexture)load("glActiveTexture");
@@ -375,3 +378,7 @@ PTR_glGetSamplerParameterIuiv gles_glGetSamplerParameterIuiv; // = (PTR_glGetSam
 PTR_glTexBuffer gles_glTexBuffer; // = (PTR_glTexBuffer)load("glTexBuffer");
 PTR_glTexBufferRange gles_glTexBufferRange; // = (PTR_glTexBufferRange)load("glTexBufferRange");
 PTR_glTexStorage3DMultisample gles_glTexStorage3DMultisample; // = (PTR_glTexStorage3DMultisample)load("glTexStorage3DMultisample");
+
+#ifdef __cplusplus
+}
+#endif
