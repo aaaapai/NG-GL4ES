@@ -173,4 +173,4 @@ void APIENTRY_GL4ES gl4es_glClearStencil(GLint s) {
     errorGL();
     gles_glClearStencil(s);
 }
-AliasExport(void,glClearStencil,,(GLint s));
+//AliasExport(void,glClearStencil,,(GLint s));
