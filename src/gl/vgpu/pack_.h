@@ -5,7 +5,9 @@
 
 #define GLAPI extern
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 
@@ -330,3 +332,6 @@ GLAPI void gl4es_glDeleteVertexArrays (GLsizei n, const GLuint *arrays);
 GLAPI void gl4es_glGenVertexArrays (GLsizei n, GLuint *arrays);
 GLAPI GLboolean gl4es_glIsVertexArray (GLuint array);
 
+#ifdef __cplusplus
+}
+#endif
