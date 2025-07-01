@@ -628,12 +628,6 @@ int gl4es_commonGet(GLenum pname, GLfloat *params) {
                 errorShim(GL_INVALID_ENUM);
             }
             break;
-        case GL_MAX_COLOR_ATTACHMENTS:
-            if(hardext.fbo)
-                *params=hardext.maxcolorattach;
-            else
-                *params=0;
-            break;
         case 0x8CDF:
             if(hardext.fbo){
             	LOAD_GLES_(glGetIntegerv);
@@ -653,7 +647,7 @@ int gl4es_commonGet(GLenum pname, GLfloat *params) {
             	gles_glGetIntegerv(0x8824, &a1);
             	*params = (float)a1;
             }
-            break
+            break;
         case GL_MATRIX_MODE:
             *params=glstate->matrix_mode;
             break;
