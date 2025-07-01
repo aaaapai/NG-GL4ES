@@ -85,16 +85,16 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         src/gl/wrap/gl4eswraps.c
         src/gl/wrap/gles.c
         src/gl/wrap/glstub.c
-        src/gl/math/matheval.cpp
+        src/gl/math/matheval.c
         src/glx/hardext.c
         src/glx/glx.c
         src/glx/lookup.c
         src/glx/gbm.c
         src/glx/streaming.c
         src/gl/vgpu/shaderconv.c
-        src/gl/vgpu/Initialization.cpp
-        src/gl/vgpu/load.cpp
-        src/gl/vgpu/pack.cpp
+        src/gl/vgpu/Initialization.c
+        src/gl/vgpu/load.c
+        src/gl/vgpu/pack.c
         src/gl/samplers.c
         src/gl/arbconverter.cpp
         src/glsl/glsl_for_es.cpp
