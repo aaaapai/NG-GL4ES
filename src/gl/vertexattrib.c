@@ -14,7 +14,7 @@
 #define DBG(a)
 #endif
 
-void VISIBLE glVertexAttribL1d(GLuint index, GLdouble x) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL1d(GLuint index, GLdouble x) {
     DBG(SHUT_LOGD("glVertexAttribL1d(%d, %f)\n", index, x);)
         FLUSH_BEGINEND;
 
@@ -32,7 +32,7 @@ void VISIBLE glVertexAttribL1d(GLuint index, GLdouble x) {
     memcpy(glstate->vavalue[index], v, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL2d(GLuint index, GLdouble x, GLdouble y) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL2d(GLuint index, GLdouble x, GLdouble y) {
     DBG(SHUT_LOGD("glVertexAttribL2d(%d, %f, %f)\n", index, x, y);)
         FLUSH_BEGINEND;
 
@@ -50,7 +50,7 @@ void VISIBLE glVertexAttribL2d(GLuint index, GLdouble x, GLdouble y) {
     memcpy(glstate->vavalue[index], v, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL3d(GLuint index, GLdouble x, GLdouble y, GLdouble z) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL3d(GLuint index, GLdouble x, GLdouble y, GLdouble z) {
     DBG(SHUT_LOGD("glVertexAttribL3d(%d, %f, %f, %f)\n", index, x, y, z);)
         FLUSH_BEGINEND;
 
@@ -68,7 +68,7 @@ void VISIBLE glVertexAttribL3d(GLuint index, GLdouble x, GLdouble y, GLdouble z)
     memcpy(glstate->vavalue[index], v, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL4d(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL4d(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w) {
     DBG(SHUT_LOGD("glVertexAttribL4d(%d, %f, %f, %f, %f)\n", index, x, y, z, w);)
         FLUSH_BEGINEND;
 
@@ -86,7 +86,7 @@ void VISIBLE glVertexAttribL4d(GLuint index, GLdouble x, GLdouble y, GLdouble z,
     memcpy(glstate->vavalue[index], v, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL1dv(GLuint index, const GLdouble* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL1dv(GLuint index, const GLdouble* v) {
     DBG(SHUT_LOGD("glVertexAttribL1dv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
 
@@ -104,7 +104,7 @@ void VISIBLE glVertexAttribL1dv(GLuint index, const GLdouble* v) {
     memcpy(glstate->vavalue[index], value, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL2dv(GLuint index, const GLdouble* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL2dv(GLuint index, const GLdouble* v) {
     DBG(SHUT_LOGD("glVertexAttribL2dv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
 
@@ -122,7 +122,7 @@ void VISIBLE glVertexAttribL2dv(GLuint index, const GLdouble* v) {
     memcpy(glstate->vavalue[index], value, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL3dv(GLuint index, const GLdouble* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL3dv(GLuint index, const GLdouble* v) {
     DBG(SHUT_LOGD("glVertexAttribL3dv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
 
@@ -140,7 +140,7 @@ void VISIBLE glVertexAttribL3dv(GLuint index, const GLdouble* v) {
     memcpy(glstate->vavalue[index], value, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glVertexAttribL4dv(GLuint index, const GLdouble* v) {
+void APIENTRY_GL4ES gl4es_glVertexAttribL4dv(GLuint index, const GLdouble* v) {
     DBG(SHUT_LOGD("glVertexAttribL4dv(%d, %p)\n", index, v);)
         FLUSH_BEGINEND;
 
@@ -158,7 +158,7 @@ void VISIBLE glVertexAttribL4dv(GLuint index, const GLdouble* v) {
     memcpy(glstate->vavalue[index], value, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glBindVertexBuffers(GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizeiptr* strides) {
+void APIENTRY_GL4ES gl4es_glBindVertexBuffers(GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizeiptr* strides) {
     glstate_t* glstate = glstate;
     glvao_t* vao = glstate->vao;
 
@@ -190,7 +190,7 @@ void VISIBLE glBindVertexBuffers(GLuint first, GLsizei count, const GLuint* buff
 
 
 
-void VISIBLE glBindVertexBuffer(GLuint bindingIndex, GLuint buffer, GLintptr offset, GLsizeiptr stride) {
+void APIENTRY_GL4ES gl4es_glBindVertexBuffer(GLuint bindingIndex, GLuint buffer, GLintptr offset, GLsizeiptr stride) {
     glstate_t* glstate = glstate;
 
     khash_t(buff)* buffers = glstate->buffers;

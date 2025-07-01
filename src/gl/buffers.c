@@ -134,8 +134,8 @@ void APIENTRY_GL4ES gl4es_glGenBuffers(GLsizei n, GLuint * buffers) {
     }
 }
 
-void VISIBLE glBindBufferBase(GLenum target, GLuint index, GLuint buffer) {
-    DBG(SHUT_LOGD("glBindBufferBase(%s, %u, %u)\n", PrintEnum(target), index, buffer);)
+void APIENTRY_GL4ES gl4es_glBindBufferBase(GLenum target, GLuint index, GLuint buffer) {
+    DBG(SHUT_LOGD("gl4es_glBindBufferBase(%s, %u, %u)\n", PrintEnum(target), index, buffer);)
         FLUSH_BEGINEND;
 
     // Check if the target is valid
@@ -183,7 +183,7 @@ void VISIBLE glBindBufferBase(GLenum target, GLuint index, GLuint buffer) {
     noerrorShim();
 }
 
-void VISIBLE glBindBuffersRange(GLenum target, GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizeiptr* sizes) {
+void APIENTRY_GL4ES glBindBuffersRange(GLenum target, GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizeiptr* sizes) {
     DBG(SHUT_LOGD("glBindBuffersRange(%s, %u, %d, %p, %p, %p)\n", PrintEnum(target), first, count, buffers, offsets, sizes);)
         FLUSH_BEGINEND;
 
@@ -295,8 +295,8 @@ void VISIBLE glBindBuffersBase(GLenum target, GLuint first, GLsizei count, const
 }
 
 
-void VISIBLE glBindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size) {
-    DBG(SHUT_LOGD("glBindBufferRange(%s, %u, %u, %ld, %ld)\n", PrintEnum(target), index, buffer, offset, size);)
+void APIENTRY_GL4ES gl4es_glBindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size) {
+    DBG(SHUT_LOGD("gl4es_glBindBufferRange(%s, %u, %u, %ld, %ld)\n", PrintEnum(target), index, buffer, offset, size);)
         FLUSH_BEGINEND;
 
     // Check if the target is valid
