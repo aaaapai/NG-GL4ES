@@ -6,8 +6,8 @@
 #include "Initialization.h"
 
 int loaded = 0;
-const char *LIB_GLES_NAME = getenv("LIBGL_GLES");
-const char *LIB_EGL_NAME = getenv("LIBGL_EGL");
+const char *LIB_GLES_NAME = "libGLESv3.so";
+const char *LIB_EGL_NAME = "libEGL.so";
 
 void load_all(void){
 	
@@ -20,7 +20,7 @@ void load_all(void){
 	char* gles_ = getenv("LIBGL_GLES");
 	int flags = RTLD_LOCAL | RTLD_NOW;
 	
-	libGL = dlopen(LIB_GLES_NAME, flags);
+	libGL = dlopen(gles_, flags);
 	/*if(libGL == nullptr)
 		libGL = dlopen("libGLESv2.so", flags);
 	*/
