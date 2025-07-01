@@ -1515,10 +1515,10 @@ void APIENTRY_GL4ES gl4es_glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX
 #endif
 }
 
-/*VISIBLE void glReadBuffer(GLenum src) {
-    LOAD_GLES3(glReadBuffer);
-    //glReadBuffer(src);
-}*/
+void APIENTRY_GL4ES gl4es_glReadBuffer(GLenum src) {
+    LOAD_GLES2_(glReadBuffer);
+    gles_glReadBuffer(src);
+}
 
 GLuint gl4es_getCurrentFBO() {
   return (glstate->fbo.current_fb->id)?glstate->fbo.current_fb->id:glstate->fbo.mainfbo_fbo;
