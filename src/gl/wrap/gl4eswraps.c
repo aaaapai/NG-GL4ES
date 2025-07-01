@@ -707,7 +707,6 @@ void APIENTRY_GL4ES gl4es_glVertexAttrib4Nub(GLuint index, GLubyte v0, GLubyte v
 
 // ============= GL_ARB_vertex_shader =================
 
-/*
 AliasExport(GLvoid,glVertexAttrib1f,ARB,(GLuint index, GLfloat v0));
 AliasExport(GLvoid,glVertexAttrib1s,ARB,(GLuint index, GLshort v0));
 AliasExport_D_1(GLvoid,glVertexAttrib1d,ARB,(GLuint index, GLdouble v0));
@@ -745,7 +744,6 @@ AliasExport(GLvoid,glVertexAttrib4Niv,ARB,(GLuint index, const GLint *v));
 AliasExport(GLvoid,glVertexAttrib4Nubv,ARB,(GLuint index, const GLubyte *v));
 AliasExport(GLvoid,glVertexAttrib4Nusv,ARB,(GLuint index, const GLushort *v));
 AliasExport(GLvoid,glVertexAttrib4Nuiv,ARB,(GLuint index, const GLuint *v));
-*/
 
 
 //Direct wrapper
