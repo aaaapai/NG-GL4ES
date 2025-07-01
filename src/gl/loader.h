@@ -103,7 +103,6 @@ static void* dlsym(void* __restrict handle, const char* __restrict symbol)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "vgpu/load.h"
 
 #include "../glx/hardext.h"
 extern void* (APIENTRY_GL4ES *gles_getProcAddress)(const char *name);
