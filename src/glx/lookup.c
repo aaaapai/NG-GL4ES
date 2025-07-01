@@ -71,7 +71,17 @@ void *gl4es_glXGetProcAddress(const char *name) {
     _EX(glXGetProcAddress);
     _ARB(glXGetProcAddress);
 
-    return gl4es_GetProcAddress(name);
+    gl4es_GetProcAddress(name);
+
+    void* proc = dlsym(RTLD_DEFAULT, (const char*)name);
+
+    if (!proc) {
+        fprintf(stderr, "Failed to get OpenGL function %s: %s\n", name, dlerror());
+        SHUT_LOGD("[WARNING] Failed to get OpenGL function: %s", (const char*)name);
+        return nullptr;
+    }
+
+    return proc;
 }
 #ifdef AMIGAOS4
 //AliasExport(void*,aglGetProcAddress,,(const char* name));
