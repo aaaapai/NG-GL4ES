@@ -1,10 +1,13 @@
-#include "arbconverter.h"
 
 #include <cstddef>
 
 #include <cstring>
 #include <string_view>
 #include <memory>
+
+extern "C" {
+
+#include "arbconverter.h"
 
 #include "arbgenerator.h"
 #include "arbhelper.h"
@@ -348,4 +351,6 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 	
 	freeStatus(&curStatus);
 	return curStatus.outputString;
+}
+
 }
