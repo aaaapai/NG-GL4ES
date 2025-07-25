@@ -10,6 +10,10 @@
 #include "vgpu/shaderconv.h"
 #include "../glsl/glsl_for_es.h"
 
+#include "pack/shaderconv.h"
+#include "pack/shader.h"
+#include "pack/printf_def.h"
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
