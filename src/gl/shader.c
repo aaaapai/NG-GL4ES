@@ -210,6 +210,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             DBG(SHUT_LOGD("%s", glshader->source))
             if(glsl_version < 140 || globals4es.esversion < 300) {
                 glshader->converted = strdup(ConvertShaderConditionally(glshader));
+		glshader->converted = ConvertShader(glshader->converted, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need);
                 glshader->is_converted_essl_320 = 0;
             }
             else {
@@ -219,6 +220,14 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             }
             DBG(SHUT_LOGD("\n[INFO] [Shader] Converted Shader source: \n%s", glshader->converted))
         }
+
+	add_marker(&glshader->converted);
+        // ======== Handling the first half of an implicit type conversion.
+    	num_add_f(&glshader->converted);
+
+	shader_conv_(&glshader->source, &glshader->converted);
+
+
 		// send source to GLES2 hardware if any
         gles_glShaderSource(shader, 1, (const GLchar * const*)((glshader->converted)?(&glshader->converted):(&glshader->source)), NULL);
         errorGL();
@@ -272,8 +281,9 @@ void redoShader(GLuint shader, shaderconv_need_t *need) {
     // test, if no changes, no need to reconvert & recompile...
     if (memcmp(&glshader->need, need, sizeof(shaderconv_need_t))==0)
         return;
-    free(glshader->converted);
+    //free(glshader->converted);
     memcpy(&glshader->need, need, sizeof(shaderconv_need_t));
+/*
 	if(is_direct_shader(glshader->source))
 		glshader->converted = strdup(glshader->source);
     else {
@@ -295,6 +305,7 @@ void redoShader(GLuint shader, shaderconv_need_t *need) {
     gles_glShaderSource(shader, 1, (const GLchar * const*)((glshader->converted)?(&glshader->converted):(&glshader->source)), NULL);
     // recompile...
     gl4es_glCompileShader(glshader->id);
+*/
 }
 
 void APIENTRY_GL4ES gl4es_glGetShaderSource(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source) {
