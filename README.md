@@ -1,15 +1,15 @@
 Krypton Wrapper
 ====
 
-> [!WARNING]
+> [!NOTE]
 > 
-> This project is no longer maintained.
+> This project may be no longer maintained.
 
 > [!NOTE]
 > 
 > The latest version:
 > 
-> **Release 0.1.0**
+> **Release 0.3.0**
 >
 > See [Releases](https://github.com/BZLZHH/NG-GL4ES/releases)
 

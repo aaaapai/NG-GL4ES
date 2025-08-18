@@ -168,6 +168,7 @@ extern "C"
                    "GL_ARB_explicit_attrib_location "
                    //"GL_ARB_multi_bind "
                    "GL_ARB_indirect_parameters "
+                   "GL_ARB_draw_indirect "
                    //"GL_ARB_separate_shader_objects "
                    //                "GL_EXT_blend_logic_op "
             );

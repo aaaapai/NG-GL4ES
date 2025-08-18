@@ -232,6 +232,7 @@ typedef struct {
     glbuffer_t* write;
     glbuffer_t* uniform;
     glbuffer_t* textureBuffer;
+    glbuffer_t* indirect;
 } glvao_t;
 
 void VaoSharedClear(glvao_t* vao);

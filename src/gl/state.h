@@ -319,6 +319,7 @@ typedef struct {
     GLuint texture;
     GLuint pack;
     GLuint unpack;
+    GLuint indirect;
 } bind_buffers_t;
 
 #endif // _GL4ES_STATE_H_
