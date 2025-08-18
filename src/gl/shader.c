@@ -149,9 +149,7 @@ void APIENTRY_GL4ES gl4es_glCompileShader(GLuint shader) {
 
 bool can_run_essl3(int esversion, const char *glsl) {
     int glsl_version = 0;
-    if (strncmp(glsl, "#version 100", 12) == 0) {
-        return true;
-    } else if (strncmp(glsl, "#version 300 es", 15) == 0) {
+    if (strncmp(glsl, "#version 300 es", 15) == 0) {
         return true;
     } else if (strncmp(glsl, "#version 310 es", 15) == 0) {
         glsl_version = 310;
@@ -208,11 +206,10 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             int glsl_version = getGLSLVersion(glshader->source);
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
             DBG(SHUT_LOGD("%s", glshader->source))
-            if(glsl_version < 140 || globals4es.esversion < 300) {
+            if(globals4es.esversion < 300) {
                 glshader->converted = strdup(ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 0;
-            }
-            else {
+            } else {
                 int returnCode = 0; // TODO: handle returnCode
                 char* result = GLSLtoGLSLES_c(glshader->source, glshader->type, globals4es.esversion, glsl_version, &returnCode);
                 glshader->converted = strdup(result!=NULL?process_uniform_declarations(result, glshader->uniforms_declarations, &glshader->uniforms_declarations_count):ConvertShaderConditionally(glshader));
