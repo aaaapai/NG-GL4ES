@@ -660,6 +660,29 @@ vec2 mg_textureQueryLod(sampler2D tex, vec2 uv) {
     glsl.insert(insertPos, "\n" + textureQueryLodImpl + "\n");
 }
 
+static void inject_image2D_declarations(std::string& glsl) {
+    const std::regex defRegex(R"(layout\s*\(\s*rgba16f\s*\)\s+writeonly\s+restrict\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_one(R"(layout\s*\(\s*rgba8f\s*\)\s+writeonly\s+restrict\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_two(R"(layout\s*\(\s*rgba16f\s*\)\s+writeonly\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_three(R"(layout\s*\(\s*rgba16f\s*\)\s+restrict\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_four(R"(layout\s*\(\s*rgba8f\s*\)\s+writeonly\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_five(R"(layout\s*\(\s*rgba8f\s*\)\s+restrict\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+    const std::regex defRegex_six(R"(layout\s*\(\s*r32f\s*\)\s+restrict\s+uniform\s+image2D\s*;)", std::regex::ECMAScript);
+
+    if (glsl.find("uniform image2D") == std::string::npos) {
+        return;
+    }
+
+    if (std::regex_search(glsl, defRegex) && std::regex_search(glsl, defRegex_one) && std::regex_search(glsl, defRegex_two) && std::regex_search(glsl, defRegex_three) && std::regex_search(glsl, defRegex_four) && std::regex_search(glsl, defRegex_five)) {
+        return;
+    } else {
+        replace_all(glsl, "restrict uniform image2D", "layout (r32f) restrict uniform image2D");
+        replace_all(glsl, "writeonly restrict uniform image2D", "layout (rgba16f) writeonly restrict uniform image2D");
+        replace_all(glsl, "writeonly uniform image2D", "layout (rgba16f) writeonly uniform image2D");
+    }
+
+}
+
 static void inject_gl_DepthRange(std::string& glsl) {
    const std::regex defRegex(R"(uniform\s+gl_DepthRangeParameters\s+gl_DepthRange\s*;)", std::regex::ECMAScript);
 
