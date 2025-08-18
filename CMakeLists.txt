@@ -142,7 +142,7 @@ else()
 if(ANDROID)
     # Android
     find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/)
-    target_link_libraries(${CMAKE_PROJECT_NAME}
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libGenericCodeGen.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang-default-resource-limits.a
