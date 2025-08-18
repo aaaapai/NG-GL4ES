@@ -209,12 +209,32 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
             DBG(SHUT_LOGD("%s", glshader->source))
             if(globals4es.esversion < 300) {
-                glshader->converted = strdup(ConvertShaderConditionally(glshader));
+                // glshader->converted = strdup(ConvertShaderConditionally(glshader));
+
+				glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need);
+				// ======== add marker
+                add_marker(&glshader->converted);
+                // ======== Handling the first half of an implicit type conversion.
+             	num_add_f(&glshader->converted);
+        
+                //pot = replace_common("0.0 es", "0 es", &glshader->converted, 1);
+        
+                Printf("========ConvertShader : \n %s \n========\n ", glshader->converted);
+		
+		        shader_conv_(&glshader->source, &glshader->converted);
+		
+                //Printf("========NewConvertShader : \n %s \n========\n ", glshader->converted);
+		
+		        Printf("========NewConvertShader : \n");
+                int lenS = strlen(glshader->converted);
+                for(int len=0; len<lenS; len+=1023){
+        	      Printf("%s", glshader->converted+len);
+                }
+                Printf("\n========\n ");
                 glshader->is_converted_essl_320 = 0;
             } else {
                 int returnCode = 0; // TODO: handle returnCode
-				glshader->converted = strdup(ConvertShaderConditionally(glshader));
-                char* result = GLSLtoGLSLES_c(glshader->converted, glshader->type, globals4es.esversion, glsl_version, &returnCode);
+                char* result = GLSLtoGLSLES_c(glshader->source, glshader->type, globals4es.esversion, glsl_version, &returnCode);
                 glshader->converted = strdup(result!=NULL?process_uniform_declarations(result, glshader->uniforms_declarations, &glshader->uniforms_declarations_count):ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 1;
             }
