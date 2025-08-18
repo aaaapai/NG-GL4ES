@@ -513,12 +513,12 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need, i
   newptr=strstr(Tmp, "#version");
   if (!newptr) {
     Tmp = InplaceInsert(Tmp, GLESFullHeader, Tmp, &tmpsize);
-  } else {
+  }/* else {
     while(*newptr!=0x0a) newptr++;
     newptr++;
     memmove(Tmp, newptr, strlen(newptr)+1);
     Tmp = InplaceInsert(Tmp, GLESFullHeader, Tmp, &tmpsize);
-  }
+  }*/
   int headline = 3;
   int texture3D = (strstr(pBuffer, "texture3D")) ? 1 : 0;
   const char* GLESUseTexture3D = "#extension GL_OES_texture_3D : enable\nprecision lowp sampler3D;\n";
