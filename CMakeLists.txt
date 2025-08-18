@@ -102,7 +102,6 @@ set(C_SRC_FILES
 set(CPP_SRC_FILES
         src/gl/glsl/glsl_for_es.cpp
         src/gl/arbconverter.cpp
-        src/glsl/glsl_for_es.cpp
         src/gl/getter.cpp
         )
 
