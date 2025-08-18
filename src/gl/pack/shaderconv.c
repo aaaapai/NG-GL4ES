@@ -309,7 +309,7 @@ void func_build_in(char **converted, int cut_in_offset, int type){//				Printf("
 }
 
 
-void GLSLHeader(char **source){
+void GLSLHeader_vgpu(char **source){
 	int pot;
 	if(hardext.glsl320es){		// pack/shaderconv.h shaderconv.c: old_version new_version
   		pot = replace_common(old_version, new_version, source, 1);
