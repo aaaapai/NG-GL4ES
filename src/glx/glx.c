@@ -882,11 +882,11 @@ GLXContext createPBufferContext(Display *display, GLXContext shareList, GLXFBCon
 GLXContext gl4es_glXCreateContextAttribsARB(Display *display, GLXFBConfig config,
                                       GLXContext share_context, Bool direct,
                                       const int *attrib_list) {
-    DBG(SHUT_LOGD("glXCreateContextAttribsARB(%p, %p, %p, %d, %p) ", display, config, share_context, direct, attrib_list);
-        if(config)
-            SHUT_LOGD("config is RGBA:%d%d%d%d, depth=%d, stencil=%d, multisample=%d/%d doublebuff=%d, drawable=%d\n", config->redBits, config->greenBits, config->blueBits, config->alphaBits, config->depthBits, config->stencilBits, config->multiSampleSize, config->nMultiSampleBuffers, config->doubleBufferMode, config->drawableType);
-        else SHUT_LOGD("\n");
-    )
+    //DBG(SHUT_LOGD("glXCreateContextAttribsARB(%p, %p, %p, %d, %p) ", display, config, share_context, direct, attrib_list);
+    //    if(config)
+    //        SHUT_LOGD("config is RGBA:%d%d%d%d, depth=%d, stencil=%d, multisample=%d/%d doublebuff=%d, drawable=%d\n", config->redBits, config->greenBits, config->blueBits, config->alphaBits, config->depthBits, config->stencilBits, config->multiSampleSize, config->nMultiSampleBuffers, config->doubleBufferMode, config->drawableType);
+    //    else SHUT_LOGD("\n");
+    //)
     if(config && config->drawableType==GLX_PBUFFER_BIT) {
         return createPBufferContext(display, share_context, config);
     } else {

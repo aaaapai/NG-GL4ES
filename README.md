@@ -24,9 +24,7 @@ Features
 
 2. Be able to render some minecraft shaders (with or without realtime shadows) with a high efficiency with Minecraft [Iris](https://github.com/IrisShaders/Iris) mod;
 
-3. Be able to run Minecraft in most versions (like Minecraft 1.21.4 / Minecraft 1.12.2).
-
-> Minecraft version 25w16a+ (1.21.6+) is not supported!
+3. Be able to run Minecraft in most versions (like Minecraft 1.21.8 / Minecraft 1.12.2).
 
 Change Log
 ===
@@ -45,18 +43,20 @@ License
 
 [gl4es-114-extra](https://github.com/PojavLauncherTeam/gl4es-114-extra): MIT License
 
-This Project (for modified code): LGPL-2.1 License.
+This Project (for modified code): MIT License
 
 Please see [LICENSE](https://github.com/BZLZHH/NG-GL4ES/blob/main/LICENSE).
 
 Third party components
 ====
 
-**SPIRV-Cross** by **KhronosGroup**: [github](https://github.com/KhronosGroup/SPIRV-Cross)
+**SPIRV-Cross** by **KhronosGroup** - [Apache License 2.0](https://github.com/KhronosGroup/SPIRV-Cross/blob/master/LICENSE): [github](https://github.com/KhronosGroup/SPIRV-Cross)
 
-**glslang** by **KhronosGroup**: [github](https://github.com/KhronosGroup/glslang)
+**glslang** by **KhronosGroup** - [Various Licenses](https://github.com/KhronosGroup/glslang/blob/main/LICENSE.txt): [github](https://github.com/KhronosGroup/glslang)
 
-**cJSON** by **DaveGamble**: [github](https://github.com/DaveGamble/cJSON)
+**cJSON** by **DaveGamble** - [MIT License](https://github.com/DaveGamble/cJSON/blob/master/LICENSE): [github](https://github.com/DaveGamble/cJSON)
+
+Some code is from MobileGlues.
 
 Sponsor
 ====

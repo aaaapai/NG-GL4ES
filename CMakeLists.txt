@@ -2,19 +2,23 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ng_gl4es)
 
+enable_language(CXX)
 set(CMAKE_C_STANDARD 23)
-set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto=auto -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-parallel -mllvm -polly-scheduling=dynamic -fno-emulated-tls -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fvisibility=hidden -Wall -Wextra -fPIC -DPIC -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -mllvm -polly-omp-backend=LLVM -Wno-macro-redefined -Wno-gcc-compat -DDEFAULT_ES=3 -DNO_GBM -DNOX11 -ferror-limit=0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto=auto -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-parallel -mllvm -polly-scheduling=dynamic -fno-emulated-tls -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fPIC -DPIC -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -fexceptions -fno-rtti -mllvm -polly-omp-backend=LLVM -Wno-macro-redefined -Wno-gcc-compat -DDEFAULT_ES=3 -DNO_GBM -DNOX11 -ferror-limit=0")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -flto=auto -O3 -Wl,-plugin-opt=-emulated-tls=0 -Wl,--strip-all -fvisibility=hidden -Wl,-Bsymbolic -Wl,-O3 -Wl,--sort-common -Wl,--relax -Wl,--gc-sections -Wl,--as-needed -Wl,--error-limit=0")
 
-set(CMAKE_ANDROID_STL_TYPE c++_static)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DNO_GBM -DDEFAULT_ES=3 -fvisibility=hidden")
 
-set(CMAKE_BUILD_TYPE Release)
+if(ANDROID)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11") # TODO: build glx source files for non-Android
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include )
 
@@ -96,6 +100,7 @@ set(C_SRC_FILES
         )
 
 set(CPP_SRC_FILES
+        src/gl/glsl/glsl_for_es.cpp
         src/gl/arbconverter.cpp
         src/glsl/glsl_for_es.cpp
         src/gl/getter.cpp
@@ -107,12 +112,75 @@ find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/)
 
 add_library(ng_gl4es SHARED ${SRC_FILES})
 
-target_link_libraries(ng_gl4es
-        ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/libglslang.a
-        ${CMAKE_SOURCE_DIR}/libraries/arm64-v8a/libspirv-cross-c-shared.so
-        dl
-        libomp.a
-        )
+if(MACOS)
+    # iOS
+    set(iOS_LIB_DIR ${CMAKE_SOURCE_DIR}/library/ios)
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        ${iOS_LIB_DIR}/libglslang.a
+        ${iOS_LIB_DIR}/libspirv-cross-c-shared.dylib
+        ${iOS_LIB_DIR}/libGenericCodeGen.a
+        ${iOS_LIB_DIR}/libglslang-default-resource-limits.a
+        ${iOS_LIB_DIR}/libMachineIndependent.a
+        ${iOS_LIB_DIR}/libOSDependent.a
+        ${iOS_LIB_DIR}/libSPIRV-Tools-diff.a
+        ${iOS_LIB_DIR}/libSPIRV-Tools-link.aBuffer
+        ${iOS_LIB_DIR}/libSPIRV-Tools-lint.a
+        ${iOS_LIB_DIR}/libSPIRV-Tools-opt.a
+        ${iOS_LIB_DIR}/libSPIRV-Tools-reduce.a
+        ${iOS_LIB_DIR}/libSPIRV-Tools.a
+        ${iOS_LIB_DIR}/libSPIRV.a
+        ${iOS_LIB_DIR}/libSPVRemapper.a
+        "-F${CMAKE_SOURCE_DIR}/external"
+        "-framework libEGL"
+        "-framework libGLESv2"
+        "-framework Metal"
+        "-framework Foundation"
+        "-framework QuartzCore"
+    )
+else()
+if(ANDROID)
+    # Android
+    find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/)
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-c-shared.so
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libGenericCodeGen.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang-default-resource-limits.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libMachineIndependent.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libOSDependent.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools-diff.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools-link.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools-lint.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools-opt.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools-reduce.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPVRemapper.a
+        android
+        log
+    )
+else()
+    # Linux
+    # TODO: support more architectures.
+    find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/library/linux/x86_64)
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libglslang.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libspirv-cross-c-shared.so
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libGenericCodeGen.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libglslang-default-resource-limits.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libMachineIndependent.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libOSDependent.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools-diff.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools-link.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools-lint.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools-opt.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools-reduce.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV-Tools.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPIRV.a
+        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libSPVRemapper.a
+    )
+endif()
+endif()
 
 target_include_directories(ng_gl4es PUBLIC
         ${CMAKE_SOURCE_DIR}/include

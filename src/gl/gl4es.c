@@ -53,10 +53,9 @@ void trim(char* str) {
     *(end + 1) = 0;
 }
 
+static FILE* file = NULL;
 void write_log(const char* format, ...) {
-    FILE* file = fopen(LOG_FILE_PATH, "a");
     if (file == NULL) {
-        fprintf(stderr, "Error opening log file '%s': %s\n", LOG_FILE_PATH, strerror(errno));
         return;
     }
     va_list args;
@@ -64,15 +63,19 @@ void write_log(const char* format, ...) {
     vfprintf(file, format, args);
     va_end(args);
     fprintf(file, "\n");
-    fclose(file);
+	fflush(file);
 }
 void clear_log() {
-    FILE* file = fopen(LOG_FILE_PATH, "w");
+    char* path = malloc(strlen(NGGDirectory) + strlen (LOG_FILE_PATH) + 1);
+    strcpy(path, NGGDirectory);
+    strcat(path, LOG_FILE_PATH);
+    file = fopen(path, "w");
     if (file == NULL) {
-        fprintf(stderr, "Error opening log file '%s' for clearing: %s\n", LOG_FILE_PATH, strerror(errno));
+        fprintf(stderr, "Error opening log file '%s' for clearing: %s\n", path, strerror(errno));
         return;
     }
     fclose(file);
+    free(path);
 }
 
 int adjust_vertices(GLenum mode, int nb) {

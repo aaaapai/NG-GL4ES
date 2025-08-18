@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#define NGG_DIRECTORY_PATH "/sdcard/NGG"
-#define CONFIG_FILE_PATH NGG_DIRECTORY_PATH "/config.json"
-#define LOG_FILE_PATH NGG_DIRECTORY_PATH "/latest.log"
+#define DEFAULT_NGG_DIRECTORY_PATH "/sdcard/NGG"
+#define CONFIG_FILE_PATH "/config.json"
+#define LOG_FILE_PATH "/latest.log"
     
 void config_refresh();
 int config_get_int(char* name);

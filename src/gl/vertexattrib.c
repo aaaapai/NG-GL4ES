@@ -158,64 +158,6 @@ void VISIBLE glVertexAttribL4dv(GLuint index, const GLdouble* v) {
     memcpy(glstate->vavalue[index], value, 4 * sizeof(GLfloat));
 }
 
-void VISIBLE glBindVertexBuffers(GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizeiptr* strides) {
-    glstate_t* glstate = glstate;
-    glvao_t* vao = glstate->vao;
-
-    if (!vao) {
-        errorShim(GL_INVALID_OPERATION);
-        return;
-    }
-
-    for (GLsizei i = 0; i < count; ++i) {
-        GLuint buffer = buffers[i];
-        GLintptr offset = offsets ? offsets[i] : 0;
-        GLsizeiptr stride = strides ? strides[i] : 0;
-        khash_t(buff)* buffers_map = glstate->buffers;
-        khint_t k = kh_get(buff, buffers_map, buffer);
-
-        if (k == kh_end(buffers_map)) {
-            errorShim(GL_INVALID_OPERATION);
-            return;
-        }
-
-        glbuffer_t* glbuffer = kh_value(buffers_map, k);
-
-        vao->vertexattrib[first + i].buffer = glbuffer;
-        vao->vertexattrib[first + i].pointer = (const void*)offset;
-        vao->vertexattrib[first + i].stride = stride;
-        vao->vertexattrib[first + i].enabled = 1;
-    }
-}
-
-
-
-void VISIBLE glBindVertexBuffer(GLuint bindingIndex, GLuint buffer, GLintptr offset, GLsizeiptr stride) {
-    glstate_t* glstate = glstate;
-
-    khash_t(buff)* buffers = glstate->buffers;
-    khint_t k = kh_get(buff, buffers, buffer);
-
-    if (k == kh_end(buffers)) {
-        errorShim(GL_INVALID_OPERATION);
-        return;
-    }
-
-    glbuffer_t* glbuffer = kh_value(buffers, k);
-
-    glvao_t* vao = glstate->vao;
-
-    if (vao) {
-        vao->vertexattrib[bindingIndex].buffer = glbuffer;
-        vao->vertexattrib[bindingIndex].pointer = (const void*)offset;
-        vao->vertexattrib[bindingIndex].stride = stride;
-        vao->vertexattrib[bindingIndex].enabled = 1;
-    }
-    else {
-        errorShim(GL_INVALID_OPERATION);
-    }
-}
-
 void APIENTRY_GL4ES gl4es_glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer) {
     DBG(SHUT_LOGD("glVertexAttribPointer(%d, %d, %s, %d, %d, %p), vertex %p buffer = %p\n", index, size, PrintEnum(type), normalized, stride, pointer, glstate->vao->vertex, (glstate->vao->vertex)?glstate->vao->vertex->data:0);)
     FLUSH_BEGINEND;

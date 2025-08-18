@@ -56,7 +56,7 @@ const char _blit_fsh_alpha[] = "#version 300 es            \n" \
 "in mediump vec2 vTexCoord;                                \n" \
 "out vec4 FragColor;                                       \n" \
 "void main(){                                              \n" \
-"   lowp vec4 p = texture(uTex, vTexCoord);                \n" \
+"   highp vec4 p = texture(uTex, vTexCoord);                \n" \
 "   if (p.a==0.0) discard;                                 \n" \
 "   FragColor = p;                                         \n" \
 "   //FragColor = vec4(0.0, 1.0, 0.0, 1.0);                \n" \

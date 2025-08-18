@@ -10,9 +10,13 @@
 static cJSON *config_json = NULL;
 
 void config_refresh() {
-    FILE *file = fopen(CONFIG_FILE_PATH, "r");
+    char* path = malloc(strlen(NGGDirectory) + strlen(CONFIG_FILE_PATH) + 1);
+    strcpy(path, NGGDirectory);
+    strcat(path, CONFIG_FILE_PATH);
+
+    FILE *file = fopen(path, "r");
     if (file == NULL) {
-        SHUT_LOGE("Unable to open config file %s", CONFIG_FILE_PATH);
+        SHUT_LOGE("Unable to open config file %s", path);
         return;
     }
 
@@ -37,6 +41,7 @@ void config_refresh() {
     }
 
     free(file_content);
+    free(path);
 }
 
 int config_get_int(char* name) {
