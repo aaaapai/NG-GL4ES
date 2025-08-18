@@ -213,12 +213,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
             DBG(SHUT_LOGD("%s", glshader->source))
             if( glsl_version < 150 || globals4es.esversion < 300) {
-                glshader->converted = ConvertShaderConditionally(glshader);
-
-				int returnCode = 0; // TODO: handle returnCode
-                char* result = GLSLtoGLSLES_c(glshader->converted, glshader->type, globals4es.esversion, glsl_version, &returnCode);
-                glshader->converted = result!=NULL?process_uniform_declarations(result, glshader->uniforms_declarations, &glshader->uniforms_declarations_count):ConvertShaderConditionally(glshader);
-				glshader->converted = strdup(ConvertShaderConditionally(glshader));
+                glshader->converted = strdup(ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 1;
 
 				/*//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
@@ -244,7 +239,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                 //glshader->is_converted_essl_320 = 0;
             } else {
                 int returnCode = 0; // TODO: handle returnCode
-                char* result = GLSLtoGLSLES_c(glshader->source, glshader->type, globals4es.esversion, glsl_version, &returnCode);
+
+				glshader->converted = strdup(ConvertShaderConditionally(glshader));
+                char* result = GLSLtoGLSLES_c(glshader->converted, glshader->type, globals4es.esversion, glsl_version, &returnCode);
                 glshader->converted = strdup(result!=NULL?process_uniform_declarations(result, glshader->uniforms_declarations, &glshader->uniforms_declarations_count):ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 1;
             }
