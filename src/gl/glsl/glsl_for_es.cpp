@@ -660,6 +660,284 @@ vec2 mg_textureQueryLod(sampler2D tex, vec2 uv) {
     glsl.insert(insertPos, "\n" + textureQueryLodImpl + "\n");
 }
 
+static void inject_subgroup_BigGiftPackage(std::string& glsl) {
+    const std::regex defRegex(R"(#define\s+SUBGROUP_SIZE\s+\d+)", std::regex::ECMAScript);
+
+    if (glsl.find("subgroupBallot") == std::string::npos && 
+        glsl.find("activeMask") == std::string::npos &&
+        glsl.find("gl_SubgroupInvocationID") == std::string::npos &&
+        glsl.find("subgroupAdd") == std::string::npos &&
+        glsl.find("gl_NumSubgroups") == std::string::npos &&
+        glsl.find("gl_SubgroupID") == std::string::npos &&
+        glsl.find("subgroupAny") == std::string::npos &&
+        glsl.find("subgroupAll") == std::string::npos &&
+        glsl.find("subgroupElect") == std::string::npos) {
+        return;
+    }
+
+    if (std::regex_search(glsl, defRegex)) {
+        return;
+    }
+
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup", "// #extension GL_KHR_shader_subgroup");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_basic", "// #extension GL_KHR_shader_subgroup_basic");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_ballot", "// #extension GL_KHR_shader_subgroup_ballot");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_arithmetic", "// #extension GL_KHR_shader_subgroup_arithmetic");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered", "// #extension GL_KHR_shader_subgroup_clustered");
+    replace_all(glsl, "subgroupBallot", "mg_subgroupBallot");
+    replace_all(glsl, "activeMask", "mg_activeMask");
+    replace_all(glsl, "gl_SubgroupInvocationID", "mg_gl_SubgroupInvocationID()");
+    replace_all(glsl, "subgroupAdd", "mg_subgroupAdd");
+    replace_all(glsl, "gl_NumSubgroups", "mg_gl_NumSubgroups()");
+    replace_all(glsl, "gl_SubgroupID", "mg_gl_SubgroupID()");
+    replace_all(glsl, "subgroupAny", "mg_subgroupAny");
+    replace_all(glsl, "subgroupAll", "mg_subgroupAll");
+    replace_all(glsl, "subgroupElect", "mg_subgroupElect");
+
+    const std::string subgroup_BigGiftPackageImpl = R"(
+#define SUBGROUP_SIZE 32
+
+// ==================== 基础子组模拟 (核心功能) ====================
+// 使用内置变量模拟子组基础功能
+uint mg_gl_SubgroupID() {
+    // 通过工作组内线性索引计算子组ID
+    return gl_LocalInvocationIndex / SUBGROUP_SIZE;
+}
+
+uint mg_gl_SubgroupInvocationID() {
+    // 子组内调用索引 = 局部线性索引 % 子组大小
+    return gl_LocalInvocationIndex % SUBGROUP_SIZE;
+}
+
+uint mg_gl_NumSubgroups() {
+    // 子组总数 = 工作组大小 / 子组大小（向上取整）
+    return (gl_WorkGroupSize.x * gl_WorkGroupSize.y * gl_WorkGroupSize.z + SUBGROUP_SIZE - 1u) / SUBGROUP_SIZE;
+}
+
+// ==================== 投票功能模拟 (共享内存实现) ====================
+shared uint s_ballot; // 共享存储用于投票结果
+
+uvec2 mg_subgroupBallot(bool condition) {
+    // Step 1: 初始化共享变量
+    if (gl_LocalInvocationID.x == 0 && gl_LocalInvocationID.y == 0 && gl_LocalInvocationID.z == 0) {
+        s_ballot = 0u;
+    }
+    memoryBarrierShared();
+    barrier();
+
+    // Step 2: 原子操作设置比特位
+    if (condition) {
+        uint mask = 1u << mg_gl_SubgroupInvocationID();
+        atomicOr(s_ballot, mask);
+    }
+    memoryBarrierShared();
+    barrier();
+
+    // Step 3: 返回结果（兼容uvec2结构）
+    return uvec2(s_ballot, 0u); // 高位始终为0
+}
+
+uvec2 activeMask() {
+    // 所有活跃线程返回true
+    return mg_subgroupBallot(true);
+}
+
+// ==================== 条件判断辅助 ====================
+bool mg_subgroupAny(bool value) {
+    uvec2 mask = mg_subgroupBallot(value);
+    return mask.x != 0u;
+}
+
+bool mg_subgroupAll(bool value) {
+    uvec2 fullMask = activeMask();
+    uvec2 valueMask = mg_subgroupBallot(value);
+    return fullMask == valueMask;
+}
+
+
+// ==================== 全局共享内存声明 ====================
+const uint total_workgroup_size = gl_WorkGroupSize.x * gl_WorkGroupSize.y * gl_WorkGroupSize.z;
+const uint num_subgroups = (total_workgroup_size + SUBGROUP_SIZE - 1u) / SUBGROUP_SIZE;
+
+// 标量类型共享内存
+shared float s_reduceAdd_float[num_subgroups * SUBGROUP_SIZE];
+shared uint s_reduceAdd_uint[num_subgroups * SUBGROUP_SIZE];
+shared int s_reduceAdd_int[num_subgroups * SUBGROUP_SIZE];
+
+// 向量类型共享内存
+shared vec2 s_reduceAdd_vec2[num_subgroups * SUBGROUP_SIZE];
+shared vec3 s_reduceAdd_vec3[num_subgroups * SUBGROUP_SIZE];
+shared vec4 s_reduceAdd_vec4[num_subgroups * SUBGROUP_SIZE];
+
+// ==================== 子组加法归约模拟 ====================
+float mg_subgroupAdd(float value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    // 初始化共享内存
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_float[i] = 0.0;
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_float[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_float[offset] += s_reduceAdd_float[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_float[subgroupID * SUBGROUP_SIZE];
+}
+
+uint mg_subgroupAdd(uint value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_uint[i] = 0u;
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_uint[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_uint[offset] += s_reduceAdd_uint[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_uint[subgroupID * SUBGROUP_SIZE];
+}
+
+int mg_subgroupAdd(int value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_int[i] = 0;
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_int[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_int[offset] += s_reduceAdd_int[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_int[subgroupID * SUBGROUP_SIZE];
+}
+
+vec2 mg_subgroupAdd(vec2 value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_vec2[i] = vec2(0.0);
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_vec2[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_vec2[offset] += s_reduceAdd_vec2[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_vec2[subgroupID * SUBGROUP_SIZE];
+}
+
+vec3 mg_subgroupAdd(vec3 value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_vec3[i] = vec3(0.0);
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_vec3[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_vec3[offset] += s_reduceAdd_vec3[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_vec3[subgroupID * SUBGROUP_SIZE];
+}
+
+vec4 mg_subgroupAdd(vec4 value) {
+    uint subgroupID = mg_gl_SubgroupID();
+    uint laneID = mg_gl_SubgroupInvocationID();
+    uint offset = subgroupID * SUBGROUP_SIZE + laneID;
+
+    for (uint i = gl_LocalInvocationIndex; i < num_subgroups * SUBGROUP_SIZE; i += total_workgroup_size) {
+        s_reduceAdd_vec4[i] = vec4(0.0);
+    }
+    memoryBarrierShared();
+    barrier();
+
+    s_reduceAdd_vec4[offset] = value;
+    memoryBarrierShared();
+    barrier();
+
+    for (uint stride = SUBGROUP_SIZE / 2; stride > 0; stride >>= 1) {
+        if (laneID < stride) {
+            s_reduceAdd_vec4[offset] += s_reduceAdd_vec4[offset + stride];
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+
+    return s_reduceAdd_vec4[subgroupID * SUBGROUP_SIZE];
+}
+
+bool mg_subgroupElect() {
+    // 子组内第一个线程（调用ID=0）被选为领导线程
+    return (mg_gl_SubgroupInvocationID() == 0u);
+}
+
+)";
+
+    size_t insertPos = find_insertion_point(glsl);
+    glsl.insert(insertPos, "\n" + subgroup_BigGiftPackageImpl + "\n");
+}
+
 static void inject_subgroup_clustered(std::string& glsl) {
     const std::regex defRegex(R"(shared\s+uint\s+_cluster_shared_data\s*\[\s*gl_WorkGroupSize\.x\s*\*\s*gl_WorkGroupSize\.y\s*\*\s*gl_WorkGroupSize\.z\s*\]\s*;)", std::regex::ECMAScript);
 
