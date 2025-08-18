@@ -213,9 +213,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
             DBG(SHUT_LOGD("%s", glshader->source))
             if(globals4es.esversion < 300) {
-                // glshader->converted = strdup(ConvertShaderConditionally(glshader));
+                glshader->converted = strdup(ConvertShaderConditionally(glshader));
 
-				glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
+				//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
 				// ======== add marker
                 add_marker(&glshader->converted);
                 // ======== Handling the first half of an implicit type conversion.
