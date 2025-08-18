@@ -206,17 +206,18 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
     LOAD_GLES2(glShaderSource);
     if (gles_glShaderSource) {
         // adapt shader if needed (i.e. not an es2 context and shader is not #version 100)
-		if(is_direct_shader(glshader->source))
+		if(is_direct_shader(glshader->source)) {
 			glshader->converted = strdup(glshader->source);
-        else {
+			glshader->is_converted_essl_320 = 0;
+		} else {
             int glsl_version = getGLSLVersion(glshader->source);
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
             DBG(SHUT_LOGD("%s", glshader->source))
             if( glsl_version < 150 || globals4es.esversion < 300) {
                 glshader->converted = strdup(ConvertShaderConditionally(glshader));
-                glshader->is_converted_essl_320 = 1;
+                glshader->is_converted_essl_320 = 0;
 
-				/*//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
+				//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
 				// ======== add marker
                 add_marker(&glshader->converted);
                 // ======== Handling the first half of an implicit type conversion.
@@ -224,23 +225,22 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
         
                 //pot = replace_common("0.0 es", "0 es", &glshader->converted, 1);
         
-                Printf("========ConvertShader : \n %s \n========\n ", glshader->converted);
+                // Printf("========ConvertShader : \n %s \n========\n ", glshader->converted);
 		
-		        shader_conv_(&glshader->source, &glshader->converted);
+		        // shader_conv_(&glshader->source, &glshader->converted);
 		
                 //Printf("========NewConvertShader : \n %s \n========\n ", glshader->converted);
 		
-		        Printf("========NewConvertShader : \n");
+		        /*Printf("========NewConvertShader : \n");
                 int lenS = strlen(glshader->converted);
                 for(int len=0; len<lenS; len+=1023){
         	      Printf("%s", glshader->converted+len);
                 }
                 Printf("\n========\n ");*/
-                //glshader->is_converted_essl_320 = 0;
             } else {
                 int returnCode = 0; // TODO: handle returnCode
 
-                char* result = GLSLtoGLSLES_c(glshader->converted, glshader->type, globals4es.esversion, glsl_version, &returnCode);
+                char* result = GLSLtoGLSLES_c(glshader->source, glshader->type, globals4es.esversion, glsl_version, &returnCode);
                 glshader->converted = strdup(result!=NULL?process_uniform_declarations(result, glshader->uniforms_declarations, &glshader->uniforms_declarations_count):ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 1;
             }
