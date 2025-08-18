@@ -388,6 +388,13 @@ char * ConvertShaderVgpu(struct shader_s * shader_source){
     source = InplaceReplaceSimple(source, &sourceLength, "#define attribute in\n", "");
     source = InplaceReplaceSimple(source, &sourceLength, "#define varying out\n", "");
 
+    if (shader_source->type == GL_VERTEX_SHADER) {
+        source = ReplaceVariableName(source, &sourceLength, "attribute", "in");
+        source = ReplaceVariableName(source, &sourceLength, "varying", "out");
+    } else {
+        source = ReplaceVariableName(source, &sourceLength, "varying", "in");
+    }
+
     // Draw buffers aren't dealt the same on OPEN GL|ES
     if(shader_source->type == GL_FRAGMENT_SHADER && doesShaderVersionContainsES(source) ){
         //printf("REPLACING FRAG DATA");
