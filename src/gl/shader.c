@@ -215,7 +215,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
             if( glsl_version < 150 || globals4es.esversion < 300) {
                 glshader->converted = strdup(ConvertShaderConditionally(glshader));
 
-				//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
+				/*//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
 				// ======== add marker
                 add_marker(&glshader->converted);
                 // ======== Handling the first half of an implicit type conversion.
@@ -234,7 +234,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                 for(int len=0; len<lenS; len+=1023){
         	      Printf("%s", glshader->converted+len);
                 }
-                Printf("\n========\n ");
+                Printf("\n========\n ");*/
                 glshader->is_converted_essl_320 = 0;
             } else {
                 int returnCode = 0; // TODO: handle returnCode
