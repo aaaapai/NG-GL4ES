@@ -207,10 +207,10 @@ extern "C"
     DEFINE_RAW(lib, name);                                                                                             \
     LOAD_RAW_ALT(lib, alt, name, proc_address(lib, #name))
 
-#define LOAD_GLES(name) LOAD_LIB(gles, name)
-#define LOAD_GLES2(name) LOAD_LIB(gles, name)
-#define LOAD_GLES3(name) LOAD_LIB(gles, name)
-#define LOAD_GLES_OR_FPE(name) LOAD_LIB_ALT(gles, fpe, name)
+#define LOAD_GLES(name)         LOAD_GLES2(name)
+#define LOAD_GLES2(name)        LOAD_LIB(gles, name)
+#define LOAD_GLES3(name)        LOAD_LIB(gles, name)
+#define LOAD_GLES_OR_FPE(name)  LOAD_LIB_ALT(gles, fpe, name)
 
 #define LOAD_GLES_FPE(name)                                                                                            \
     DEFINE_RAW(gles, name);                                                                                            \
@@ -233,9 +233,13 @@ extern "C"
     DEFINE_RAW(gles, name);                                                                                            \
     { LOAD_RAW(gles, name, proc_address(gles, #name "EXT")); }
 
-#define LOAD_GLES2_OR_OES(name)                                                                                        \
-    DEFINE_RAW(gles, name);                                                                                            \
-    { LOAD_RAW_SILENT(gles, name, proc_address(gles, #name)); }
+#define LOAD_GLES2_OR_OES(name) LOAD_GLES2(name)
+/*
+    DEFINE_RAW(gles, name); \
+    { \
+        LOAD_RAW_SILENT(gles, name, proc_address(gles, #name)); \
+    }
+*/
 
 #else // defined(AMIGAOS4) || defined(NOEGL)
 
@@ -266,14 +270,14 @@ extern "C"
                  ((hardext.esversion <= 2) ? egl_eglGetProcAddress(#name "EXT") : egl_eglGetProcAddress(#name)));      \
     }
 
-#define LOAD_GLES2_OR_OES(name)                                                                                        \
-    DEFINE_RAW(gles, name);                                                                                            \
-    {                                                                                                                  \
-        LOAD_EGL(eglGetProcAddress);                                                                                   \
-        LOAD_RAW_SILENT(                                                                                               \
-            gles, name,                                                                                                \
-            ((hardext.esversion == 1) ? ((void*)egl_eglGetProcAddress(#name "OES")) : ((void*)dlsym(gles, #name))));   \
+#define LOAD_GLES2_OR_OES(name) LOAD_GLES2(name)
+ /*
+DEFINE_RAW(gles, name); \
+    { \
+        LOAD_EGL(eglGetProcAddress); \
+        LOAD_RAW_SILENT(gles, name, ((hardext.esversion==1)?((void*)egl_eglGetProcAddress(#name"OES")):((void*)dlsym(gles, #name)))); \
     }
+*/
 #endif // defined(AMIGAOS4) || defined(NOEGL)
 
 #endif // _GL4ES_LOADER_H_
