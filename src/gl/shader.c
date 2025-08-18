@@ -153,9 +153,9 @@ void APIENTRY_GL4ES gl4es_glCompileShader(GLuint shader) {
 
 bool can_run_essl3(int esversion, const char *glsl) {
     int glsl_version = 0;
-    if (strncmp(glsl, "#version 100", 12) == 0) {
+    /*if (strncmp(glsl, "#version 100", 12) == 0) {
         return true;
-	} else if (strncmp(glsl, "#version 300 es", 15) == 0) {
+	} else */if (strncmp(glsl, "#version 300 es", 15) == 0) {
         return true;
     } else if (strncmp(glsl, "#version 310 es", 15) == 0) {
         glsl_version = 310;
