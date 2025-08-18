@@ -1272,7 +1272,7 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
         inject_textureQueryLod(ret);
     }
 
-	// inject_gl_DepthRange(ret);
+	inject_gl_DepthRange(ret);
 
     inject_image2D_declarations(ret);
 
