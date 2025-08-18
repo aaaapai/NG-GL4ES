@@ -22,13 +22,13 @@ int NO_OPERATOR_VALUE = 9999;
 #include <ctype.h>
 #include <stdbool.h>
 
-// ¸¨Öúº¯Êı£º½âÎö²¢ÌáÈ¡¸¡µãÊıÊı×é£¨ÓÃÓÚ mat2, mat3, mat4, vec2, vec3, vec4 ÀàĞÍµÄ´¦Àí£©
+// è¾…åŠ©å‡½æ•°ï¼šè§£æå¹¶æå–æµ®ç‚¹æ•°æ•°ç»„ï¼ˆç”¨äº mat2, mat3, mat4, vec2, vec3, vec4 ç±»å‹çš„å¤„ç†ï¼‰
 int parse_floats_from_string(const char* str, GLfloat* outValues, int maxCount) {
     int count = 0;
     const char* cursor = str;
 
     while (*cursor && count < maxCount) {
-        // ²éÕÒÊı×Ö
+        // æŸ¥æ‰¾æ•°å­—
         while (*cursor && !isdigit((unsigned char)*cursor) && *cursor != '-') cursor++;
 
         if (*cursor) {
@@ -38,7 +38,7 @@ int parse_floats_from_string(const char* str, GLfloat* outValues, int maxCount) 
     return count;
 }
 
-// ¸¨Öúº¯Êı£º½âÎö bool ÀàĞÍ
+// è¾…åŠ©å‡½æ•°ï¼šè§£æ bool ç±»å‹
 int parse_bool_from_string(const char* str) {
     if (strcmp(str, "true") == 0) {
         return GL_TRUE;
@@ -46,7 +46,7 @@ int parse_bool_from_string(const char* str) {
     if (strcmp(str, "false") == 0) {
         return GL_FALSE;
     }
-    return -1;  // ÎŞĞ§µÄ²¼¶ûÖµ
+    return -1;  // æ— æ•ˆçš„å¸ƒå°”å€¼
 }
 
 bool has_valid_data(char arr[256]) {
@@ -117,7 +117,7 @@ void set_uniforms_default_value(GLuint program, uniforms_declarations uniformVec
             }
         }
         else if (strstr(uniform->initial_value, "vec3") != NULL) {
-            // ´¦Àí vec3 ÀàĞÍ
+            // å¤„ç† vec3 ç±»å‹
             GLfloat vecValues[3];
             int count = parse_floats_from_string(uniform->initial_value, vecValues, 3);
 
@@ -340,43 +340,6 @@ char * ConvertShaderVgpu(struct shader_s * shader_source){
     // Get the shader source
     char * source = shader_source->converted;
     int sourceLength = strlen(source) + 1;
-    // For now, skip stuff
-    if(FindString(source, "#version 100")){
-        if(globals4es.vgpu_force_conv || globals4es.vgpu_backport){
-            if (shader_source->type == GL_VERTEX_SHADER){
-                source = ReplaceVariableName(source, &sourceLength, "in", "attribute");
-                source = ReplaceVariableName(source, &sourceLength, "out", "varying");
-            }else{
-                source = ReplaceVariableName(source, &sourceLength, "in", "varying");
-                source = ReplaceFragmentOut(source, &sourceLength);
-            }
-
-            // Well, we don't have gl_VertexID on OPENGL 1
-            source = ReplaceVariableName(source, &sourceLength, "gl_VertexID", "0");
-            source = InplaceReplaceSimple(source, &sourceLength, "ivec", "vec");
-            source = InplaceReplaceSimple(source, &sourceLength, "bvec", "vec");
-            source = InplaceReplaceSimple(source, &sourceLength, "flat ", "");
-
-            source = BackportConstArrays(source, &sourceLength);
-            int insertPoint = FindPositionAfterVersion(source);
-            source = InplaceInsertByIndex(source, &sourceLength, insertPoint + 1, "#define texelFetch(a, b, c) vec4(1.0,1.0,1.0,1.0) \n");
-
-            source = ReplaceModOperator(source, &sourceLength);
-
-            if (globals4es.vgpu_dump){
-                SHUT_LOGD("New VGPU Shader conversion:\n%s\n", source);
-            }
-
-            return source;
-        }
-
-        // Else, skip the conversion
-        if (globals4es.vgpu_dump){
-            SHUT_LOGD("SKIPPING OLD SHADER CONVERSION \n%s\n", source);
-        }
-        return source;
-    }
-
 
     // Remove 'const' storage qualifier
     //printf("REMOVING CONST qualifiers");
@@ -430,13 +393,6 @@ char * ConvertShaderVgpu(struct shader_s * shader_source){
     source = InplaceReplaceSimple(source, &sourceLength, "#define texture texture2D\n", "");
     source = InplaceReplaceSimple(source, &sourceLength, "#define attribute in\n", "");
     source = InplaceReplaceSimple(source, &sourceLength, "#define varying out\n", "");
-
-    if (shader_source->type == GL_VERTEX_SHADER){
-        source = ReplaceVariableName(source, &sourceLength, "attribute", "in");
-        source = ReplaceVariableName(source, &sourceLength, "varying", "out");
-    }else{
-        source = ReplaceVariableName(source, &sourceLength, "varying", "in");
-    }
 
     // Draw buffers aren't dealt the same on OPEN GL|ES
     if(shader_source->type == GL_FRAGMENT_SHADER && doesShaderVersionContainsES(source) ){
