@@ -98,6 +98,8 @@ set(C_SRC_FILES
         src/glx/streaming.c
         src/gl/vgpu/shaderconv.c
         src/gl/samplers.c
+        src/gl/pack/shader.c
+        src/gl/pack/shaderconv.c
         )
 
 set(CPP_SRC_FILES
