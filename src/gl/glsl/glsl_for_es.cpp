@@ -660,6 +660,211 @@ vec2 mg_textureQueryLod(sampler2D tex, vec2 uv) {
     glsl.insert(insertPos, "\n" + textureQueryLodImpl + "\n");
 }
 
+static void inject_subgroup_clustered(std::string& glsl) {
+    const std::regex defRegex(R"(shared\s+uint\s+_cluster_shared_data\s*\[\s*gl_WorkGroupSize\.x\s*\*\s*gl_WorkGroupSize\.y\s*\*\s*gl_WorkGroupSize\.z\s*\]\s*;)", std::regex::ECMAScript);
+
+    // 检查是否使用了扩展中的任何标识符
+    if (glsl.find("subgroupClusteredMax") == std::string::npos && 
+        glsl.find("subgroupMemoryBarrier") == std::string::npos && 
+        glsl.find("subgroupBarrier") == std::string::npos &&
+        glsl.find("subgroupClusteredAllEqual") == std::string::npos &&
+        glsl.find("subgroupClusteredAny") == std::string::npos &&
+        glsl.find("subgroupClusteredAll") == std::string::npos &&
+        glsl.find("subgroupClusteredXor") == std::string::npos &&
+        glsl.find("subgroupClusteredOr") == std::string::npos &&
+        glsl.find("subgroupClusteredAnd") == std::string::npos &&
+        glsl.find("subgroupClusteredMin") == std::string::npos &&
+        glsl.find("subgroupClusteredMul") == std::string::npos &&
+        glsl.find("subgroupClusteredAdd") == std::string::npos)
+    {
+        return;
+    }
+
+    if (std::regex_search(glsl, defRegex)) {
+        return;
+    }
+
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered :enable", "// #extension GL_KHR_shader_subgroup_clustered :enable");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered : enable", "// #extension GL_KHR_shader_subgroup_clustered : enable");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered: enable", "// #extension GL_KHR_shader_subgroup_clustered: enable");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered: require", "// #extension GL_KHR_shader_subgroup_clustered : require");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered : require", "// #extension GL_KHR_shader_subgroup_clustered : require");
+    replace_all(glsl, "#extension GL_KHR_shader_subgroup_clustered :require", "// #extension GL_KHR_shader_subgroup_clustered : require"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredMax", "mg_subgroupClusteredMax"); //防止编译错误
+    replace_all(glsl, "subgroupMemoryBarrier", "mg_subgroupMemoryBarrier"); //防止编译错误
+    replace_all(glsl, "subgroupBarrier", "mg_subgroupBarrier"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredAllEqual", "mg_subgroupClusteredAllEqual"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredAny", "mg_subgroupClusteredAny"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredAll", "mg_subgroupClusteredAll"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredXor", "mg_subgroupClusteredXor"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredOr", "mg_subgroupClusteredOr"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredAnd", "mg_subgroupClusteredAnd"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredMin", "mg_subgroupClusteredMin"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredMul", "mg_subgroupClusteredMul"); //防止编译错误
+    replace_all(glsl, "subgroupClusteredAdd", "mg_subgroupClusteredAdd"); //防止编译错误
+
+    const std::string subgroup_clusteredImpl = R"(
+precision highp float;
+precision highp int;
+
+// 共享内存用于线程间通信
+shared uint _cluster_shared_data[gl_WorkGroupSize.x * gl_WorkGroupSize.y * gl_WorkGroupSize.z];
+
+// 一维索引计算（假设工作组为一维）
+uint _get_linear_index() {
+    return gl_LocalInvocationID.x;
+}
+
+// ================== 核心归约函数模板 ==================
+uint _clustered_reduce(uint value, uint clusterSize, uint op) {
+    uint idx = _get_linear_index();
+    uint clusterIdx = idx / clusterSize;
+    uint offset = idx % clusterSize;
+    uint base = clusterIdx * clusterSize;
+
+    // 存储原始值到共享内存
+    _cluster_shared_data[idx] = value;
+    barrier();
+    memoryBarrierShared();
+
+    // 归约循环（要求clusterSize是2的幂）
+    for (uint stride = 1; stride < clusterSize; stride *= 2) {
+        if ((offset & (2u * stride - 1u)) == 0u) {
+            uint otherIdx = idx + stride;
+            if (offset + stride < clusterSize) {
+                uint a = _cluster_shared_data[idx];
+                uint b = _cluster_shared_data[otherIdx];
+                
+                // 根据操作类型执行计算
+                switch (op) {
+                    case 0:  a += b; break;    // Add
+                    case 1:  a *= b; break;    // Mul
+                    case 2:  a = min(a, b); break; // Min
+                    case 3:  a = max(a, b); break; // Max
+                    case 4:  a &= b; break;    // And
+                    case 5:  a |= b; break;    // Or
+                    case 6:  a ^= b; break;    // Xor
+                    default: break;
+                }
+                _cluster_shared_data[idx] = a;
+            }
+        }
+        barrier();
+        memoryBarrierShared();
+    }
+    return _cluster_shared_data[base]; // 返回归约结果
+}
+
+// ================== 算术操作实现 ==================
+float mg_subgroupClusteredAdd(float val, uint clusterSize) {
+    uint u = floatBitsToUint(val);
+    u = _clustered_reduce(u, clusterSize, 0);
+    return uintBitsToFloat(u);
+}
+
+float mg_subgroupClusteredMul(float val, uint clusterSize) {
+    uint u = floatBitsToUint(val);
+    u = _clustered_reduce(u, clusterSize, 1);
+    return uintBitsToFloat(u);
+}
+
+float mg_subgroupClusteredMin(float val, uint clusterSize) {
+    uint u = floatBitsToUint(val);
+    u = _clustered_reduce(u, clusterSize, 2);
+    return uintBitsToFloat(u);
+}
+
+float mg_subgroupClusteredMax(float val, uint clusterSize) {
+    uint u = floatBitsToUint(val);
+    u = _clustered_reduce(u, clusterSize, 3);
+    return uintBitsToFloat(u);
+}
+
+// ================== 按位操作实现 ==================
+uint mg_subgroupClusteredAnd(uint val, uint clusterSize) {
+    return _clustered_reduce(val, clusterSize, 4);
+}
+
+uint mg_subgroupClusteredOr(uint val, uint clusterSize) {
+    return _clustered_reduce(val, clusterSize, 5);
+}
+
+uint mg_subgroupClusteredXor(uint val, uint clusterSize) {
+    return _clustered_reduce(val, clusterSize, 6);
+}
+
+// ================== 投票操作实现 ==================
+bool mg_subgroupClusteredAll(bool condition, uint clusterSize) {
+    uint val = condition ? 0xFFFFFFFFu : 0u;
+    uint result = _clustered_reduce(val, clusterSize, 4);
+    return (result == 0xFFFFFFFFu);
+}
+
+bool mg_subgroupClusteredAny(bool condition, uint clusterSize) {
+    uint val = condition ? 0xFFFFFFFFu : 0u;
+    uint result = _clustered_reduce(val, clusterSize, 5);
+    return (result != 0u);
+}
+
+bool mg_subgroupClusteredAllEqual(float value, uint clusterSize) {
+    uint idx = _get_linear_index();
+    uint clusterIdx = idx / clusterSize;
+    uint offset = idx % clusterSize;
+    uint base = clusterIdx * clusterSize;
+
+    // 存储原始值
+    _cluster_shared_data[idx] = floatBitsToUint(value);
+    barrier();
+    memoryBarrierShared();
+
+    // 获取第一个元素作为参考
+    uint ref = _cluster_shared_data[base];
+    
+    // 检查所有元素是否等于参考值
+    bool equal = (floatBitsToUint(value) == ref);
+    uint u = equal ? 0xFFFFFFFFu : 0u;
+    uint result = _clustered_reduce(u, clusterSize, 4);
+    
+    return (result == 0xFFFFFFFFu);
+}
+
+// ================== 同步操作 ==================
+void mg_subgroupBarrier() {
+    barrier();
+    memoryBarrierShared();
+}
+
+void mg_subgroupMemoryBarrier() {
+    memoryBarrierShared();
+}
+)";
+
+    size_t insertPos = find_insertion_point(glsl);
+    glsl.insert(insertPos, "\n" + subgroup_clusteredImpl + "\n");
+}
+
+static void inject_shaderDrawParameters(std::string& glsl) {
+    const std::regex defRegex(R"(#extension GL_ARB_shader_draw_parameters : enable)", std::regex::ECMAScript);
+
+    // 检查是否使用了扩展中的任何标识符
+    if (glsl.find("gl_DrawID") == std::string::npos && 
+        glsl.find("gl_DrawIDARB") == std::string::npos && 
+        glsl.find("gl_BaseInstanceARB") == std::string::npos &&
+        glsl.find("gl_BaseVertexARB") == std::string::npos) {
+        return;
+    }
+    if (std::regex_search(glsl, defRegex)) {
+        return;
+    }
+
+    const std::string drawParametersImpl = R"(
+#extension GL_ARB_shader_draw_parameters : enable
+)";
+
+    size_t insertPos = find_insertion_point(glsl);
+    glsl.insert(insertPos, "\n" + drawParametersImpl + "\n");
+}
+
 static inline void inject_temporal_filter(std::string& glsl) {
     const std::regex defRegex(R"(vec4\s+GI_TemporalFilter\s*\()", std::regex::ECMAScript);
 
