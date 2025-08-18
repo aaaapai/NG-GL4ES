@@ -513,12 +513,12 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need, i
   newptr=strstr(Tmp, "#version");
   if (!newptr) {
     Tmp = InplaceInsert(Tmp, GLESFullHeader, Tmp, &tmpsize);
-  }/* else {
+  } else {
     while(*newptr!=0x0a) newptr++;
     newptr++;
     memmove(Tmp, newptr, strlen(newptr)+1);
     Tmp = InplaceInsert(Tmp, GLESFullHeader, Tmp, &tmpsize);
-  }*/
+  }
   int headline = 3;
   int texture3D = (strstr(pBuffer, "texture3D")) ? 1 : 0;
   const char* GLESUseTexture3D = "#extension GL_OES_texture_3D : enable\nprecision lowp sampler3D;\n";
@@ -1247,6 +1247,14 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need, i
   if(strstr(Tmp, "mat3x3")) {
     // better to use #define ?
     Tmp = InplaceReplace(Tmp, &tmpsize, "mat3x3", "mat3");
+  }
+
+  if (versionHeader > 1) {
+    const char* GLESBackport = "#define texture2D texture\n#define attribute in\n#define varying out\n";
+    Tmp = InplaceInsert(GetLine(Tmp, 1), GLESBackport, Tmp, &tmpsize);
+  }else {
+      const char* GLESForwardPort = "#define texture texture2D\n #define textureProj texture2DProj\n #define mod(a,b) (int(a) - int(b) * int(a/b))\n";
+      Tmp = InplaceInsert(GetLine(Tmp, 1), GLESForwardPort, Tmp, &tmpsize);
   }
 
   // finish
