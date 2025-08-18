@@ -76,8 +76,11 @@ void set_getprocaddress(void*(APIENTRY_GL4ES* new_proc_address)(const char*)) {
     gles_getProcAddress = new_proc_address;
 }
 
+void init_internal_glDrawElementsBaseVertex();
 void initialize_ng_gl4es() {
+    /*
     int enableANGLE = config_get_int("enableANGLE");
+    globals4es.enableANGLE = enableANGLE;
     if (enableANGLE) {
         setenv("LIBGL_GLES", "libGLESv2_angle.so", 1);
         setenv("LIBGL_EGL", "libEGL_angle.so", 1);
@@ -87,6 +90,8 @@ void initialize_ng_gl4es() {
         setenv("LIBGL_EGL", "", 1);
         LOGD("ANGLE disabled and not used")
     }
+        */
+    globals4es.enableANGLE = false;
 }
 char* NGGDirectory;
 
@@ -111,7 +116,7 @@ void initialize_gl4es() {
     }
 
     clear_log();
-    SHUT_LOGD("Initialising Krypton Wrapper\n")
+    SHUT_LOGD("Initialising Krypton Wrapper")
 
     config_refresh();
 
@@ -119,7 +124,7 @@ void initialize_gl4es() {
 
 #ifdef BUILD_WINDOWS_DLL
     if (!dll_inited) {
-        LOGE("Windows ES emulator's can't be initialized from DllMain (directX limitation)\n");
+        LOGE("Windows ES emulator's can't be initialized from DllMain (directX limitation)");
         return;
     }
 #endif
@@ -146,7 +151,7 @@ void initialize_gl4es() {
 
 #define env(name, global, message)                                                                                     \
     if (IsEnvVarTrue(#name)) {                                                                                         \
-        SHUT_LOGD(message "\n");                                                                                       \
+        SHUT_LOGD(message "");                                                                                         \
         global = true;                                                                                                 \
     }
 
@@ -162,26 +167,26 @@ void initialize_gl4es() {
         ;
     switch (LIBGL_FB_ENV_VAR) {
     case 1:
-        SHUT_LOGD("framebuffer output enabled\n");
+        SHUT_LOGD("framebuffer output enabled");
         globals4es.usefb = 1;
         break;
     case 2:
-        SHUT_LOGD("using framebuffer + fbo\n");
+        SHUT_LOGD("using framebuffer + fbo");
         globals4es.usefb = 1;
         globals4es.usefbo = 1;
         break;
 #ifndef NOX11
     case 3:
-        SHUT_LOGD("using pbuffer\n");
+        SHUT_LOGD("using pbuffer");
         globals4es.usefb = 0;
         globals4es.usepbuffer = 1;
         break;
 #endif
     case 4:
 #ifdef NO_GBM
-        SHUT_LOGD("GBM support not built, cannot use it\n");
+        SHUT_LOGD("GBM support not built, cannot use it");
 #else
-        SHUT_LOGD("using GBM\n");
+        SHUT_LOGD("using GBM");
         globals4es.usefb = 0;
         globals4es.usegbm = 1;
 #endif
@@ -196,7 +201,7 @@ void initialize_gl4es() {
 #endif
 #ifdef PANDORA
     if (GetEnvVarFloat("LIBGL_GAMMA", &globals4es.gamma, 0.0f)) {
-        SHUT_LOGD("Set gamma to %.2f\n", globals4es.gamma);
+        SHUT_LOGD("Set gamma to %.2f", globals4es.gamma);
     }
 #endif
     env(LIBGL_NOBGRA, globals4es.nobgra, "Ignore BGRA texture capability");
@@ -221,6 +226,7 @@ void initialize_gl4es() {
 #else
     globals4es.esversion = 300;
 #endif
+    init_internal_glDrawElementsBaseVertex();
 
     globals4es.use_mc_color = ReturnEnvVarInt("LIBGL_USE_MC_COLOR");
 
@@ -260,14 +266,14 @@ void initialize_gl4es() {
         break;
     }
 
-    SHUT_LOGD("Using GLES %s backend\n", (globals4es.es == 1) ? "1.1" : ((globals4es.es > 2) ? "3.x" : "2.0"));
+    SHUT_LOGD("Using GLES %s backend", (globals4es.es == 1) ? "1.1" : ((globals4es.es > 2) ? "3.x" : "2.0"));
 
     env(LIBGL_NODEPTHTEX, globals4es.nodepthtex, "Disable usage of Depth Textures");
 
     const char* env_drmcard = GetEnvVar("LIBGL_DRMCARD");
     if (env_drmcard) {
 #ifdef NO_GBM
-        SHUT_LOGD("Warning, GBM not compiled in, cannot use LIBGL_DRMCARD\n");
+        SHUT_LOGD("Warning, GBM not compiled in, cannot use LIBGL_DRMCARD");
 #else
         strncpy(globals4es.drmcard, env_drmcard, 50);
     } else {
@@ -289,10 +295,10 @@ void initialize_gl4es() {
     globals4es.floattex = ReturnEnvVarIntDef("LIBGL_FLOAT", 1);
     switch (globals4es.floattex) {
     case 0:
-        SHUT_LOGD("Float and Half-Float texture support disabled\n");
+        SHUT_LOGD("Float and Half-Float texture support disabled");
         break;
     case 2:
-        SHUT_LOGD("Float and Half-float texture support forced\n");
+        SHUT_LOGD("Float and Half-float texture support forced");
         break;
     default:
         globals4es.floattex = 1;
@@ -304,7 +310,7 @@ void initialize_gl4es() {
 #if !defined(NO_LOADER) && !defined(NO_GBM)
     if (globals4es.usegbm) LoadGBMFunctions();
     if (globals4es.usegbm && !(gbm && drm)) {
-        SHUT_LOGD("cannot use GBM, disabling\n");
+        SHUT_LOGD("cannot use GBM, disabling");
         globals4es.usegbm = 0; // should do some smarter fallback?
     }
 #else
@@ -329,19 +335,19 @@ void initialize_gl4es() {
     globals4es.automipmap = ReturnEnvVarInt("LIBGL_MIPMAP");
     switch (globals4es.automipmap) {
     case 1:
-        SHUT_LOGD("AutoMipMap forced\n");
+        SHUT_LOGD("AutoMipMap forced");
         break;
     case 2:
-        SHUT_LOGD("guess AutoMipMap\n");
+        SHUT_LOGD("guess AutoMipMap");
         break;
     case 3:
-        SHUT_LOGD("ignore MipMap\n");
+        SHUT_LOGD("ignore MipMap");
         break;
     case 4:
-        SHUT_LOGD("ignore AutoMipMap on non-squared textures\n");
+        SHUT_LOGD("ignore AutoMipMap on non-squared textures");
         break;
     case 5:
-        SHUT_LOGD("Calculate sub-mipmap in case some are missing\n");
+        SHUT_LOGD("Calculate sub-mipmap in case some are missing");
         break;
     default:
         globals4es.automipmap = 0;
@@ -352,48 +358,47 @@ void initialize_gl4es() {
 
     if (IsEnvVarTrue("LIBGL_TEXCOPY")) {
         globals4es.texcopydata = 1;
-        SHUT_LOGD("Texture copy enabled\n");
+        SHUT_LOGD("Texture copy enabled");
     }
 
     globals4es.texshrink = ReturnEnvVarInt("LIBGL_SHRINK");
     switch (globals4es.texshrink) {
     case 10:
         SHUT_LOGD("Texture shrink, mode 10 selected (advertise 8192 max texture size, but >2048 are quadshrinked and > "
-                  "512 are shrinked), but not for empty textures\n");
+                  "512 are shrinked), but not for empty textures");
         break;
     case 11:
         SHUT_LOGD("Texture shrink, mode 11 selected (advertise a max texture size *2, but every texture with one "
-                  "dimension > max texture size will get shrinked to max texture size), but not for empty textures\n");
+                  "dimension > max texture size will get shrinked to max texture size), but not for empty textures");
         break;
     case 1:
-        SHUT_LOGD("Texture shrink, mode 1 selected (everything / 2)\n");
+        SHUT_LOGD("Texture shrink, mode 1 selected (everything / 2)");
         break;
     case 2:
-        SHUT_LOGD("Texture shrink, mode 2 selected (only > 512 /2 )\n");
+        SHUT_LOGD("Texture shrink, mode 2 selected (only > 512 /2 )");
         break;
     case 3:
-        SHUT_LOGD("Texture shrink, mode 3 selected (only > 256 /2 )\n");
+        SHUT_LOGD("Texture shrink, mode 3 selected (only > 256 /2 )");
         break;
     case 4:
-        SHUT_LOGD("Texture shrink, mode 4 selected (only > 256 /2, >=1024 /4 )\n");
+        SHUT_LOGD("Texture shrink, mode 4 selected (only > 256 /2, >=1024 /4 )");
         break;
     case 5:
-        SHUT_LOGD("Texture shrink, mode 5 selected (every > 256 is downscaled to 256 ), but not for empty textures\n");
+        SHUT_LOGD("Texture shrink, mode 5 selected (every > 256 is downscaled to 256 ), but not for empty textures");
         break;
     case 6:
         SHUT_LOGD("Texture shrink, mode 6 selected (only > 128 /2, >=512 is downscaled to 256 ), but not for empty "
-                  "textures\n");
+                  "textures");
         break;
     case 7:
-        SHUT_LOGD("Texture shrink, mode 7 selected (only > 512 /2 ), but not for empty textures\n");
+        SHUT_LOGD("Texture shrink, mode 7 selected (only > 512 /2 ), but not for empty textures");
         break;
     case 8:
-        SHUT_LOGD(
-            "Texture shrink, mode 8 selected (advertise 8192 max texture size, but >2048 are shrinked to 2048)\n");
+        SHUT_LOGD("Texture shrink, mode 8 selected (advertise 8192 max texture size, but >2048 are shrinked to 2048)");
         break;
     case 9:
         SHUT_LOGD("Texture shrink, mode 9 selected (advertise 8192 max texture size, but >4096 are quadshrinked and > "
-                  "512 are shrinked), but not for empty textures\n");
+                  "512 are shrinked), but not for empty textures");
         break;
     default:
         globals4es.texshrink = 0;
@@ -407,12 +412,12 @@ void initialize_gl4es() {
     switch (ReturnEnvVarInt("LIBGL_STREAM")) {
     case 1:
         globals4es.texstream = InitStreamingCache();
-        SHUT_LOGD("Streaming texture %s\n", (globals4es.texstream) ? "enabled" : "not available");
+        SHUT_LOGD("Streaming texture %s", (globals4es.texstream) ? "enabled" : "not available");
         // FreeStreamed(AddStreamed(1024, 512, 0));
         break;
     case 2:
         globals4es.texstream = InitStreamingCache() ? 2 : 0;
-        SHUT_LOGD("Streaming texture %s\n", (globals4es.texstream) ? "forced" : "not available");
+        SHUT_LOGD("Streaming texture %s", (globals4es.texstream) ? "forced" : "not available");
         // FreeStreamed(AddStreamed(1024, 512, 0));
         break;
     default:
@@ -446,7 +451,7 @@ void initialize_gl4es() {
 #endif
             ;
     if (env_version) {
-        SHUT_LOGD("Overide version string with \"%s\" (should be in the form of \"1.x\")\n", env_version);
+        SHUT_LOGD("Overide version string with \"%s\" (should be in the form of \"1.x\")", env_version);
     }
 
     if (env_version) {
@@ -454,29 +459,29 @@ void initialize_gl4es() {
                  globals4es.use_mc_color == 1 ? "%s §aKrypton Wrapper %s%s%d.%d.%d%s§r"
                                               : "%s Krypton Wrapper %s%s%d.%d.%d%s",
                  env_version, version_color, VERSION_TYPE, MAJOR, MINOR, REVISION, VERSION_SUFFIX);
-        SHUT_LOGD("Targeting OpenGL %s\n", env_version);
+        SHUT_LOGD("Targeting OpenGL %s", env_version);
     } else {
         snprintf(globals4es.version, 64,
                  globals4es.use_mc_color == 1 ? "%d.%d §aKrypton Wrapper %s%s%d.%d.%d%s§r"
                                               : "%d.%d Krypton Wrapper %s%s%d.%d.%d%s",
                  globals4es.gl / 10, globals4es.gl % 10, version_color, VERSION_TYPE, MAJOR, MINOR, REVISION,
                  VERSION_SUFFIX);
-        SHUT_LOGD("Targeting OpenGL %d.%d\n", globals4es.gl / 10, globals4es.gl % 10);
+        SHUT_LOGD("Targeting OpenGL %d.%d", globals4es.gl / 10, globals4es.gl % 10);
     }
 
-    SHUT_LOGD("Target OpenGL Version: %s\n", globals4es.version)
+    SHUT_LOGD("Target OpenGL Version: %s", globals4es.version)
 
     if (hardext.srgb && IsEnvVarTrue("LIBGL_SRGB")) {
         globals4es.glx_surface_srgb = 2;
-        SHUT_LOGD("enabling sRGB support\n");
+        SHUT_LOGD("enabling sRGB support");
     }
 
     if (IsEnvVarTrue("LIBGL_FASTMATH")) {
 #if defined(PANDORA) || defined(CHIP) || (defined(GOA_CLONE) && !defined(__aarch64__))
-        SHUT_LOGD("Enable FastMath for cortex-a8\n");
+        SHUT_LOGD("Enable FastMath for cortex-a8");
         fast_math();
 #else
-        SHUT_LOGD("No FastMath on this platform\n");
+        SHUT_LOGD("No FastMath on this platform");
 #endif
     }
 
@@ -496,34 +501,34 @@ void initialize_gl4es() {
     case 1:
         if (globals4es.npot < 1) {
             globals4es.npot = 1;
-            SHUT_LOGD("Expose limited NPOT extension\n");
+            SHUT_LOGD("Expose limited NPOT extension");
         }
         break;
     case 2:
         if (globals4es.npot < 3) {
             globals4es.npot = 2;
-            SHUT_LOGD("Expose GL_ARB_texture_non_power_of_two extension\n");
+            SHUT_LOGD("Expose GL_ARB_texture_non_power_of_two extension");
         }
         break;
     }
 
     if (IsEnvVarFalse("LIBGL_GLQUERIES")) {
         globals4es.queries = 0;
-        SHUT_LOGD("Don't expose fake glQueries functions\n");
+        SHUT_LOGD("Don't expose fake glQueries functions");
     }
     if (IsEnvVarTrue("LIBGL_NODOWNSAMPLING")) {
         globals4es.nodownsampling = 1;
-        SHUT_LOGD("No downsampling of DXTc textures\n");
+        SHUT_LOGD("No downsampling of DXTc textures");
     }
     env(LIBGL_NOTEXMAT, globals4es.texmat, "Don't handle Texture Matrice internally");
     env(LIBGL_NOVAOCACHE, globals4es.novaocache, "Don't use VAO cache");
     if (IsEnvVarTrue("LIBGL_NOINTOVLHACK")) {
         globals4es.nointovlhack = 1;
-        SHUT_LOGD("No hack in shader converter to define overloaded function with int\n");
+        SHUT_LOGD("No hack in shader converter to define overloaded function with int");
     }
     if (IsEnvVarTrue("LIBGL_NOSHADERLOD")) {
         globals4es.noshaderlod = 1;
-        SHUT_LOGD("No GL_EXT_shader_texture_lod used even if present\n");
+        SHUT_LOGD("No GL_EXT_shader_texture_lod used even if present");
         hardext.shaderlod = 0;
     }
 
@@ -533,33 +538,32 @@ void initialize_gl4es() {
         case 0:
             globals4es.beginend = 0;
             globals4es.mergelist = 0;
-            SHUT_LOGD("Don't try to merge subsequent glBegin/glEnd blocks\n");
+            SHUT_LOGD("Don't try to merge subsequent glBegin/glEnd blocks");
             break;
         case 1:
         case 2:
             globals4es.beginend = 1;
-            SHUT_LOGD(
-                "Try to merge subsequent glBegin/glEnd blocks, even if there is a glColor / glNormal in between\n");
+            SHUT_LOGD("Try to merge subsequent glBegin/glEnd blocks, even if there is a glColor / glNormal in between");
             break;
         }
     }
 
     if (GetEnvVarBool("LIBGL_AVOID16BITS", &globals4es.avoid16bits, (hardext.vendor & VEND_IMGTEC) ? 0 : 1)) {
         if (globals4es.avoid16bits) {
-            SHUT_LOGD("Avoid 16bits textures\n");
+            SHUT_LOGD("Avoid 16bits textures");
         } else {
-            SHUT_LOGD("Don't avoid 16bits textures\n");
+            SHUT_LOGD("Don't avoid 16bits textures");
         }
     }
 
     if (GetEnvVarInt("LIBGL_AVOID24BITS", &globals4es.avoid24bits, 0)) {
         switch (globals4es.avoid24bits) {
         case 0:
-            SHUT_LOGD("Don't try to avoid 24bits textures\n");
+            SHUT_LOGD("Don't try to avoid 24bits textures");
             break;
         case 1:
             globals4es.avoid24bits = 2;
-            SHUT_LOGD("Avoid 24bits textures\n");
+            SHUT_LOGD("Avoid 24bits textures");
             break;
         default:
             globals4es.avoid24bits = 0;
@@ -572,15 +576,15 @@ void initialize_gl4es() {
 
     int env_forcenpot = ReturnEnvVarIntDef("LIBGL_FORCENPOT", 0);
     if (env_forcenpot == 0 && (hardext.esversion == 2 && (hardext.npot == 1 || hardext.npot == 2))) {
-        SHUT_LOGD("Not forcing NPOT support\n");
+        SHUT_LOGD("Not forcing NPOT support");
     } else if (env_forcenpot != 0 || (hardext.esversion == 2 && (hardext.npot == 1 || hardext.npot == 2))) {
         if (hardext.npot == 3) {
-            SHUT_LOGD("NPOT texture handled in hardware\n");
+            SHUT_LOGD("NPOT texture handled in hardware");
         } else if (hardext.npot == 1) {
             globals4es.forcenpot = 1;
-            SHUT_LOGD("Forcing NPOT support by disabling MIPMAP support for NPOT textures\n");
+            SHUT_LOGD("Forcing NPOT support by disabling MIPMAP support for NPOT textures");
         } else {
-            SHUT_LOGD("WARNING, No Limited or Full NPOT support in hardware, Forcing NPOT has no effect!\n");
+            SHUT_LOGD("WARNING, No Limited or Full NPOT support in hardware, Forcing NPOT has no effect!");
         }
     }
 
@@ -606,9 +610,9 @@ void initialize_gl4es() {
         break;
     }
     if (globals4es.maxbatch == 0) {
-        SHUT_LOGD("Not trying to batch small subsequent glDrawXXXX\n");
+        SHUT_LOGD("Not trying to batch small subsequent glDrawXXXX");
     } else {
-        SHUT_LOGD("Trying to batch subsequent glDrawXXXX of size between %d and %d vertices\n", globals4es.minbatch,
+        SHUT_LOGD("Trying to batch subsequent glDrawXXXX of size between %d and %d vertice", globals4es.minbatch,
                   globals4es.maxbatch);
     }
 
@@ -618,16 +622,16 @@ void initialize_gl4es() {
         globals4es.usevbo = ReturnEnvVarIntDef("LIBGL_USEVBO", 1);
         switch (globals4es.usevbo) {
         case 0:
-            SHUT_LOGD("Use of VBO disabled\n");
+            SHUT_LOGD("Use of VBO disabled");
             break;
         case 1:
-            SHUT_LOGD("Trying to use VBO\n");
+            SHUT_LOGD("Trying to use VBO");
             break;
         case 2:
-            SHUT_LOGD("Trying to use VBO (also with glLockArrays)\n");
+            SHUT_LOGD("Trying to use VBO (also with glLockArrays)");
             break;
         case 3:
-            SHUT_LOGD("Trying to use VBO (special glLockArrays case for idtech3 engine)\n");
+            SHUT_LOGD("Trying to use VBO (special glLockArrays case for idtech3 engine)");
             break;
         default:
             globals4es.usevbo = 1;
@@ -641,7 +645,7 @@ void initialize_gl4es() {
     case 0:
         if (globals4es.fbomakecurrent) {
             globals4es.fbomakecurrent = 0;
-            SHUT_LOGD("glXMakeCurrent FBO workaround disabled\n");
+            SHUT_LOGD("glXMakeCurrent FBO workaround disabled");
         }
         break;
     case 1:
@@ -649,7 +653,7 @@ void initialize_gl4es() {
         break;
     }
     if (globals4es.fbomakecurrent) {
-        SHUT_LOGD("glXMakeCurrent FBO workaround enabled\n");
+        SHUT_LOGD("glXMakeCurrent FBO workaround enabled");
     }
 
     globals4es.fbounbind = 0;
@@ -658,7 +662,7 @@ void initialize_gl4es() {
     case 0:
         if (globals4es.fbounbind) {
             globals4es.fbounbind = 0;
-            SHUT_LOGD("FBO workaround for using binded texture disabled\n");
+            SHUT_LOGD("FBO workaround for using binded texture disabled");
         }
         break;
     case 1:
@@ -666,16 +670,16 @@ void initialize_gl4es() {
         break;
     }
     if (globals4es.fbounbind) {
-        SHUT_LOGD("FBO workaround for using binded texture enabled\n");
+        SHUT_LOGD("FBO workaround for using binded texture enabled");
     }
 
     globals4es.fboforcetex = 1;
     GetEnvVarInt("LIBGL_FBOFORCETEX", &globals4es.fboforcetex, globals4es.fboforcetex);
-    if (globals4es.fboforcetex) SHUT_LOGD("Force texture for Attachment color0 on FBO\n");
+    if (globals4es.fboforcetex) SHUT_LOGD("Force texture for Attachment color0 on FBO");
     globals4es.blitfullscreen = 1;
     GetEnvVarInt("LIBGL_BLITFULLSCREEN", &globals4es.blitfullscreen, globals4es.blitfullscreen);
     if (globals4es.blitfullscreen)
-        SHUT_LOGD("Hack to trigger a SwapBuffers when a Full Framebuffer Blit on default FBO is done\n");
+        SHUT_LOGD("Hack to trigger a SwapBuffers when a Full Framebuffer Blit on default FBO is done");
 
     env(LIBGL_COMMENTS, globals4es.comments, "Keep comments in converted Shaders");
 
@@ -689,22 +693,22 @@ void initialize_gl4es() {
     if (GetEnvVarInt("LIBGL_DEFAULTWRAP", &globals4es.defaultwrap, (hardext.npot == 3) ? 0 : 1)) {
         switch (globals4es.defaultwrap) {
         case 0:
-            SHUT_LOGD("Default wrap mode is GL_REPEAT\n");
+            SHUT_LOGD("Default wrap mode is GL_REPEAT");
             break;
         case 1:
-            SHUT_LOGD("Default wrap mode is GL_CLAMP_TO_EDGE\n");
+            SHUT_LOGD("Default wrap mode is GL_CLAMP_TO_EDGE");
             break;
         case 2:
         default:
             globals4es.defaultwrap = 2;
-            SHUT_LOGD("Default wrap mode is GL_CLAMP_TO_EDGE, enforced\n");
+            SHUT_LOGD("Default wrap mode is GL_CLAMP_TO_EDGE, enforced");
             break;
         }
     }
 
     GetEnvVarBool("LIBGL_NOTEXARRAY", &globals4es.notexarray, 0);
     if (globals4es.notexarray) {
-        SHUT_LOGD("No Texture Array in Shaders\n");
+        SHUT_LOGD("No Texture Array in Shaders");
     }
 
     env(LIBGL_LOGSHADERERROR, globals4es.logshader, "Log errors compiling shaders to the console");
@@ -724,7 +728,7 @@ void initialize_gl4es() {
         if (globals4es.dbgshaderconv & 8) SHUT_LOGD_NOPREFIX("After  ");
         if (globals4es.dbgshaderconv & 1) SHUT_LOGD_NOPREFIX("Vertex  ");
         if (globals4es.dbgshaderconv & 2) SHUT_LOGD_NOPREFIX("Fragment  ");
-        SHUT_LOGD_NOPREFIX("\n");
+        SHUT_LOGD_NOPREFIX("");
     }
 
     // VGPU pipeline stuff
@@ -745,16 +749,16 @@ void initialize_gl4es() {
     int env_glxrecycle = ReturnEnvVarIntDef("LIBGL_GLXRECYCLE", -1);
     if (globals4es.glxrecycle && env_glxrecycle == 0 && !((globals4es.usepbuffer) || (globals4es.usefb))) {
         globals4es.glxrecycle = 0;
-        SHUT_LOGD("glX Will NOT try to recycle EGL Surface\n");
+        SHUT_LOGD("glX Will NOT try to recycle EGL Surface");
     }
     if (env_glxrecycle == 1) globals4es.glxrecycle = 1;
     if (globals4es.glxrecycle) {
-        SHUT_LOGD("glX Will try to recycle EGL Surface\n");
+        SHUT_LOGD("glX Will try to recycle EGL Surface");
     }
     env(LIBGL_GLXNATIVE, globals4es.glxnative, "Don't filter GLXConfig with GLX_X_NATIVE_TYPE");
 #endif
     char cwd[4096];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) SHUT_LOGD("Current folder is:%s\n", cwd);
+    if (getcwd(cwd, sizeof(cwd)) != NULL) SHUT_LOGD("Current folder is:%s", cwd);
 
     if (hardext.shader_fbfetch) {
         env(LIBGL_SHADERBLEND, globals4es.shaderblend, "Blend will be handled in shaders");
@@ -786,11 +790,11 @@ void initialize_gl4es() {
             }
         }
     } else
-        SHUT_LOGD("Not using PSA (prgbin_n=%d, notexarray=%d)\n", hardext.prgbin_n, globals4es.notexarray);
+        SHUT_LOGD("Not using PSA (prgbin_n=%d, notexarray=%d)", hardext.prgbin_n, globals4es.notexarray);
 
     env(LIBGL_SKIPTEXCOPIES, globals4es.skiptexcopies, "Texture Copies will be skipped");
     if (GetEnvVarFloat("LIBGL_FB_TEX_SCALE", &globals4es.fbtexscale, 0.0f)) {
-        SHUT_LOGD("Framebuffer Textures will be scaled by %.2f\n", globals4es.fbtexscale);
+        SHUT_LOGD("Framebuffer Textures will be scaled by %.2f", globals4es.fbtexscale);
     }
 }
 
@@ -809,11 +813,11 @@ EXPORT // symmetric for init -- trivialize application code
 #endif
 void close_gl4es() {
 #ifdef GL4ES_COMPILE_FOR_USE_IN_SHARED_LIB
-    SHUT_LOGD("Shutdown requested\n");
+    SHUT_LOGD("Shutdown requested");
     if (--inited) return;
 #endif
     config_cleanup();
-    SHUT_LOGD("Shutting down\n");
+    SHUT_LOGD("Shutting down");
 #ifndef NOX11
     FreeFBVisual();
 #endif

@@ -5,6 +5,7 @@
 #include "../gl/init.h"
 #include "../gl/logs.h"
 #include "../gl/loader.h"
+#include "GLES3/gl32.h"
 #ifndef ANDROID
 #include "rpi.h"
 #endif
@@ -69,7 +70,7 @@ static int testGLSL(const char* version, int uniformLoc) {
         LOAD_GLES2(glGetShaderInfoLog)
         char buff[500];
         gles_glGetShaderInfoLog(shad, 500, NULL, buff);
-        printf("LIBGL: \"%s\" failed, message:\n%s\n", version, buff);
+        printf("LIBGL: \"%s\" failed, message:\n%s", version, buff);
     }
     */
     gles_glDeleteShader(shad);
@@ -117,7 +118,7 @@ void GetHardwareExtensions(int notest) {
     hardext.esversion = globals4es.es;
     if (notest) {
 #ifndef AMIGAOS4
-        SHUT_LOGD("Hardware test disabled, nothing activated...\n");
+        SHUT_LOGD("Hardware test disabled, nothing activated...");
 #endif
         if (hardext.esversion >= 2) {
             hardext.maxteximage = 4;
@@ -149,7 +150,7 @@ void GetHardwareExtensions(int notest) {
     rpi_init();
 #endif
 #ifdef NOEGL
-    SHUT_LOGD("Hardware test on current Context...\n");
+    SHUT_LOGD("Hardware test on current Context...");
 #else
     // used EGL & GLES functions
     LOAD_EGL(eglBindAPI);
@@ -168,7 +169,7 @@ void GetHardwareExtensions(int notest) {
     EGLSurface eglSurface;
     EGLContext eglContext;
 
-    SHUT_LOGD("Using GLES %s backend\n", (hardext.esversion == 1) ? "1.1" : (hardext.esversion == 2) ? "2.0" : "3.x");
+    SHUT_LOGD("Using GLES %s backend", (hardext.esversion == 1) ? "1.1" : (hardext.esversion == 2) ? "2.0" : "3.x");
 
     // Create a PBuffer first...
     EGLint egl_context_attrib_es2[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
@@ -224,7 +225,7 @@ void GetHardwareExtensions(int notest) {
 
     egl_eglBindAPI(EGL_OPENGL_ES_API);
     if (egl_eglInitialize(eglDisplay, NULL, NULL) != EGL_TRUE) {
-        LOGE("Error while gathering supported extension (eglInitialize: %s), default to none\n", PrintEGLError(0));
+        LOGE("Error while gathering supported extension (eglInitialize: %s), default to none", PrintEGLError(0));
         egl_eglTerminate(eglDisplay);
         return;
     }
@@ -233,7 +234,7 @@ void GetHardwareExtensions(int notest) {
 #ifndef NO_GBM
     const char* eglExts = egl_eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
     if (eglExts && strstr(eglExts, "EGL_KHR_platform_gbm ")) {
-        SHUT_LOGD("GBM Surfaces supported%s\n", globals4es.usegbm ? " and used" : "");
+        SHUT_LOGD("GBM Surfaces supported%s", globals4es.usegbm ? " and used" : "");
         hardext.gbm = 1;
     }
 #endif
@@ -243,27 +244,26 @@ void GetHardwareExtensions(int notest) {
         configAttribs[4 * 2 - 1] = 0;
         egl_eglChooseConfig(eglDisplay, configAttribs, pbufConfigs, 1, &configsFound);
         if (configsFound) {
-            SHUT_LOGD("No alpha channel in PBuffer context, disabling EGL Alpha channel...\n");
+            SHUT_LOGD("No alpha channel in PBuffer context, disabling EGL Alpha channel...");
             hardext.eglnoalpha = 1;
         }
     }
 #endif
     if (!configsFound) {
-        SHUT_LOGE("Error while gathering supported extension (eglChooseConfig: %s), default to none\n",
-                  PrintEGLError(0));
+        SHUT_LOGE("Error while gathering supported extension (eglChooseConfig: %s), default to none", PrintEGLError(0));
         egl_eglTerminate(eglDisplay);
         return;
     }
     eglContext = egl_eglCreateContext(eglDisplay, pbufConfigs[0], EGL_NO_CONTEXT,
                                       (hardext.esversion == 1) ? egl_context_attrib : egl_context_attrib_es2);
     if (!eglContext) {
-        SHUT_LOGE("Error while gathering supported extension (eglCreateContext: %s), default to none\n",
+        SHUT_LOGE("Error while gathering supported extension (eglCreateContext: %s), default to none",
                   PrintEGLError(0));
         return;
     }
     eglSurface = egl_eglCreatePbufferSurface(eglDisplay, pbufConfigs[0], egl_attribs);
     if (!eglSurface) {
-        SHUT_LOGE("Error while gathering supported extension (eglCreatePBufferSurface: %s), default to none\n",
+        SHUT_LOGE("Error while gathering supported extension (eglCreatePBufferSurface: %s), default to none",
                   PrintEGLError(0));
         egl_eglDestroyContext(eglDisplay, eglContext);
         egl_eglTerminate(eglDisplay);
@@ -281,7 +281,7 @@ void GetHardwareExtensions(int notest) {
 #define S(A, B, C)                                                                                                     \
     if (strstr(Exts, A)) {                                                                                             \
         hardext.B = 1;                                                                                                 \
-        SHUT_LOGD("Extension %s detected%s", A, C ? " and used\n" : "\n");                                             \
+        SHUT_LOGD("Extension %s detected%s", A, C ? " and used" : "");                                                 \
     }
     if (hardext.esversion > 1) hardext.npot = 1;
     if (strstr(Exts, "GL_APPLE_texture_2D_limited_npot ")) hardext.npot = 1;
@@ -290,12 +290,12 @@ void GetHardwareExtensions(int notest) {
             1; // it should enable mipmap (so hardext.npot=2), but mipmap (so level > 0) needs to be POT-sized?!!
     if (strstr(Exts, "GL_ARB_texture_non_power_of_two ") || strstr(Exts, "GL_OES_texture_npot ")) hardext.npot = 3;
     if (hardext.npot > 0) {
-        SHUT_LOGD("Hardware %s NPOT detected and used\n",
+        SHUT_LOGD("Hardware %s NPOT detected and used",
                   hardext.npot == 3 ? "Full" : (hardext.npot == 2 ? "Limited+Mipmap" : "Limited"));
     }
     S("GL_EXT_blend_minmax ", blendminmax, 1);
     if (hardext.esversion > 2) {
-        SHUT_LOGD("Extension GL_EXT_draw_buffers is in core ES3, and so used\n");
+        SHUT_LOGD("Extension GL_EXT_draw_buffers is in core ES3, and so used");
         hardext.drawbuffers = 1;
     } else {
         S("GL_EXT_draw_buffers ", drawbuffers, 1);
@@ -305,7 +305,7 @@ void GetHardwareExtensions(int notest) {
         LOAD_GLES_OR_OES(glBlendColor);
         if(gles_glBlendColor != NULL) {
             hardext.blendcolor = 1;
-            SHUT_LOGD("Extension glBlendColor found and used\n");
+            SHUT_LOGD("Extension glBlendColor found and used");
         }
     }*/ // I don't think this is correct
     if (hardext.esversion < 2) {
@@ -320,20 +320,20 @@ void GetHardwareExtensions(int notest) {
         S("GL_OES_texture_mirrored_repeat ", mirrored, 1);
     } else {
         hardext.fbo = 1;
-        SHUT_LOGD("FBO are in core, and so used\n");
+        SHUT_LOGD("FBO are in core, and so used");
         hardext.pointsprite = 1;
-        SHUT_LOGD("PointSprite are in core, and so used\n");
+        SHUT_LOGD("PointSprite are in core, and so used");
         hardext.pointsize = 1;
-        SHUT_LOGD("CubeMap are in core, and so used\n");
+        SHUT_LOGD("CubeMap are in core, and so used");
         hardext.cubemap = 1;
-        SHUT_LOGD("BlendColor is in core, and so used\n");
+        SHUT_LOGD("BlendColor is in core, and so used");
         hardext.blendcolor = 1;
-        SHUT_LOGD("Blend Subtract is in core, and so used\n");
+        SHUT_LOGD("Blend Subtract is in core, and so used");
         hardext.blendsub = 1;
-        SHUT_LOGD("Blend Function and Equation Separation is in core, and so used\n");
+        SHUT_LOGD("Blend Function and Equation Separation is in core, and so used");
         hardext.blendfunc = 1;
         hardext.blendeq = 1;
-        SHUT_LOGD("Texture Mirrored Repeat is in core, and so used\n");
+        SHUT_LOGD("Texture Mirrored Repeat is in core, and so used");
         hardext.mirrored = 1;
     }
     S("GL_OES_mapbuffer ", mapbuffer, 0);
@@ -344,7 +344,7 @@ void GetHardwareExtensions(int notest) {
     S("GL_EXT_multi_draw_arrays ", multidraw, 0);
     if (!globals4es.nobgra) {
         // S("GL_EXT_texture_format_BGRA8888 ", bgra8888, 1);
-        LOGD("GL_EXT_texture_format_BGRA8888 never used")
+        LOGD("Extension GL_EXT_texture_format_BGRA8888 never used")
     }
     if (!globals4es.nodepthtex) {
         S("GL_OES_depth_texture ", depthtex, 1);
@@ -376,7 +376,7 @@ void GetHardwareExtensions(int notest) {
                     gles_glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
                     if (!(range[0] == 0 && range[1] == 0 && precision == 0)) {
                         hardext.highp = 2; // no need to declare #entension here
-                        SHUT_LOGD("high precision float in fragment shader available and used\n");
+                        SHUT_LOGD("high precision float in fragment shader available and used");
                     }
                 }
             }
@@ -386,12 +386,12 @@ void GetHardwareExtensions(int notest) {
             // test is textureCubeLod need EXT or not (seems to be a bug in some PVR driver)
             if (testTextureCubeLod()) {
                 hardext.cubelod = 1;
-                SHUT_LOGD("textureCubeLod in fragment doesn't need trailing EXT\n");
+                SHUT_LOGD("textureCubeLod in fragment doesn't need trailing EXT");
             }
         }
         S("GL_EXT_frag_depth ", fragdepth, 1);
         gles_glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &hardext.maxvattrib);
-        SHUT_LOGD("Max vertex attrib: %d\n", hardext.maxvattrib);
+        SHUT_LOGD("Max vertex attrib: %d", hardext.maxvattrib);
         S("GL_OES_standard_derivatives ", derivatives, 1);
         S("GL_ARM_shader_framebuffer_fetch", shader_fbfetch, 1);
         S("GL_OES_get_program ", prgbinary, 1);
@@ -400,12 +400,21 @@ void GetHardwareExtensions(int notest) {
         }
         if (hardext.prgbinary) {
             gles_glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &hardext.prgbin_n);
-            SHUT_LOGD("Number of supported Program Binary Format: %d\n", hardext.prgbin_n);
+            SHUT_LOGD("Number of supported Program Binary Format: %d", hardext.prgbin_n);
+        }
+        S("GL_EXT_draw_elements_base_vertex", basevertex, 1);
+        int versionMajor, versionMinor;
+        gles_glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+        gles_glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+
+        if (versionMajor > 3 || (versionMajor == 3 && versionMinor >= 2)) { // GLES 3.2+
+            hardext.basevertex = 1;
         }
     }
+
     // Now get some max stuffs
     gles_glGetIntegerv(GL_MAX_TEXTURE_SIZE, &hardext.maxsize);
-    SHUT_LOGD("Max texture size: %d\n", hardext.maxsize);
+    SHUT_LOGD("Max texture size: %d", hardext.maxsize);
     gles_glGetIntegerv((hardext.esversion == 1) ? GL_MAX_TEXTURE_UNITS : GL_MAX_TEXTURE_IMAGE_UNITS, &hardext.maxtex);
     if (hardext.esversion == 1) {
         gles_glGetIntegerv(GL_MAX_LIGHTS, &hardext.maxlights);
@@ -417,7 +426,7 @@ void GetHardwareExtensions(int notest) {
         hardext.maxplanes = 6;
         gles_glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &hardext.maxteximage);
         gles_glGetIntegerv(GL_MAX_VARYING_VECTORS, &hardext.maxvarying);
-        SHUT_LOGD("Max Varying Vector: %d\n", hardext.maxvarying);
+        SHUT_LOGD("Max Varying Vector: %d", hardext.maxvarying);
         if (hardext.maxvattrib < 16 && hardext.maxtex > 4)
             hardext.maxtex = 4; // with less then 16 vertexattrib, more then 4 textures seems unreasonnable
     }
@@ -427,17 +436,17 @@ void GetHardwareExtensions(int notest) {
     if (hardext.maxlights > MAX_LIGHT) hardext.maxlights = MAX_LIGHT; // caping lights too
     if (hardext.maxplanes > MAX_CLIP_PLANES)
         hardext.maxplanes = MAX_CLIP_PLANES; // caping planes, even 6 should be the max supported anyway
-    SHUT_LOGD("Texture Units: %d/%d (hardware: %d), Max lights: %d, Max planes: %d\n", hardext.maxtex,
+    SHUT_LOGD("Texture Units: %d/%d (hardware: %d), Max lights: %d, Max planes: %d", hardext.maxtex,
               hardext.maxteximage, hardmaxtex, hardext.maxlights, hardext.maxplanes);
     S("GL_EXT_texture_filter_anisotropic ", aniso, 1);
     if (hardext.aniso) {
         gles_glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &hardext.aniso);
         if (gles_glGetError() != GL_NO_ERROR) hardext.aniso = 0;
-        if (hardext.aniso) SHUT_LOGD("Max Anisotropic filtering: %d\n", hardext.aniso);
+        if (hardext.aniso) SHUT_LOGD("Max Anisotropic filtering: %d", hardext.aniso);
     }
     // get GLES driver signatures...
     const char* vendor = (const char*)gles_glGetString(GL_VENDOR);
-    SHUT_LOGD("Hardware vendor is %s\n", vendor);
+    SHUT_LOGD("Hardware vendor is %s", vendor);
     if (strstr(vendor, "ARM"))
         hardext.vendor = VEND_ARM;
     else if (strstr(vendor, "Imagination Technologies"))
@@ -449,16 +458,16 @@ void GetHardwareExtensions(int notest) {
         if (testGLSL("#version 320 es", 1)) hardext.glsl320es = 1;
     }
     if (hardext.glsl120) {
-        SHUT_LOGD("GLSL 120 supported and used\n");
+        SHUT_LOGD("GLSL 120 supported and used");
     }
     if (hardext.glsl300es) {
-        SHUT_LOGD("GLSL 300 es supported%s\n", (hardext.glsl120 || hardext.glsl310es) ? "" : " and used");
+        SHUT_LOGD("GLSL 300 es supported%s", (hardext.glsl120 || hardext.glsl310es) ? "" : " and used");
     }
     if (hardext.glsl310es) {
-        SHUT_LOGD("GLSL 310 es supported%s\n", hardext.glsl310es ? "" : " and used");
+        SHUT_LOGD("GLSL 310 es supported%s", hardext.glsl310es ? "" : " and used");
     }
     if (hardext.glsl320es) {
-        SHUT_LOGD("GLSL 320 es supported%s\n", hardext.glsl320es ? "" : " and used");
+        SHUT_LOGD("GLSL 320 es supported%s", hardext.glsl320es ? "" : " and used");
     }
     if (!hardext.glsl300es) {
         // We can't use the vgpu forward conversion
@@ -473,22 +482,22 @@ void GetHardwareExtensions(int notest) {
     if (hardext.maxcolorattach > MAX_DRAW_BUFFERS) hardext.maxcolorattach = MAX_DRAW_BUFFERS;
     if (hardext.maxdrawbuffers < 1) hardext.maxdrawbuffers = 1;
     if (hardext.maxdrawbuffers > MAX_DRAW_BUFFERS) hardext.maxdrawbuffers = MAX_DRAW_BUFFERS;
-    SHUT_LOGD("Max Color Attachments: %d / Draw buffers: %d\n", hardext.maxdrawbuffers, hardext.maxcolorattach);
+    SHUT_LOGD("Max Color Attachments: %d / Draw buffers: %d", hardext.maxdrawbuffers, hardext.maxcolorattach);
 #ifndef NOEGL
     if (strstr(egl_eglQueryString(eglDisplay, EGL_EXTENSIONS), "EGL_KHR_gl_colorspace")) {
-        SHUT_LOGD("sRGB surface supported\n");
+        SHUT_LOGD("sRGB surface supported");
         hardext.srgb = 1;
     }
     if (strstr(egl_eglQueryString(eglDisplay, EGL_EXTENSIONS), "EGL_KHR_image_pixmap")) {
-        SHUT_LOGD("EGLImage from Pixmap supported\n");
+        SHUT_LOGD("EGLImage from Pixmap supported");
         hardext.khr_pixmap = 1;
     }
     if (strstr(egl_eglQueryString(eglDisplay, EGL_EXTENSIONS), "EGL_KHR_gl_texture_2D_image")) {
-        SHUT_LOGD("EGLImage to Texture2D supported\n");
+        SHUT_LOGD("EGLImage to Texture2D supported");
         hardext.khr_texture_2d = 1;
     }
     if (strstr(egl_eglQueryString(eglDisplay, EGL_EXTENSIONS), "EGL_KHR_gl_renderbuffer_image")) {
-        SHUT_LOGD("EGLImage to RenderBuffer supported\n");
+        SHUT_LOGD("EGLImage to RenderBuffer supported");
         hardext.khr_renderbuffer = 1;
     }
 

@@ -9,25 +9,23 @@
 #include "glx.h"
 #include "hardext.h"
 
-
-void glXStub(void *x, ...) {
+void glXStub(void* x, ...) {
     return;
 }
-void *gl4es_glXGetProcAddress(const char *name) __attribute__((visibility("default")));
-void *gl4es_glXGetProcAddress(const char *name) {
+void* gl4es_glXGetProcAddress(const char* name) __attribute__((visibility("default")));
+void* gl4es_glXGetProcAddress(const char* name) {
     void* proc = dlsym(RTLD_DEFAULT, (const char*)name);
 
     if (!proc) {
-        fprintf(stderr, "Failed to get OpenGL function %s: %s\n", name, dlerror());
-        SHUT_LOGD("[WARNING] Failed to get OpenGL function: %s", (const char*)name);
+        DBG(SHUT_LOGD("[WARNING] Failed to get OpenGL function: %s", (const char*)name));
         return NULL;
     }
 
     return proc;
 }
 #ifdef AMIGAOS4
-//AliasExport(void*,aglGetProcAddress,,(const char* name));
+// AliasExport(void*,aglGetProcAddress,,(const char* name));
 #else
-AliasExport(void*,glXGetProcAddress,,(const char* name));
-AliasExport(void*,glXGetProcAddress,ARB,(const char* name));
+AliasExport(void*, glXGetProcAddress, , (const char* name));
+AliasExport(void*, glXGetProcAddress, ARB, (const char* name));
 #endif

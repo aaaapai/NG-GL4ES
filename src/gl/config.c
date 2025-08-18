@@ -16,7 +16,7 @@ void config_refresh() {
 
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        SHUT_LOGE("Unable to open config file %s", path);
+        DBG(SHUT_LOGE("Unable to open config file %s", path);)
         return;
     }
 
@@ -37,7 +37,7 @@ void config_refresh() {
 
     config_json = cJSON_Parse(file_content);
     if (config_json == NULL) {
-        SHUT_LOGE("Error parsing config JSON: %s\n", cJSON_GetErrorPtr());
+        SHUT_LOGE("Error parsing config JSON: %s", cJSON_GetErrorPtr());
     }
 
     free(file_content);
@@ -51,7 +51,7 @@ int config_get_int(char* name) {
 
     cJSON *item = cJSON_GetObjectItem(config_json, name);
     if (item == NULL || !cJSON_IsNumber(item)) {
-        SHUT_LOGD("Config item '%s' not found or not an integer.\n", name);
+        DBG(SHUT_LOGD("Config item '%s' not found or not an integer.\n", name);)
         return -1;
     }
 
@@ -65,7 +65,7 @@ char* config_get_string(char* name) {
 
     cJSON *item = cJSON_GetObjectItem(config_json, name);
     if (item == NULL || !cJSON_IsString(item)) {
-        SHUT_LOGD("Config item '%s' not found or not a string.\n", name);
+        DBG(SHUT_LOGD("Config item '%s' not found or not a string.\n", name);)
         return NULL; 
     }
 

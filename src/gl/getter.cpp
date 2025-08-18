@@ -27,7 +27,6 @@ extern "C"
 #else
 #define DBG(a)
 #endif
-
     GLenum APIENTRY_GL4ES gl4es_glGetError(void) {
         DBG(SHUT_LOGD("glGetError(), noerror=%d, type_error=%d shim_error=%s\n", globals4es.noerror,
                       glstate->type_error, PrintEnum(glstate->shim_error));)
@@ -315,6 +314,7 @@ extern "C"
         return gpuName;
     }
 
+    void init_internal_glDrawElementsBaseVertex();
     void set_es_version() {
         LOAD_GLES(glGetString);
         const char* ESVersion = getBeforeThirdSpace((const char*)gles_glGetString(GL_VERSION));
@@ -325,10 +325,16 @@ extern "C"
         } else {
             globals4es.esversion = globals4es.es * 100;
         }
+        init_internal_glDrawElementsBaseVertex();
         SHUT_LOGD("OpenGL ES Version: %s (%d)", ESVersion, globals4es.esversion);
         if (globals4es.esversion < 300) {
-            SHUT_LOGD("OpenGL ES version is lower than 3.0! This version is not supported!");
-            SHUT_LOGD("Disable glslang and SPIRV-Cross. Using vgpu to process all shaders!");
+            SHUT_LOGD("OpenGL ES version is lower than 3.0! This version is not supported completely!");
+            SHUT_LOGD("FBO and texture compression may be completely broken!");
+            SHUT_LOGD("Disabled glslang and SPIRV-Cross, using vgpu shaderconv to convert all shaders!");
+        } else if (globals4es.esversion < 310) {
+            SHUT_LOGD("OpenGL ES version is lower than 3.1! Rendering may be broken!");
+        } else if (globals4es.esversion < 320) {
+            SHUT_LOGD("OpenGL ES version is lower than 3.2! Some features may not work as expected!");
         }
     }
 

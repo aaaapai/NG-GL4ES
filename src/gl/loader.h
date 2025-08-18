@@ -266,8 +266,8 @@ extern "C"
     DEFINE_RAW(gles, name);                                                                                            \
     {                                                                                                                  \
         LOAD_EGL(eglGetProcAddress);                                                                                   \
-        LOAD_RAW(gles, name,                                                                                           \
-                 ((hardext.esversion <= 2) ? egl_eglGetProcAddress(#name "EXT") : egl_eglGetProcAddress(#name)));      \
+        name##_PTR origin = (name##_PTR)egl_eglGetProcAddress(#name);                                                  \
+        LOAD_RAW(gles, name, ((origin ? origin : egl_eglGetProcAddress(#name "EXT"))));                                \
     }
 
 #define LOAD_GLES2_OR_OES(name) LOAD_GLES2(name)

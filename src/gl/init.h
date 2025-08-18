@@ -54,10 +54,10 @@ typedef struct _globals4es {
     int usevbo;
     int comments;
     int forcenpot;
-    int fbomakecurrent;    // hack to bind/unbind FBO when doing glXMakeCurrent
-    int fbounbind;         // hack to bind/unbind fbo if a bind texture is used for drawing
-    int fboforcetex;       // force texture attachment for Color0
-    int blitfullscreen;    // a "fullscreen" blit to FB0 means SwapBuffers
+    int fbomakecurrent; // hack to bind/unbind FBO when doing glXMakeCurrent
+    int fbounbind;      // hack to bind/unbind fbo if a bind texture is used for drawing
+    int fboforcetex;    // force texture attachment for Color0
+    int blitfullscreen; // a "fullscreen" blit to FB0 means SwapBuffers
     int notexarray;
     int nodepthtex;
     int logshader;
@@ -71,27 +71,28 @@ typedef struct _globals4es {
     int nointovlhack;
     int noshaderlod;
     int fbo_noalpha;
-    int noarbprogram;      // to disable ARB Program
+    int noarbprogram; // to disable ARB Program
     int glxnative;
-    int normalize;         // force normal normalization (workaround a bug)
+    int normalize; // force normal normalization (workaround a bug)
     int blitfb0;
     int skiptexcopies;
     int shaderblend;
     int deepbind;
     float fbtexscale;
-    #ifndef NO_GBM
+#ifndef NO_GBM
     char drmcard[50];
-    #endif
+#endif
     char version[65];
     int use_mc_color;
-    int vgpu_dump;         // Whether vgpu dumps the shader input and output.
-    int vgpu_force_conv;   // Whether vgpu is forced to convert all shaders
-    int vgpu_precision;    // The level of precision used by vgpu
-    int vgpu_backport;     // Whether we try hard to backport shaders to #version 100
+    int vgpu_dump;       // Whether vgpu dumps the shader input and output.
+    int vgpu_force_conv; // Whether vgpu is forced to convert all shaders
+    int vgpu_precision;  // The level of precision used by vgpu
+    int vgpu_backport;   // Whether we try hard to backport shaders to #version 100
 
     int force_es_copy_tex;
-    const char *force_egl_lib;
-    const char *force_gles_lib;
+    const char* force_egl_lib;
+    const char* force_gles_lib;
+    _Bool enableANGLE;
 } globals4es_t;
 
 extern globals4es_t globals4es;

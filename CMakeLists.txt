@@ -90,6 +90,7 @@ set(C_SRC_FILES
         src/gl/wrap/gl4eswraps.c
         src/gl/wrap/gles.c
         src/gl/wrap/glstub.c
+        src/gl/wrap/glesnative.cpp
         src/gl/math/matheval.c
         src/glx/hardext.c
         src/glx/glx.c

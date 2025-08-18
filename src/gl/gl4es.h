@@ -103,7 +103,7 @@ extern "C"
                                                 GLsizei primcount);
     void APIENTRY_GL4ES gl4es_glMultiDrawElements(GLenum mode, GLsizei* count, GLenum type, const void* const* indices,
                                                   GLsizei primcount);
-    void APIENTRY_GL4ES gl4es_glMultiDrawElementsBaseVertex(GLenum mode, GLsizei* counts, GLenum type,
+    void APIENTRY_GL4ES gl4es_glMultiDrawElementsBaseVertex(GLenum mode, const GLsizei* counts, GLenum type,
                                                             const void* const* indices, GLsizei primcount,
                                                             const GLint* basevertex);
 

@@ -4252,6 +4252,46 @@ typedef void (*glTexBuffer_PTR)(glTexBuffer_ARG_EXPAND);
 void gl4es_glGetTexLevelParameterfv(glGetTexLevelParameterfv_ARG_EXPAND);
 typedef void (*glGetTexLevelParameterfv_PTR)(glGetTexLevelParameterfv_ARG_EXPAND);
 
+#define glMapBufferRange_ARG_EXPAND GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access
+void* gl4es_glMapBufferRange(glMapBufferRange_ARG_EXPAND);
+typedef void* (*glMapBufferRange_PTR)(glMapBufferRange_ARG_EXPAND);
+
+#define glUnmapBuffer_ARG_EXPAND GLenum target
+GLboolean gl4es_glUnmapBuffer(glUnmapBuffer_ARG_EXPAND);
+typedef GLboolean (*glUnmapBuffer_PTR)(glUnmapBuffer_ARG_EXPAND);
+
+#define glDrawElementsIndirect_ARG_EXPAND GLenum mode, GLenum type, const void *indirect
+void gl4es_glDrawElementsIndirect(glDrawElementsIndirect_ARG_EXPAND);
+typedef void (*glDrawElementsIndirect_PTR)(glDrawElementsIndirect_ARG_EXPAND);
+
+#define glFenceSync_ARG_EXPAND GLenum condition, GLbitfield flags
+GLsync gl4es_glFenceSync(glFenceSync_ARG_EXPAND);
+typedef GLsync (*glFenceSync_PTR)(glFenceSync_ARG_EXPAND);
+
+#define glIsSync_ARG_EXPAND GLsync sync
+GLboolean gl4es_glIsSync(glIsSync_ARG_EXPAND);
+typedef GLboolean (*glIsSync_PTR)(glIsSync_ARG_EXPAND);
+
+#define glDeleteSync_ARG_EXPAND GLsync sync
+void gl4es_glDeleteSync(glDeleteSync_ARG_EXPAND);
+typedef void (*glDeleteSync_PTR)(glDeleteSync_ARG_EXPAND);
+
+#define glClientWaitSync_ARG_EXPAND GLsync sync, GLbitfield flags, GLuint64 timeout
+GLenum gl4es_glClientWaitSync(glClientWaitSync_ARG_EXPAND);
+typedef GLenum (*glClientWaitSync_PTR)(glClientWaitSync_ARG_EXPAND);
+
+#define glWaitSync_ARG_EXPAND GLsync sync, GLbitfield flags, GLuint64 timeout
+void gl4es_glWaitSync(glWaitSync_ARG_EXPAND);
+typedef void (*glWaitSync_PTR)(glWaitSync_ARG_EXPAND);
+
+#define glGetSynciv_ARG_EXPAND GLsync sync, GLenum pname, GLsizei bufSize, GLsizei *length, GLint *values
+void gl4es_glGetSynciv(glGetSynciv_ARG_EXPAND);
+typedef void (*glGetSynciv_PTR)(glGetSynciv_ARG_EXPAND);
+
+#define glMultiDrawElementsBaseVertex_ARG_EXPAND GLenum mode, const GLsizei *count, GLenum type, const void *const* indices, GLsizei drawcount, const GLint *basevertex
+void gl4es_glMultiDrawElementsBaseVertex(glMultiDrawElementsBaseVertex_ARG_EXPAND);
+typedef void (*glMultiDrawElementsBaseVertex_PTR)(glMultiDrawElementsBaseVertex_ARG_EXPAND);
+
 #ifndef direct_glActiveTexture
 #define push_glActiveTexture(texture) { \
     glActiveTexture_PACKED *packed_data = malloc(sizeof(glActiveTexture_PACKED)); \
