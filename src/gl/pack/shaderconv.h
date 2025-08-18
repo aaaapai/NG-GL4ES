@@ -43,7 +43,7 @@ extern void fix_layout(char **);
 
 
 extern void replace_with_char(char *, char, int);
-extern void GLSLHeader(char **);
+extern void GLSLHeader_vgpu(char **);
 
 extern void replace_func_name(char *, char *, char **, int);
 extern void variable_length_array(char **);
