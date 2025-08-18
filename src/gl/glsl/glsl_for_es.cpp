@@ -1257,10 +1257,10 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
     //replace_all(ret, "r11f_g11f_b10f", "r32f"); //no good.
 
     // Replace deprecated syntax
-    if (glsl_type == GL_VERTEX_SHADER) {
+    if (shaderType == GL_VERTEX_SHADER) {
         replace_all(ret, "attribute", "in");
         replace_all(ret, "varying", "out");
-    } else if (glsl_type == GL_FRAGMENT_SHADER) {
+    } else if (shaderType == GL_FRAGMENT_SHADER) {
         replace_all(ret, "varying", "in");
 	}
 
