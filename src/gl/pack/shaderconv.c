@@ -49,7 +49,7 @@ void shader_conv_(char **glshader_source, char **glshader_converted){//				Print
   		in_to_attribute(glshader_converted);				// in >> attribute
   	}
   	*/
-  	GLSLHeader(glshader_converted);
+  	GLSLHeader_vgpu(glshader_converted);
   	fix_const("const ", glshader_converted);
   	//pot = replace("#ext", "//#ext", glshader_converted);				// #extension
   	
