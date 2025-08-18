@@ -258,6 +258,7 @@ void initialize_gl4es() {
     case 44:
     case 45:
     case 46:
+    case 91:
         break;
     default:
         // automatic GL version selection
