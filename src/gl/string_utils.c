@@ -315,24 +315,3 @@ char* gl4es_inplace_replace_simple(char* pBuffer, int* size, const char* S, cons
     
     return pBuffer;
 }
-
-
-// for vgpu/shaderconv.c
-const char* FindString(const char* pBuffer, const char* S) __attribute__((alias("gl4es_find_string")));
-char* FindStringNC(char* pBuffer, const char* S) __attribute__((alias("gl4es_find_string_nc")));
-int CountString(const char* pBuffer, const char* S) __attribute__((alias("gl4es_count_string")));
-char* ResizeIfNeeded(char* pBuffer, int *size, int addsize) __attribute__((alias("gl4es_resize_if_needed")));
-char* InplaceReplace(char* pBuffer, int* size, const char* S, const char* D) __attribute__((alias("gl4es_inplace_replace")));
-char* Append(char* pBuffer, int* size, const char* S) __attribute__((alias("gl4es_append")));
-char* InplaceInsert(char* pBuffer, const char* S, char* master, int* size) __attribute__((alias("gl4es_inplace_insert")));
-char* GetLine(char* pBuffer, int num) __attribute__((alias("gl4es_getline")));
-int CountLine(const char* pBuffer) __attribute__((alias("gl4es_countline")));
-int GetLineFor(const char* pBuffer, const char* S) __attribute__((alias("gl4es_getline_for")));
-char* StrNext(char *pBuffer, const char* S) __attribute__((alias("gl4es_str_next")));
-char* NextStr(char* pBuffer) __attribute__((alias("gl4es_next_str")));
-char* PrevStr(char* Str, char* pBuffer) __attribute__((alias("gl4es_prev_str")));
-char* NextBlank(char* pBuffer) __attribute__((alias("gl4es_next_blank")));
-char* NextLine(char* pBuffer) __attribute__((alias("gl4es_next_line")));
-const char* GetNextStr(char* pBuffer) __attribute__((alias("gl4es_get_next_str")));
-int CountStringSimple(char* pBuffer, const char* S) __attribute__((alias("gl4es_countstring_simple")));
-char* InplaceReplaceSimple(char* pBuffer, int* size, const char* S, const char* D) __attribute__((alias("gl4es_inplace_replace_simple")));
