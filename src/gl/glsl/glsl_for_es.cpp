@@ -1312,6 +1312,16 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
         process_sampler_buffer(ret);
     }
 
+	replace_all(ret, "#version 100", "#version 330");
+    replace_all(ret, "#version 110", "#version 330");
+    replace_all(ret, "#version 120", "#version 330");
+    replace_all(ret, "#version 130", "#version 330");
+    replace_all(ret, "#version 140", "#version 330");
+    replace_all(ret, "#version 150", "#version 330");
+    replace_all(ret, "#version 300", "#version 330");
+    replace_all(ret, "#version 310", "#version 330");
+    replace_all(ret, "#version 320", "#version 330");
+
     *atomicCounterEmulated = process_non_opaque_atomic_to_ssbo(ret);
     return ret;
 }
