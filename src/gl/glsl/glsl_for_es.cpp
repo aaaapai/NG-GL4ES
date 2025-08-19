@@ -1330,10 +1330,10 @@ int get_or_add_glsl_version(std::string& glsl) {
     int glsl_version = getGLSLVersion(glsl.c_str());
     if (glsl_version == -1) {
         glsl_version = 330;
-        glsl.insert(0, "#version 330 core\n");
+        glsl.insert(0, "#version 330\n");
     } else if (glsl_version < 330) {
         // force upgrade glsl version
-        glsl = replace_line_starting_with(glsl, "#version", "#version 330 core\n");
+        glsl = replace_line_starting_with(glsl, "#version", "#version 330\n");
         glsl_version = 330;
     }
     //LOG_D("GLSL version: %d",glsl_version)
