@@ -208,7 +208,6 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
         // adapt shader if needed (i.e. not an es2 context and shader is not #version 100)
 		if(is_direct_shader(glshader->source)) {
 			glshader->converted = strdup(glshader->source);
-			glshader->is_converted_essl_320 = 0;
 		} else {
             int glsl_version = getGLSLVersion(glshader->source);
             DBG(SHUT_LOGD("[INFO] [Shader] Shader source: "))
@@ -219,9 +218,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
 
 				//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
 				// ======== add marker
-                add_marker(&glshader->converted);
+                //add_marker(&glshader->converted);
                 // ======== Handling the first half of an implicit type conversion.
-             	num_add_f(&glshader->converted);
+             	//num_add_f(&glshader->converted);
         
                 //pot = replace_common("0.0 es", "0 es", &glshader->converted, 1);
         
