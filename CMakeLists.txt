@@ -24,6 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include )
 set(C_SRC_FILES
         src/egl/egl.c
         src/egl/lookup.c
+        src/gl/arbconverter.c
         src/gl/string_utils.c
         src/gl/cJSON.c
         src/gl/config.c
@@ -105,7 +106,6 @@ set(C_SRC_FILES
 
 set(CPP_SRC_FILES
         src/gl/glsl/glsl_for_es.cpp
-        src/gl/arbconverter.cpp
         src/gl/getter.cpp
         )
 
