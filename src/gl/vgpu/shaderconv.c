@@ -341,6 +341,43 @@ char * ConvertShaderVgpu(struct shader_s * shader_source){
     char * source = shader_source->converted;
     int sourceLength = strlen(source) + 1;
 
+    // For now, skip stuff
+    if(FindString(source, "#version 100")){
+        if(globals4es.vgpu_force_conv || globals4es.vgpu_backport){
+            if (shader_source->type == GL_VERTEX_SHADER){
+                source = ReplaceVariableName(source, &sourceLength, "in", "attribute");
+                source = ReplaceVariableName(source, &sourceLength, "out", "varying");
+            }else{
+                source = ReplaceVariableName(source, &sourceLength, "in", "varying");
+                source = ReplaceFragmentOut(source, &sourceLength);
+            }
+
+            // Well, we don't have gl_VertexID on OPENGL 1
+            source = ReplaceVariableName(source, &sourceLength, "gl_VertexID", "0");
+            source = InplaceReplaceSimple(source, &sourceLength, "ivec", "vec");
+            source = InplaceReplaceSimple(source, &sourceLength, "bvec", "vec");
+            source = InplaceReplaceSimple(source, &sourceLength, "flat ", "");
+
+            source = BackportConstArrays(source, &sourceLength);
+            int insertPoint = FindPositionAfterVersion(source);
+            source = InplaceInsertByIndex(source, &sourceLength, insertPoint + 1, "#define texelFetch(a, b, c) vec4(1.0,1.0,1.0,1.0) \n");
+
+            source = ReplaceModOperator(source, &sourceLength);
+
+            if (globals4es.vgpu_dump){
+                SHUT_LOGD("New VGPU Shader conversion:\n%s\n", source);
+            }
+
+            return source;
+        }
+
+        // Else, skip the conversion
+        if (globals4es.vgpu_dump){
+            SHUT_LOGD("SKIPPING OLD SHADER CONVERSION \n%s\n", source);
+        }
+        return source;
+    }
+
     // Remove 'const' storage qualifier
     //printf("REMOVING CONST qualifiers");
     //source = RemoveConstInsideBlocks(source, &sourceLength);
