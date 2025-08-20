@@ -16,7 +16,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -flto=auto -W
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DNO_GBM -DDEFAULT_ES=3 -fvisibility=hidden")
 
 if(ANDROID)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11") # TODO: build glx source files for non-Android
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11")
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include )
@@ -94,7 +94,6 @@ set(C_SRC_FILES
         src/gl/wrap/glesnative.cpp
         src/gl/math/matheval.c
         src/glx/hardext.c
-        src/glx/glx.c
         src/glx/lookup.c
         src/glx/gbm.c
         src/glx/streaming.c
@@ -103,6 +102,10 @@ set(C_SRC_FILES
         src/gl/pack/shader.c
         src/gl/pack/shaderconv.c
         )
+
+if(NOT ANDROID)
+    list(APPEND C_SRC_FILES src/glx/glx.c)
+endif()
 
 set(CPP_SRC_FILES
         src/gl/glsl/glsl_for_es.cpp

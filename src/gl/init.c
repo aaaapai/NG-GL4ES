@@ -14,6 +14,7 @@
 #endif
 #include "../../version.h"
 #include "../glx/glx_gbm.h"
+#include "../glx/glx.h"
 #include "../glx/streaming.h"
 #include "gl4es.h"
 #include "build_info.h"

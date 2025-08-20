@@ -283,6 +283,7 @@ void gl4es_glXWaitX();
 #if !defined(NOX11) || defined(GLX_STUBS)
 XVisualInfo *gl4es_glXChooseVisual(Display *display, int screen, int *attributes);
 int gl4es_glXQueryDrawable(Display *dpy, GLXDrawable draw, int attribute,	unsigned int *value);
+void* gl4es_glXGetProcAddress(const char* name);
 
 // GLX 1.2
 Display *gl4es_glXGetCurrentDisplay();

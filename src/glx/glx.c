@@ -39,7 +39,7 @@
 #include "utils.h"
 #include "../gl/envvars.h"
 
-//#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #pragma GCC optimize 0
 #define DBG(a) a
@@ -448,7 +448,7 @@ static void init_eglconfig(Display *display) {
     LOAD_EGL(eglChooseConfig);
     LOAD_EGL(eglGetConfigAttrib);
     EGLint configAttribs[] = {
-        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
         EGL_NONE
     };
     int configsFound;
@@ -704,13 +704,15 @@ GLXContext gl4es_glXCreateContext(Display *display,
     if(depthBits==16 && glxfbconfig->stencilBits)
         glxfbconfig->stencilBits = EGL_DONT_CARE;
 #ifdef PANDORA
-    if(depthBits==32)
-        depthBits = (glxfbconfig->stencilBits==8 && hardext.esversion>=2)?24:16;
-    if(depthBits==24 && glxfbconfig->stencilBits==8 && !(globals4es.usefbo || globals4es.usepbuffer || hardext.esversion>=2))
-        depthBits = 16;
-    else if(depthBits==16 && glxfbconfig->stencilBits==8 && hardext.esversion>=2)
-        depthBits = 24;
-#endif    
+     if(depthBits==24 && glxfbconfig->stencilBits==8 && !(globals4es.usefbo || globals4es.usepbuffer || hardext.esversion>=2))
+         depthBits = 16;
+     else if(depthBits==16 && glxfbconfig->stencilBits==8 && hardext.esversion>=2)
+         depthBits = 24;
+-    if(depthBits==16 && glxfbconfig->stencilBits)
+-        glxfbconfig->stencilBits = EGL_DONT_CARE;
++    if(depthBits==16 && glxfbconfig->stencilBits)
++        glxfbconfig->stencilBits = 0;
+ #endif
 
     DBG(SHUT_LOGD("Creating R:%d G:%d B:%d A:%d visual deth=%d Depth:%d Stencil:%d Multisample:%d/%d Doublebuff=%d\n", glxfbconfig->redBits, glxfbconfig->greenBits, glxfbconfig->blueBits, glxfbconfig->alphaBits, visual?visual->depth:0, depthBits, glxfbconfig->stencilBits, glxfbconfig->nMultiSampleBuffers, glxfbconfig->multiSampleSize, glxfbconfig->doubleBufferMode);)
     EGLint configAttribs[] = {
@@ -725,7 +727,7 @@ GLXContext gl4es_glXCreateContext(Display *display,
         EGL_ALPHA_SIZE, (hardext.eglnoalpha)?0:glxfbconfig->alphaBits,
 #endif
         EGL_DEPTH_SIZE, depthBits,
-        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
         //EGL_BUFFER_SIZE, depthBits,
         EGL_STENCIL_SIZE, glxfbconfig->stencilBits,
 
@@ -817,7 +819,7 @@ GLXContext createPBufferContext(Display *display, GLXContext shareList, GLXFBCon
         EGL_BLUE_SIZE, (config)?config->blueBits:0,
         EGL_ALPHA_SIZE, (hardext.eglnoalpha)?0:((config)?config->alphaBits:0),
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
         EGL_SAMPLE_BUFFERS, (config)?config->nMultiSampleBuffers:0,
         EGL_SAMPLES, (config)?config->multiSampleSize:0,
         EGL_NONE
@@ -912,7 +914,7 @@ GLXContext gl4es_glXCreateContextAttribsARB(Display *display, GLXFBConfig config
 #endif
             EGL_SAMPLES, config->multiSampleSize,
             EGL_SAMPLE_BUFFERS, config->nMultiSampleBuffers,
-            EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+            EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
             EGL_SURFACE_TYPE, globals4es.usepbuffer?EGL_PBUFFER_BIT:type,
             EGL_NONE
         };
@@ -1714,6 +1716,7 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
 #else
     // first build a table of EGL attributes
     int attr[50];
+    int i = 0;
     int cur = 0;
     int cr = 0, cg = 0, cb = 0, ca = 0, vt = 0;
     int tmp;
@@ -1724,7 +1727,7 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
     attr[cur++] = 0;
 
     if(attrib_list) {
-		int i = 0;
+		i = 0;
 		while(attrib_list[i]!=0) {
 			switch(attrib_list[i++]) {
 				case GLX_RED_SIZE:
@@ -1845,7 +1848,7 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
     attr[1] |= (globals4es.usepbuffer)?(/*EGL_PBUFFER_BIT|*/EGL_PIXMAP_BIT):EGL_WINDOW_BIT;
 
     attr[cur++] = EGL_RENDERABLE_TYPE;
-    attr[cur++] = (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT;
+    attr[cur++] = (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT;
 
     attr[cur++] = EGL_NONE; // end list
 
@@ -1907,12 +1910,38 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
         *count = 1;
     }
     EGLConfig *eglConfigs = (EGLConfig*)calloc((*count), sizeof(EGLConfig));
-    if(glxconfig==-1)
+    if(glxconfig==-1) {
+        DBG(SHUT_LOGD("glxconfig == -1");)
         egl_eglChooseConfig(eglDisplay, attr, eglConfigs, *count, count);
-    else {
-        eglConfigs[0] = (EGLConfig)(uintptr_t)glxconfig;    // downsizing on purpose
-        doublebuffer = 1;
+    } else {
+        // Instead of using the eglConfigs array, look for the config with the given ID in the allFBConfig array
+        init_eglconfig(display);   // builds allFBConfig if not already built
+        int found = -1;
+        for (int i=0; i<maxEGLConfig*2; i++) {
+            // Compare the stored ID with the requested config ID
+            if (allFBConfig[i].id == (uint32_t)glxconfig) {
+                found = i;
+                break;
+            }
+        }
+        if (found == -1) {
+            found = 0;
+            // fallback to 0
+            //*count = 0;
+            //free(eglConfigs);
+            //DBG(SHUT_LOGD("found == -1");)
+            //return NULL;
+        }
+        // Return the found config
+        *count = 1;
+        GLXFBConfig *configs = (GLXFBConfig*)malloc(sizeof(GLXFBConfig));
+        configs[0] = &allFBConfig[found];
+        free(eglConfigs);
+        DBG(SHUT_LOGD("glXChooseFBConfig found 1 config by ID\n");)
+        DBG(SHUT_LOGD(" config[0] = %p\n", configs[0]);)
+        return configs;
     }
+
     // and now, build a config list!
     GLXFBConfig *configs = fillGLXFBConfig(eglConfigs, *count, doublebuffer, display);
     if(doublebuffer==2) *count *= 2;
@@ -1924,8 +1953,9 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
     )
 
     return configs;
-#endif		
+#endif
 }
+
 
 GLXFBConfig *gl4es_glXGetFBConfigs(Display *display, int screen, int *count) {
     DBG(SHUT_LOGD("glXGetFBConfigs(%p, %d, %p)\n", display, screen, count);)
@@ -1947,7 +1977,7 @@ GLXFBConfig *gl4es_glXGetFBConfigs(Display *display, int screen, int *count) {
     attr[cur++] = EGL_SURFACE_TYPE;
     attr[cur++] = (globals4es.usepbuffer)?(EGL_PBUFFER_BIT|EGL_PIXMAP_BIT):EGL_WINDOW_BIT;
     attr[cur++] = EGL_RENDERABLE_TYPE;
-    attr[cur++] = (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT;
+    attr[cur++] = (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT;
     attr[cur++] = EGL_NONE; // end list
 
     // get the number of EGL config matching!
@@ -2077,7 +2107,7 @@ XVisualInfo *gl4es_glXGetVisualFromFBConfig(Display *display, GLXFBConfig config
 GLXContext gl4es_glXCreateNewContext(Display *display, GLXFBConfig config,
                                int render_type, GLXContext share_list,
                                Bool is_direct) {
-    DBG(SHUT_LOGD("glXCreateNewContext(%p, %p, %d, %p, %i), drawableType=0x%02X\n", display, config, render_type, share_list, is_direct, (config)?config->drawableType:0);)
+    //DBG(SHUT_LOGD("glXCreateNewContext(%p, %p, %d, %p, %i), drawableType=0x%02X\n", display, config, render_type, share_list, is_direct, (config)?config->drawableType:0);)
     if(render_type!=GLX_RGBA_TYPE)
         return 0;
     if(config && (config->drawableType==GLX_PBUFFER_BIT)) {
@@ -2426,7 +2456,7 @@ int createPBuffer(Display * dpy, const EGLint * egl_attribs, EGLSurface* Surface
         EGL_DEPTH_SIZE, 1,
         EGL_STENCIL_SIZE, 1,
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
         EGL_SAMPLE_BUFFERS, samplebuffers,
         EGL_SAMPLES, samples,
         EGL_NONE
@@ -2569,7 +2599,7 @@ int createPixBuffer(Display * dpy, int bpp, const EGLint * egl_attribs, NativePi
         EGL_DEPTH_SIZE, 1,      // some depth
         EGL_STENCIL_SIZE, 1,    // some stencil too
         EGL_SURFACE_TYPE, EGL_PIXMAP_BIT,
-        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES3_BIT,
         EGL_NONE
     };
 
@@ -2925,30 +2955,28 @@ void refreshMainFBO()
 
 const char *gl4es_glXQueryExtensionsString(Display *display, int screen) {
     DBG(SHUT_LOGD("glXQueryExtensionString(%p, %d)\n", display, screen);)
-    static const char *basic_extensions = 
-        "GLX_ARB_create_context "
-        "GLX_ARB_create_context_profile "
-        "GLX_ARB_get_proc_address "
-        "GLX_ARB_multisample "
-        "GLX_SGI_swap_control "
-        "GLX_MESA_swap_control "
-        "GLX_EXT_swap_control "
-        "GLX_SGIX_pbuffer "
-        "GLX_EXT_framebuffer_sRGB ";
-    static const char *es2_profile =
-        "GLX_EXT_create_context_es2_profile ";
-    static char extensions[5000] = {0};
-    static int inited = 0;
-
-    if(!inited) {
-        inited = 1;
-        strcpy(extensions, basic_extensions);
-        if(globals4es.es>1 && !globals4es.noes2)
-            strcat(extensions, es2_profile);
+    static const char *ext = NULL;
+    if (!ext) {
+        static char buffer[512];
+        strcpy(buffer,
+            "GLX_ARB_create_context "
+            "GLX_ARB_create_context_profile "
+            "GLX_ARB_get_proc_address "
+            "GLX_ARB_multisample "
+            "GLX_SGI_swap_control "
+            "GLX_MESA_swap_control "
+            "GLX_EXT_swap_control "
+            "GLX_SGIX_pbuffer "
+            "GLX_EXT_framebuffer_sRGB "
+        );
+        if (globals4es.es > 1 && !globals4es.noes2)
+            strcat(buffer, "GLX_EXT_create_context_es2_profile ");
+        ext = buffer;
     }
-    
-    return extensions;
+    DBG(SHUT_LOGD("glXQueryExtensionString: %s\n", ext);)
+    return ext;
 }
+
 
 const char *gl4es_glXQueryServerString(Display *display, int screen, int name) {
     DBG(SHUT_LOGD("glXQueryServerString(%p, %d, %d)\n", display, screen, name);)
@@ -2982,8 +3010,8 @@ Bool gl4es_glXQueryVersion(Display *display, int *major, int *minor) {
 const char *gl4es_glXGetClientString(Display *display, int name) {
     DBG(SHUT_LOGD("glXGetClientString(%p, %d)\n", display, name);)
     switch (name) {
-        case GLX_VENDOR: return gl4es_glGetString(GL_VENDOR);
-        case GLX_VERSION: return gl4es_glGetString(GL_VERSION);
+        case GLX_VENDOR: return "ptitSeb & BZLZHH";//gl4es_glGetString(GL_VENDOR);
+        case GLX_VERSION: return "3.0";//gl4es_glGetString(GL_VERSION);
         case GLX_EXTENSIONS: return gl4es_glXQueryExtensionsString(display, 0);
     }
     return 0;    
@@ -3038,3 +3066,244 @@ AliasExport(void,glXSwapInterval,SGI,(int interval));
 AliasExport(void,glXWaitGL,,());
 AliasExport(void,glXWaitX,,());
 AliasExport(void,glXReleaseBuffersMESA,,());
+
+
+typedef struct {
+    GLXFBConfig* (*ptr_glXChooseFBConfig)(Display* dpy, int screen, const int* attrib_list, int* nelements);
+    XVisualInfo* (*ptr_glXChooseVisual)(Display* dpy, int screen, int* attribList);
+    void (*ptr_glXCopyContext)(Display* dpy, GLXContext src, GLXContext dst, GLuint mask);
+    GLXContext (*ptr_glXCreateContext)(Display* dpy, XVisualInfo* vis, GLXContext shareList, Bool direct);
+    GLXPixmap (*ptr_glXCreateGLXPixmap)(Display* dpy, XVisualInfo* visual, Pixmap pixmap);
+    GLXContext (*ptr_glXCreateNewContext)(Display* dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
+    GLXPbuffer (*ptr_glXCreatePbuffer)(Display* dpy, GLXFBConfig config, const int* attrib_list);
+    GLXPixmap (*ptr_glXCreatePixmap)(Display* dpy, GLXFBConfig config, Pixmap pixmap, const int* attrib_list);
+    Window (*ptr_glXCreateWindow)(Display* dpy, GLXFBConfig config, Window win, int* attrib_list);
+    void (*ptr_glXDestroyContext)(Display* dpy, GLXContext ctx);
+    void (*ptr_glXDestroyGLXPixmap)(Display* dpy, void* pixmap);
+    void (*ptr_glXDestroyPbuffer)(Display* dpy, GLXPbuffer pbuf);
+    void (*ptr_glXDestroyPixmap)(Display* dpy, void* pixmap);
+    void (*ptr_glXDestroyWindow)(Display* dpy, void* win);
+    const char* (*ptr_glXGetClientString)(Display* dpy, int name);
+    int (*ptr_glXGetConfig)(Display* dpy, XVisualInfo* visual, int attrib, int* value);
+    GLXContext (*ptr_glXGetCurrentContext)(void);
+    GLXDrawable (*ptr_glXGetCurrentDrawable)(void);
+    GLXDrawable (*ptr_glXGetCurrentReadDrawable)(void);
+    int (*ptr_glXGetFBConfigAttrib)(Display* dpy, GLXFBConfig config, int attribute, int* value);
+    GLXFBConfig* (*ptr_glXGetFBConfigs)(Display* dpy, int screen, int* nelements);
+    void* (*ptr_glXGetProcAddress)(const char* procName);
+    void* (*ptr_glXGetProcAddressARB)(const char* procName);
+    void (*ptr_glXGetSelectedEvent)(Display* dpy, GLXDrawable draw, unsigned long* event_mask);
+    XVisualInfo* (*ptr_glXGetVisualFromFBConfig)(Display* dpy, GLXFBConfig config);
+    Bool (*ptr_glXIsDirect)(Display* dpy, GLXContext ctx);
+    Bool (*ptr_glXMakeContextCurrent)(Display* dpy, int draw, int read, GLXContext ctx);
+    Bool (*ptr_glXMakeCurrent)(Display* dpy, GLXDrawable drawable, GLXContext ctx);
+    int (*ptr_glXQueryContext)(Display* dpy, GLXContext ctx, int attribute, int* value);
+    int (*ptr_glXQueryDrawable)(Display *dpy, GLXDrawable draw, int attribute, unsigned int *value);
+    Bool (*ptr_glXQueryExtension)(Display* dpy, int* errorb, int* event);
+    const char* (*ptr_glXQueryExtensionsString)(Display* dpy, int screen);
+    const char* (*ptr_glXQueryServerString)(Display* dpy, int screen, int name);
+    Bool (*ptr_glXQueryVersion)(Display* dpy, int* maj, int* min);
+    void (*ptr_glXSelectEvent)(Display* dpy, GLXDrawable draw, unsigned long event_mask);
+    void (*ptr_glXSwapBuffers)(Display* dpy, GLXDrawable drawable);
+    void (*ptr_glXUseXFont)(Font font, int first, int count, int list);
+    void (*ptr_glXWaitGL)(void);
+    void (*ptr_glXWaitX)(void);
+} __glXGLCoreFunctions;
+
+__attribute__((visibility("default")))
+const __glXGLCoreFunctions __GLXGL_CORE_FUNCTIONS = {
+    .ptr_glXChooseFBConfig      = gl4es_glXChooseFBConfig,
+    .ptr_glXChooseVisual        = gl4es_glXChooseVisual,
+    .ptr_glXCopyContext         = gl4es_glXCopyContext,
+    .ptr_glXCreateContext       = gl4es_glXCreateContext,
+    .ptr_glXCreateGLXPixmap     = gl4es_glXCreateGLXPixmap,
+    .ptr_glXCreateNewContext    = gl4es_glXCreateNewContext,
+    .ptr_glXCreatePbuffer       = gl4es_glXCreatePbuffer,
+    .ptr_glXCreatePixmap        = gl4es_glXCreatePixmap,
+    .ptr_glXCreateWindow        = gl4es_glXCreateWindow,
+    .ptr_glXDestroyContext      = gl4es_glXDestroyContext,
+    .ptr_glXDestroyGLXPixmap    = gl4es_glXDestroyGLXPixmap,
+    .ptr_glXDestroyPbuffer      = gl4es_glXDestroyPbuffer,
+    .ptr_glXDestroyPixmap       = gl4es_glXDestroyPixmap,
+    .ptr_glXDestroyWindow       = gl4es_glXDestroyWindow,
+    .ptr_glXGetClientString     = gl4es_glXGetClientString,
+    .ptr_glXGetConfig           = gl4es_glXGetConfig,
+    .ptr_glXGetCurrentContext   = gl4es_glXGetCurrentContext,
+    .ptr_glXGetCurrentDrawable  = gl4es_glXGetCurrentDrawable,
+    //.ptr_glXGetCurrentReadDrawable = gl4es_glXGetCurrentReadDrawable,
+    .ptr_glXGetFBConfigAttrib   = gl4es_glXGetFBConfigAttrib,
+    .ptr_glXGetFBConfigs        = gl4es_glXGetFBConfigs,
+    .ptr_glXGetProcAddress      = gl4es_glXGetProcAddress,
+    .ptr_glXGetProcAddressARB   = gl4es_glXGetProcAddress,
+    //.ptr_glXGetSelectedEvent    = gl4es_glXGetSelectedEvent,
+    .ptr_glXGetVisualFromFBConfig = gl4es_glXGetVisualFromFBConfig,
+    .ptr_glXIsDirect            = gl4es_glXIsDirect,
+    .ptr_glXMakeContextCurrent  = gl4es_glXMakeContextCurrent,
+    .ptr_glXMakeCurrent         = gl4es_glXMakeCurrent,
+    .ptr_glXQueryContext        = gl4es_glXQueryContext,
+    .ptr_glXQueryDrawable       = gl4es_glXQueryDrawable,
+    .ptr_glXQueryExtension      = gl4es_glXQueryExtension,
+    .ptr_glXQueryExtensionsString = gl4es_glXQueryExtensionsString,
+    .ptr_glXQueryServerString   = gl4es_glXQueryServerString,
+    .ptr_glXQueryVersion        = gl4es_glXQueryVersion,
+    //.ptr_glXSelectEvent         = gl4es_glXSelectEvent,
+    .ptr_glXSwapBuffers         = gl4es_glXSwapBuffers,
+    .ptr_glXUseXFont            = gl4es_glXUseXFont,
+    .ptr_glXWaitGL              = gl4es_glXWaitGL,
+    .ptr_glXWaitX               = gl4es_glXWaitX,
+};
+
+typedef void (*__GLXextFuncPtr)(void);
+typedef int glvnd_mutex_t;
+
+__attribute__((visibility("default")))
+__GLXextFuncPtr __glXGLLoadGLXFunction(
+    const char *name,
+    __GLXextFuncPtr *ptr,
+    glvnd_mutex_t *mutex
+) {
+    if (*ptr != NULL) {
+        return *ptr;
+    }
+
+    *ptr = (__GLXextFuncPtr) gl4es_glXGetProcAddress((const GLubyte *) name);
+
+    return *ptr;
+}
+
+__attribute__((visibility("default")))
+int XDefaultDepth(Display *display, int screen_number) {
+    DBG(SHUT_LOGD("XDefaultDepth"))
+    if (!display) return 0;
+
+    int screen = DefaultScreen(display);
+    Screen *scr = ScreenOfDisplay(display, screen);
+    if (!scr) return 0;
+
+    DBG(SHUT_LOGD("XDefaultDepth -> %d", scr->root_depth))
+    return scr->root_depth;
+}
+
+
+#ifndef XFree
+# define XFree(ptr) free(ptr)
+#endif
+
+__attribute__((visibility("default")))
+XVisualInfo *XGetVisualInfo(Display *display,
+                            long vinfo_mask,
+                            XVisualInfo *vinfo_template,
+                            int *nitems_return)
+{
+    if (!display || !nitems_return) return NULL;
+
+    int n_screens = ScreenCount(display);
+    size_t cap = 16;
+    XVisualInfo *out = (XVisualInfo *)malloc(cap * sizeof(XVisualInfo));
+    if (!out) {
+        *nitems_return = 0;
+        return NULL;
+    }
+    size_t out_count = 0;
+
+    for (int scr = 0; scr < n_screens; ++scr) {
+        Screen *screen = ScreenOfDisplay(display, scr);
+        if (!screen) continue;
+
+        int ndepths = screen->ndepths;
+        for (int di = 0; di < ndepths; ++di) {
+            Depth *depthp = &screen->depths[di];
+            int depth_val = depthp->depth;
+            int nvisuals = depthp->nvisuals;
+            for (int vi = 0; vi < nvisuals; ++vi) {
+                Visual *visual = NULL;
+                visual = &depthp->visuals[vi];
+
+                if (!visual) continue;
+
+                XVisualInfo xi;
+                memset(&xi, 0, sizeof(xi));
+                xi.visual = visual;
+                xi.visualid = XVisualIDFromVisual(visual);
+                xi.screen = scr;
+                xi.depth = depth_val;
+
+                xi.class = visual->class;
+                xi.red_mask = visual->red_mask;
+                xi.green_mask = visual->green_mask;
+                xi.blue_mask = visual->blue_mask;
+
+#ifdef MAP_ENTRIES_MEMBER_EXISTS
+                xi.colormap_size = visual->map_entries;
+#else
+                /* most X Visual has map_entries; we'll try to access it safely */
+                xi.colormap_size = (int)(visual->map_entries ? visual->map_entries : (1 << (xi.depth > 0 ? xi.depth : 8)));
+#endif
+                xi.bits_per_rgb = visual->bits_per_rgb;
+
+                bool match = true;
+                if (vinfo_mask & VisualIDMask) {
+                    if (xi.visualid != vinfo_template->visualid) match = false;
+                }
+                if (vinfo_mask & VisualScreenMask) {
+                    if (xi.screen != vinfo_template->screen) match = false;
+                }
+                if (vinfo_mask & VisualDepthMask) {
+                    if (xi.depth != vinfo_template->depth) match = false;
+                }
+                if (vinfo_mask & VisualClassMask) {
+                    if (xi.class != vinfo_template->class) match = false;
+                }
+                if (vinfo_mask & VisualRedMaskMask) {
+                    if (xi.red_mask != vinfo_template->red_mask) match = false;
+                }
+                if (vinfo_mask & VisualGreenMaskMask) {
+                    if (xi.green_mask != vinfo_template->green_mask) match = false;
+                }
+                if (vinfo_mask & VisualBlueMaskMask) {
+                    if (xi.blue_mask != vinfo_template->blue_mask) match = false;
+                }
+                if (vinfo_mask & VisualColormapSizeMask) {
+                    if (xi.colormap_size != vinfo_template->colormap_size) match = false;
+                }
+                if (vinfo_mask & VisualBitsPerRGBMask) {
+                    if (xi.bits_per_rgb != vinfo_template->bits_per_rgb) match = false;
+                }
+
+                if (!match) continue;
+
+                /* append */
+                if (out_count + 1 > cap) {
+                    size_t newcap = cap * 2;
+                    XVisualInfo *tmp = (XVisualInfo *)realloc(out, newcap * sizeof(XVisualInfo));
+                    if (!tmp) {
+                        XFree(out);
+                        *nitems_return = 0;
+                        return NULL;
+                    }
+                    out = tmp;
+                    cap = newcap;
+                }
+                out[out_count++] = xi;
+            } /* each visual */
+        } /* each depth */
+    } /* each screen */
+
+    if (out_count == 0) {
+        XFree(out);
+        *nitems_return = 0;
+        return NULL;
+    }
+
+    XVisualInfo *result = (XVisualInfo *)realloc(out, out_count * sizeof(XVisualInfo));
+    if (result) out = result;
+
+    *nitems_return = (int)out_count;
+    return out;
+}
+
+__attribute__((visibility("default")))
+VisualID XVisualIDFromVisual(Visual *visual) {
+    if (!visual) return (VisualID)0;
+    return (VisualID)visual->visualid;
+}
