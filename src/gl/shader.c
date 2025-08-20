@@ -218,9 +218,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
 
 				//glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need, 0);
 				// ======== add marker
-                //add_marker(&glshader->converted);
+                add_marker(&glshader->converted);
                 // ======== Handling the first half of an implicit type conversion.
-             	//num_add_f(&glshader->converted);
+             	num_add_f(&glshader->converted);
         
                 //pot = replace_common("0.0 es", "0 es", &glshader->converted, 1);
         
@@ -230,12 +230,12 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
 		
                 //Printf("========NewConvertShader : \n %s \n========\n ", glshader->converted);
 		
-		        /*Printf("========NewConvertShader : \n");
+		        Printf("========NewConvertShader : \n");
                 int lenS = strlen(glshader->converted);
                 for(int len=0; len<lenS; len+=1023){
         	      Printf("%s", glshader->converted+len);
                 }
-                Printf("\n========\n ");*/
+                Printf("\n========\n ");
             } else {
                 int returnCode = 0; // TODO: handle returnCode
 
