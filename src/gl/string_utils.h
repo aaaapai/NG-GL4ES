@@ -1,6 +1,25 @@
 #ifndef _GL4ES_STRING_UTILS_H_
 #define _GL4ES_STRING_UTILS_H_
 
+#define FindString gl4es_find_string
+#define FindStringNC gl4es_find_string_nc
+#define CountString gl4es_count_string
+#define ResizeIfNeeded gl4es_resize_if_needed
+#define InplaceReplace gl4es_inplace_replace
+#define Append gl4es_append
+#define InplaceInsert gl4es_inplace_insert
+#define GetLine gl4es_getline
+#define CountLine gl4es_countline
+#define GetLineFor gl4es_getline_for
+#define StrNext gl4es_str_next
+#define NextStr gl4es_next_str
+#define PrevStr gl4es_prev_str
+#define NextBlank gl4es_next_blank
+#define NextLine gl4es_next_line
+#define GetNextStr gl4es_get_next_str
+#define CountStringSimple gl4es_countstring_simple
+#define InplaceReplaceSimple gl4es_inplace_replace_simple
+
 extern const char* AllSeparators;
 
 const char* gl4es_find_string(const char* pBuffer, const char* S);
@@ -27,7 +46,6 @@ const char* gl4es_get_next_str(char* pBuffer); // get a (static) copy of next st
 int gl4es_countstring_simple(char* pBuffer, const char* S);
 char* gl4es_inplace_replace_simple(char* pBuffer, int* size, const char* S, const char* D);
 
-// dare not to change their names into gl4es_xxx :(
 int isDigit(char value);
 int isValidFunctionName(char value);
 void AppendToEnd(char **str, const char *suffix);
@@ -35,25 +53,6 @@ void InsertAtBeginning(char **str, const char *prefix);
 
 char * InplaceReplaceByIndex(char* pBuffer, int* size, int startIndex, int endIndex, const char* replacement);
 char * InplaceInsertByIndex(char * source, int *sourceLength, int insertPoint, const char *insertedString);
-
-extern const char* FindString(const char* pBuffer, const char* S);
-extern char* FindStringNC(char* pBuffer, const char* S);
-extern int CountString(const char* pBuffer, const char* S);
-extern char* ResizeIfNeeded(char* pBuffer, int *size, int addsize);
-extern char* InplaceReplace(char* pBuffer, int* size, const char* S, const char* D);
-extern char* Append(char* pBuffer, int* size, const char* S);
-extern char* InplaceInsert(char* pBuffer, const char* S, char* master, int* size);
-extern char* GetLine(char* pBuffer, int num);
-extern int CountLine(const char* pBuffer);
-extern int GetLineFor(const char* pBuffer, const char* S);
-extern char* StrNext(char *pBuffer, const char* S);
-extern char* NextStr(char* pBuffer);
-extern char* PrevStr(char* Str, char* pBuffer);
-extern char* NextBlank(char* pBuffer);
-extern char* NextLine(char* pBuffer);
-extern const char* GetNextStr(char* pBuffer);
-extern int CountStringSimple(char* pBuffer, const char* S);
-extern char* InplaceReplaceSimple(char* pBuffer, int* size, const char* S, const char* D);
 
 
 #endif // _GL4ES_STRING_UTILS_H_

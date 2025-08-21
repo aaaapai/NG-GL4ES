@@ -11,8 +11,16 @@
 		}
 #define APPEND_OUTPUT2(str) APPEND_OUTPUT(str, (size_t)-1)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void generateVariablePre(sCurStatus *curStatusPtr, int vertex, char **error_msg, sVariable *varPtr);
 void generateInstruction(sCurStatus *curStatusPtr, int vertex, char **error_msg, sInstruction *instPtr);
 void generateVariablePst(sCurStatus *curStatusPtr, int vertex, char **error_msg, sVariable *varPtr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GL4ES_ARBGENERATOR_H_

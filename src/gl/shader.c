@@ -14,6 +14,10 @@
 #include <string.h>
 
 // #define DEBUG
+#include "pack/shaderconv.h"
+#include "pack/shader.h"
+#include "pack/printf_def.h"
+
 #ifdef DEBUG
 #define DBG(a) a
 #else
@@ -152,7 +156,7 @@ bool can_run_essl3(int esversion, const char* glsl) {
     int glsl_version = 0;
     if (strncmp(glsl, "#version 100", 12) == 0) {
         return true;
-    } else if (strncmp(glsl, "#version 300 es", 15) == 0) {
+	} else if (strncmp(glsl, "#version 300 es", 15) == 0) {
         return true;
     } else if (strncmp(glsl, "#version 310 es", 15) == 0) {
         glsl_version = 310;
@@ -668,7 +672,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                 glshader->source = replace_version_line(glshader->source);
                 glsl_version = 460;
             }
-            if (glsl_version < 140 || globals4es.esversion < 300) {
+            if (glsl_version < 150 || globals4es.esversion < 300) {
+                add_marker(&glshader->source);
+                num_add_f(&glshader->source);
                 glshader->converted = strdup(ConvertShaderConditionally(glshader));
                 glshader->is_converted_essl_320 = 0;
             } else {
@@ -771,9 +777,9 @@ void redoShader(GLuint shader, shaderconv_need_t* need) {
     if (!glshader->converted) return;
     // test, if no changes, no need to reconvert & recompile...
     if (memcmp(&glshader->need, need, sizeof(shaderconv_need_t)) == 0) return;
-    free(glshader->converted);
+    // free(glshader->converted);
     memcpy(&glshader->need, need, sizeof(shaderconv_need_t));
-    if (is_direct_shader(glshader->source))
+    /*if (is_direct_shader(glshader->source))
         glshader->converted = strdup(glshader->source);
     else {
         int glsl_version = getGLSLVersion(glshader->source);
@@ -799,6 +805,7 @@ void redoShader(GLuint shader, shaderconv_need_t* need) {
         shader, 1, (const GLchar* const*)((glshader->converted) ? (&glshader->converted) : (&glshader->source)), NULL);
     // recompile...
     gl4es_glCompileShader(glshader->id);
+*/
 }
 
 void APIENTRY_GL4ES gl4es_glGetShaderSource(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* source) {

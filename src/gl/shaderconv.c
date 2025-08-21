@@ -233,7 +233,19 @@ static const char* gl4es_ftransformSource = "\n"
                                             " return gl_ModelViewProjectionMatrix * gl_Vertex;\n"
                                             "}\n";
 
-static const char* gl4es_dummyClipVertex = "vec4 dummyClipVertex_%d";
+static const char* gl4es_ClipVertex = 
+
+"vec4 gl4es_ClipVertex;\n";
+
+static const char* gl4es_ClipVertexSource = 
+
+"gl4es_ClipVertex";
+
+static const char* gl4es_ClipVertex_clip =
+
+"\nif(any(lessThanEqual(gl4es_ClipVertex.xyz, vec3(-gl4es_ClipVertex.w)))"
+
+" || any(greaterThanEqual(gl4es_ClipVertex.xyz, vec3(gl4es_ClipVertex.w)))) discard;\n";
 
 static const char* gl_TexCoordSource = "gl_TexCoord[";
 
@@ -340,6 +352,7 @@ static const char* texture2DProjLodAlt = "vec4 _gl4es_texture2DProjLod(sampler2D
 static const char* textureCubeLodAlt = "vec4 _gl4es_textureCubeLod(samplerCube sampler, vec3 coord, float lod) {\n"
                                        " return textureCube(sampler, coord);\n"
                                        "}\n";
+
 
 static const char* texture2DGradAlt =
     "vec4 _gl4es_texture2DGrad(sampler2D sampler, vec2 coord, vec2 dPdx, vec2 dPdy) {\n"
@@ -1780,7 +1793,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
     // clean preproc'd source
     if (pEntry != pBuffer) free(pBuffer);
     return Tmp;
-}
+  }
 
 int isBuiltinAttrib(const char* name) {
     int n = sizeof(builtin_attrib) / sizeof(builtin_attrib_t);

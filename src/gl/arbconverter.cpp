@@ -1,6 +1,12 @@
 #include "arbconverter.h"
 
-#include <stddef.h>
+#include <cstddef>
+
+#include <cstring>
+#include <string_view>
+#include <memory>
+
+extern "C" {
 
 #include "arbgenerator.h"
 #include "arbhelper.h"
@@ -10,30 +16,25 @@
 #define FAIL(str) curStatus.status = ST_ERROR; if (*error_msg) free(*error_msg); \
 		*error_msg = strdup(str); continue
 #define curStatusPtr &curStatus
+
+
 char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int *error_ptr) {
 	*error_ptr = -1; // Reinit error pointer
 	
 	struct sSpecialCases specialCases = {0, 0};
-	const char *codeStart = code;
+	std::string_view codeView(code);
+	const char *codeStart = codeView.data();
 	// Not sure this is really OK...
 	if ((codeStart[0] != '!') || (codeStart[1] != '!')) {
-		while (1) {
-			while ((*codeStart != '!') && (*codeStart != '\0')) {
-				++codeStart;
-			}
-			if (*codeStart == '\0') {
-				// Invalid start
-				if (*error_msg)
-					free(*error_msg);
-				*error_msg = strdup("Invalid program start");
-				*error_ptr = 0;
-				return NULL;
-			}
-			if ((codeStart[0] == '!') && (codeStart[1] == '!')) {
-				break;
-			}
-			++codeStart;
-		}
+         size_t pos = codeView.find("!!");
+		 if (pos == std::string_view::npos) {
+			if (*error_msg)
+				free(*error_msg);
+			*error_msg = strdup("Invalid program start");
+			*error_ptr = 0;
+			return nullptr;
+ 		}
+		codeStart += pos;
 	}
 	if (vertex) {
 		if (strncmp(codeStart, "!!ARBvp1.0", 10)) {
@@ -41,7 +42,7 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 				free(*error_msg);
 			*error_msg = strdup("Invalid program start");
 			*error_ptr = codeStart - code;
-			return NULL;
+			return nullptr;
 		}
 	} else {
 		if (strncmp(codeStart, "!!ARBfp1.0", 10)) {
@@ -49,7 +50,7 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 				free(*error_msg);
 			*error_msg = strdup("Invalid program start");
 			*error_ptr = codeStart - code;
-			return NULL;
+			return nullptr;
 		}
 	}
 	
@@ -57,7 +58,7 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 	
 	ARBCONV_DBG_HEAVY(SHUT_LOGD("Generating code for:\n%s\n", codeStart);)
 	
-	sCurStatus curStatus = {0};
+	sCurStatus curStatus = {};
 	initStatus(&curStatus, codeStart);
 	readNextToken(&curStatus);
 	if ((curStatus.curToken != TOK_NEWLINE) && (curStatus.curToken != TOK_WHITESPACE)) {
@@ -157,10 +158,10 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 		
 		*error_ptr = curStatus.codePtr - code;
 		
-		// We have errored, output NULL
+		// We have errored, output nullptr
 		freeStatus(&curStatus);
 		free(curStatus.outputString);
-		return NULL;
+		return nullptr;
 	}
 	
 	ARBCONV_DBG(SHUT_LOGD("Success!\n");)
@@ -257,23 +258,23 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 			APPEND_OUTPUT("\tgl_FragDepth = gl4es_FragDepthTemp.z;\n", 39)
 		}
 		switch (curStatus.fogType) {
-		case FOG_NONE:
+		case _sCurStatus::FOG_NONE:
 			break;
-		case FOG_EXP:
+		case _sCurStatus::FOG_EXP:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp(exp(-gl_Fog.density * gl_FogFragCoord), 0., 1.));\n",
 				116
 			)
 			break;
-		case FOG_EXP2:
+		case _sCurStatus::FOG_EXP2:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp(exp(-(gl_Fog.density * gl_FogFragCoord)*(gl_Fog.density * gl_FogFragCoord)), 0., 1.));\n",
 				153
 			)
 			break;
-		case FOG_LINEAR:
+		case _sCurStatus::FOG_LINEAR:
 			APPEND_OUTPUT(
 				"\tgl_FragColor.rgb = mix(gl_Fog.color.rgb, gl_FragColor.rgb, "
 				"clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0., 1.));\n",
@@ -339,14 +340,16 @@ char* gl4es_convertARB(const char* const code, int vertex, char **error_msg, int
 			*error_ptr = 0;
 		}
 		
-		// We have errored, output NULL
+		// We have errored, output nullptr
 		freeStatus(&curStatus);
 		free(curStatus.outputString);
-		return NULL;
+		return nullptr;
 	}
 	
 	ARBCONV_DBG(SHUT_LOGD("Success!\n\nOutput:\n%s", curStatus.outputString);)
 	
 	freeStatus(&curStatus);
 	return curStatus.outputString;
+}
+
 }

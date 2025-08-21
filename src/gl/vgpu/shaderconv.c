@@ -21,7 +21,7 @@ int NO_OPERATOR_VALUE = 9999;
 #include <ctype.h>
 #include <stdbool.h>
 
-// ������������������ȡ���������飨���� mat2, mat3, mat4, vec2, vec3, vec4 ���͵Ĵ�����
+// 辅助函数：解析并提取浮点数数组（用于 mat2, mat3, mat4, vec2, vec3, vec4 类型的处理）
 int parse_floats_from_string(const char* str, GLfloat* outValues, int maxCount) {
     int count = 0;
     const char* cursor = str;
@@ -365,6 +365,7 @@ char* ConvertShaderVgpu(struct shader_s* shader_source) {
     // Get the shader source
     char* source = shader_source->converted;
     int sourceLength = strlen(source) + 1;
+
     // For now, skip stuff
     if (FindString(source, "#version 100")) {
         if (globals4es.vgpu_force_conv || globals4es.vgpu_backport) {

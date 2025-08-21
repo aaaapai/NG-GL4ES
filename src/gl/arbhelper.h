@@ -223,6 +223,11 @@ KHASH_MAP_DECLARE_STR(variables, sVariable*)
 #define kh_str_exist(h, s) kh_truly_exist(h, kh_get(variables, h, s))
 
 #define MAX_OPERANDS 4
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _sInstruction {
 	eInstruction type;
 	int saturated;
@@ -313,5 +318,8 @@ void freeStatus(sCurStatus* curStatus);
 
 int appendString(sCurStatus *curStatusPtr, const char *str, size_t strLen);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GL4ES_ARBHELPER_H_

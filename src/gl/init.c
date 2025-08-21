@@ -79,7 +79,7 @@ void set_getprocaddress(void*(APIENTRY_GL4ES* new_proc_address)(const char*)) {
 
 void init_internal_glDrawElementsBaseVertex();
 void initialize_ng_gl4es() {
-    /*
+    
     int enableANGLE = config_get_int("enableANGLE");
     globals4es.enableANGLE = enableANGLE;
     if (enableANGLE) {
@@ -87,12 +87,11 @@ void initialize_ng_gl4es() {
         setenv("LIBGL_EGL", "libEGL_angle.so", 1);
         LOGD("ANGLE enabled and used")
     } else {
-        setenv("LIBGL_GLES", "", 1);
-        setenv("LIBGL_EGL", "", 1);
+        setenv("LIBGL_GLES", "libGLESv3.so", 1);
+        setenv("LIBGL_EGL", "libEGL.so", 1);
         LOGD("ANGLE disabled and not used")
     }
-        */
-    globals4es.enableANGLE = false;
+        
 }
 char* NGGDirectory;
 
@@ -260,6 +259,7 @@ void initialize_gl4es() {
     case 44:
     case 45:
     case 46:
+    case 91:
         break;
     default:
         // automatic GL version selection

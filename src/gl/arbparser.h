@@ -5,6 +5,10 @@
 
 #include "arbhelper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sSpecialCases {
 	int hasFogFragCoord;
 	int isDepthReplacing;
@@ -12,5 +16,9 @@ struct sSpecialCases {
 
 eToken readNextToken(sCurStatus* curStatus);
 void parseToken(sCurStatus *curStatus, int vertex, char **error_msg, struct sSpecialCases *hasFogFragCoord);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GL4ES_ARBPARSER_H_

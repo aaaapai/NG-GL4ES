@@ -3,16 +3,15 @@ cmake_minimum_required(VERSION 3.10)
 project(ng_gl4es)
 
 enable_language(CXX)
+set(CMAKE_C_STANDARD 23)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto=auto -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-parallel -mllvm -polly-scheduling=dynamic -fno-emulated-tls -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fvisibility=hidden -Wall -Wextra -fPIC -DPIC -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -Wno-macro-redefined -Wno-gcc-compat -DDEFAULT_ES=3 -DNO_GBM -DNOX11 -ferror-limit=0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto=auto -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-parallel -mllvm -polly-scheduling=dynamic -fno-emulated-tls -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fPIC -DPIC -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -fexceptions -fno-rtti -Wno-macro-redefined -Wno-gcc-compat -DDEFAULT_ES=3 -DNO_GBM -DNOX11 -ferror-limit=0")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -flto=auto -Wl,-plugin-opt=-emulated-tls=0 -Wl,--strip-all -fvisibility=hidden -Wl,--gc-sections -Wl,--as-needed -Wl,--error-limit=0")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DNO_GBM -DDEFAULT_ES=3 -fvisibility=hidden")
 
@@ -23,10 +22,12 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/include )
 
 set(C_SRC_FILES
+        src/egl/egl.c
+        src/egl/lookup.c
+        src/gl/arbconverter.c
         src/gl/string_utils.c
         src/gl/cJSON.c
         src/gl/config.c
-        src/gl/arbconverter.c
         src/gl/arbgenerator.c
         src/gl/arbhelper.c
         src/gl/arbparser.c
@@ -98,6 +99,8 @@ set(C_SRC_FILES
         src/glx/streaming.c
         src/gl/vgpu/shaderconv.c
         src/gl/samplers.c
+        src/gl/pack/shader.c
+        src/gl/pack/shaderconv.c
         )
 
 if(NOT ANDROID)
@@ -126,7 +129,7 @@ if(MACOS)
         ${iOS_LIB_DIR}/libMachineIndependent.a
         ${iOS_LIB_DIR}/libOSDependent.a
         ${iOS_LIB_DIR}/libSPIRV-Tools-diff.a
-        ${iOS_LIB_DIR}/libSPIRV-Tools-link.aBuffer
+        ${iOS_LIB_DIR}/libSPIRV-Tools-link.a
         ${iOS_LIB_DIR}/libSPIRV-Tools-lint.a
         ${iOS_LIB_DIR}/libSPIRV-Tools-opt.a
         ${iOS_LIB_DIR}/libSPIRV-Tools-reduce.a
@@ -144,9 +147,8 @@ else()
 if(ANDROID)
     # Android
     find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/)
-    target_link_libraries(${CMAKE_PROJECT_NAME}
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang.a
-        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-c-shared.so
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libGenericCodeGen.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libglslang-default-resource-limits.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libMachineIndependent.a
@@ -159,6 +161,13 @@ if(ANDROID)
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV-Tools.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPIRV.a
         ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libSPVRemapper.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-c.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-core.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-cpp.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-glsl.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-hlsl.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-reflect.a
+        ${CMAKE_SOURCE_DIR}/library/android/${ANDROID_ABI}/libspirv-cross-util.a
         android
         log
     )
@@ -168,7 +177,6 @@ else()
     find_library(GLSLANG_LIB glslang PATHS ${CMAKE_SOURCE_DIR}/library/linux/x86_64)
     target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libglslang.a
-        ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libspirv-cross-c-shared.so
         ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libGenericCodeGen.a
         ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libglslang-default-resource-limits.a
         ${CMAKE_SOURCE_DIR}/library/linux/x86_64/libMachineIndependent.a
