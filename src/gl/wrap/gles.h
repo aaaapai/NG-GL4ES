@@ -2,6 +2,7 @@
 extern "C" {
 #endif
 #include "../gles.h"
+#include <jemalloc/jemalloc.h>
 
 #ifndef GLESWRAP_H
 #define GLESWRAP_H
@@ -4314,7 +4315,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 
 #ifndef direct_glActiveTexture
 #define push_glActiveTexture(texture) { \
-    glActiveTexture_PACKED *packed_data = malloc(sizeof(glActiveTexture_PACKED)); \
+    glActiveTexture_PACKED *packed_data = je_malloc(sizeof(glActiveTexture_PACKED)); \
     packed_data->format = glActiveTexture_FORMAT; \
     packed_data->func = gl4es_glActiveTexture; \
     packed_data->args.a1 = (GLenum)texture; \
@@ -4323,7 +4324,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glAlphaFunc
 #define push_glAlphaFunc(func, ref) { \
-    glAlphaFunc_PACKED *packed_data = malloc(sizeof(glAlphaFunc_PACKED)); \
+    glAlphaFunc_PACKED *packed_data = je_malloc(sizeof(glAlphaFunc_PACKED)); \
     packed_data->format = glAlphaFunc_FORMAT; \
     packed_data->func = gl4es_glAlphaFunc; \
     packed_data->args.a1 = (GLenum)func; \
@@ -4333,7 +4334,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glAlphaFuncx
 #define push_glAlphaFuncx(func, ref) { \
-    glAlphaFuncx_PACKED *packed_data = malloc(sizeof(glAlphaFuncx_PACKED)); \
+    glAlphaFuncx_PACKED *packed_data = je_malloc(sizeof(glAlphaFuncx_PACKED)); \
     packed_data->format = glAlphaFuncx_FORMAT; \
     packed_data->func = gl4es_glAlphaFuncx; \
     packed_data->args.a1 = (GLenum)func; \
@@ -4343,7 +4344,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glAttachShader
 #define push_glAttachShader(program, shader) { \
-    glAttachShader_PACKED *packed_data = malloc(sizeof(glAttachShader_PACKED)); \
+    glAttachShader_PACKED *packed_data = je_malloc(sizeof(glAttachShader_PACKED)); \
     packed_data->format = glAttachShader_FORMAT; \
     packed_data->func = gl4es_glAttachShader; \
     packed_data->args.a1 = (GLuint)program; \
@@ -4353,7 +4354,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBindAttribLocation
 #define push_glBindAttribLocation(program, index, name) { \
-    glBindAttribLocation_PACKED *packed_data = malloc(sizeof(glBindAttribLocation_PACKED)); \
+    glBindAttribLocation_PACKED *packed_data = je_malloc(sizeof(glBindAttribLocation_PACKED)); \
     packed_data->format = glBindAttribLocation_FORMAT; \
     packed_data->func = gl4es_glBindAttribLocation; \
     packed_data->args.a1 = (GLuint)program; \
@@ -4364,7 +4365,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBindBuffer
 #define push_glBindBuffer(target, buffer) { \
-    glBindBuffer_PACKED *packed_data = malloc(sizeof(glBindBuffer_PACKED)); \
+    glBindBuffer_PACKED *packed_data = je_malloc(sizeof(glBindBuffer_PACKED)); \
     packed_data->format = glBindBuffer_FORMAT; \
     packed_data->func = gl4es_glBindBuffer; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4374,7 +4375,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBindFramebuffer
 #define push_glBindFramebuffer(target, framebuffer) { \
-    glBindFramebuffer_PACKED *packed_data = malloc(sizeof(glBindFramebuffer_PACKED)); \
+    glBindFramebuffer_PACKED *packed_data = je_malloc(sizeof(glBindFramebuffer_PACKED)); \
     packed_data->format = glBindFramebuffer_FORMAT; \
     packed_data->func = gl4es_glBindFramebuffer; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4384,7 +4385,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBindRenderbuffer
 #define push_glBindRenderbuffer(target, renderbuffer) { \
-    glBindRenderbuffer_PACKED *packed_data = malloc(sizeof(glBindRenderbuffer_PACKED)); \
+    glBindRenderbuffer_PACKED *packed_data = je_malloc(sizeof(glBindRenderbuffer_PACKED)); \
     packed_data->format = glBindRenderbuffer_FORMAT; \
     packed_data->func = gl4es_glBindRenderbuffer; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4394,7 +4395,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBindTexture
 #define push_glBindTexture(target, texture) { \
-    glBindTexture_PACKED *packed_data = malloc(sizeof(glBindTexture_PACKED)); \
+    glBindTexture_PACKED *packed_data = je_malloc(sizeof(glBindTexture_PACKED)); \
     packed_data->format = glBindTexture_FORMAT; \
     packed_data->func = gl4es_glBindTexture; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4404,7 +4405,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBlendColor
 #define push_glBlendColor(red, green, blue, alpha) { \
-    glBlendColor_PACKED *packed_data = malloc(sizeof(glBlendColor_PACKED)); \
+    glBlendColor_PACKED *packed_data = je_malloc(sizeof(glBlendColor_PACKED)); \
     packed_data->format = glBlendColor_FORMAT; \
     packed_data->func = gl4es_glBlendColor; \
     packed_data->args.a1 = (GLclampf)red; \
@@ -4416,7 +4417,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBlendEquation
 #define push_glBlendEquation(mode) { \
-    glBlendEquation_PACKED *packed_data = malloc(sizeof(glBlendEquation_PACKED)); \
+    glBlendEquation_PACKED *packed_data = je_malloc(sizeof(glBlendEquation_PACKED)); \
     packed_data->format = glBlendEquation_FORMAT; \
     packed_data->func = gl4es_glBlendEquation; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -4425,7 +4426,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBlendEquationSeparate
 #define push_glBlendEquationSeparate(modeRGB, modeA) { \
-    glBlendEquationSeparate_PACKED *packed_data = malloc(sizeof(glBlendEquationSeparate_PACKED)); \
+    glBlendEquationSeparate_PACKED *packed_data = je_malloc(sizeof(glBlendEquationSeparate_PACKED)); \
     packed_data->format = glBlendEquationSeparate_FORMAT; \
     packed_data->func = gl4es_glBlendEquationSeparate; \
     packed_data->args.a1 = (GLenum)modeRGB; \
@@ -4435,7 +4436,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBlendFunc
 #define push_glBlendFunc(sfactor, dfactor) { \
-    glBlendFunc_PACKED *packed_data = malloc(sizeof(glBlendFunc_PACKED)); \
+    glBlendFunc_PACKED *packed_data = je_malloc(sizeof(glBlendFunc_PACKED)); \
     packed_data->format = glBlendFunc_FORMAT; \
     packed_data->func = gl4es_glBlendFunc; \
     packed_data->args.a1 = (GLenum)sfactor; \
@@ -4445,7 +4446,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBlendFuncSeparate
 #define push_glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha) { \
-    glBlendFuncSeparate_PACKED *packed_data = malloc(sizeof(glBlendFuncSeparate_PACKED)); \
+    glBlendFuncSeparate_PACKED *packed_data = je_malloc(sizeof(glBlendFuncSeparate_PACKED)); \
     packed_data->format = glBlendFuncSeparate_FORMAT; \
     packed_data->func = gl4es_glBlendFuncSeparate; \
     packed_data->args.a1 = (GLenum)sfactorRGB; \
@@ -4457,7 +4458,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBufferData
 #define push_glBufferData(target, size, data, usage) { \
-    glBufferData_PACKED *packed_data = malloc(sizeof(glBufferData_PACKED)); \
+    glBufferData_PACKED *packed_data = je_malloc(sizeof(glBufferData_PACKED)); \
     packed_data->format = glBufferData_FORMAT; \
     packed_data->func = gl4es_glBufferData; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4469,7 +4470,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glBufferSubData
 #define push_glBufferSubData(target, offset, size, data) { \
-    glBufferSubData_PACKED *packed_data = malloc(sizeof(glBufferSubData_PACKED)); \
+    glBufferSubData_PACKED *packed_data = je_malloc(sizeof(glBufferSubData_PACKED)); \
     packed_data->format = glBufferSubData_FORMAT; \
     packed_data->func = gl4es_glBufferSubData; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4481,7 +4482,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCheckFramebufferStatus
 #define push_glCheckFramebufferStatus(target) { \
-    glCheckFramebufferStatus_PACKED *packed_data = malloc(sizeof(glCheckFramebufferStatus_PACKED)); \
+    glCheckFramebufferStatus_PACKED *packed_data = je_malloc(sizeof(glCheckFramebufferStatus_PACKED)); \
     packed_data->format = glCheckFramebufferStatus_FORMAT; \
     packed_data->func = gl4es_glCheckFramebufferStatus; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4490,7 +4491,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClear
 #define push_glClear(mask) { \
-    glClear_PACKED *packed_data = malloc(sizeof(glClear_PACKED)); \
+    glClear_PACKED *packed_data = je_malloc(sizeof(glClear_PACKED)); \
     packed_data->format = glClear_FORMAT; \
     packed_data->func = gl4es_glClear; \
     packed_data->args.a1 = (GLbitfield)mask; \
@@ -4499,7 +4500,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClearColor
 #define push_glClearColor(red, green, blue, alpha) { \
-    glClearColor_PACKED *packed_data = malloc(sizeof(glClearColor_PACKED)); \
+    glClearColor_PACKED *packed_data = je_malloc(sizeof(glClearColor_PACKED)); \
     packed_data->format = glClearColor_FORMAT; \
     packed_data->func = gl4es_glClearColor; \
     packed_data->args.a1 = (GLclampf)red; \
@@ -4511,7 +4512,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClearColorx
 #define push_glClearColorx(red, green, blue, alpha) { \
-    glClearColorx_PACKED *packed_data = malloc(sizeof(glClearColorx_PACKED)); \
+    glClearColorx_PACKED *packed_data = je_malloc(sizeof(glClearColorx_PACKED)); \
     packed_data->format = glClearColorx_FORMAT; \
     packed_data->func = gl4es_glClearColorx; \
     packed_data->args.a1 = (GLclampx)red; \
@@ -4523,7 +4524,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClearDepthf
 #define push_glClearDepthf(depth) { \
-    glClearDepthf_PACKED *packed_data = malloc(sizeof(glClearDepthf_PACKED)); \
+    glClearDepthf_PACKED *packed_data = je_malloc(sizeof(glClearDepthf_PACKED)); \
     packed_data->format = glClearDepthf_FORMAT; \
     packed_data->func = gl4es_glClearDepthf; \
     packed_data->args.a1 = (GLclampf)depth; \
@@ -4532,7 +4533,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClearDepthx
 #define push_glClearDepthx(depth) { \
-    glClearDepthx_PACKED *packed_data = malloc(sizeof(glClearDepthx_PACKED)); \
+    glClearDepthx_PACKED *packed_data = je_malloc(sizeof(glClearDepthx_PACKED)); \
     packed_data->format = glClearDepthx_FORMAT; \
     packed_data->func = gl4es_glClearDepthx; \
     packed_data->args.a1 = (GLclampx)depth; \
@@ -4541,7 +4542,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClearStencil
 #define push_glClearStencil(s) { \
-    glClearStencil_PACKED *packed_data = malloc(sizeof(glClearStencil_PACKED)); \
+    glClearStencil_PACKED *packed_data = je_malloc(sizeof(glClearStencil_PACKED)); \
     packed_data->format = glClearStencil_FORMAT; \
     packed_data->func = gl4es_glClearStencil; \
     packed_data->args.a1 = (GLint)s; \
@@ -4550,7 +4551,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClientActiveTexture
 #define push_glClientActiveTexture(texture) { \
-    glClientActiveTexture_PACKED *packed_data = malloc(sizeof(glClientActiveTexture_PACKED)); \
+    glClientActiveTexture_PACKED *packed_data = je_malloc(sizeof(glClientActiveTexture_PACKED)); \
     packed_data->format = glClientActiveTexture_FORMAT; \
     packed_data->func = gl4es_glClientActiveTexture; \
     packed_data->args.a1 = (GLenum)texture; \
@@ -4559,7 +4560,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClipPlanef
 #define push_glClipPlanef(plane, equation) { \
-    glClipPlanef_PACKED *packed_data = malloc(sizeof(glClipPlanef_PACKED)); \
+    glClipPlanef_PACKED *packed_data = je_malloc(sizeof(glClipPlanef_PACKED)); \
     packed_data->format = glClipPlanef_FORMAT; \
     packed_data->func = gl4es_glClipPlanef; \
     packed_data->args.a1 = (GLenum)plane; \
@@ -4569,7 +4570,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glClipPlanex
 #define push_glClipPlanex(plane, equation) { \
-    glClipPlanex_PACKED *packed_data = malloc(sizeof(glClipPlanex_PACKED)); \
+    glClipPlanex_PACKED *packed_data = je_malloc(sizeof(glClipPlanex_PACKED)); \
     packed_data->format = glClipPlanex_FORMAT; \
     packed_data->func = gl4es_glClipPlanex; \
     packed_data->args.a1 = (GLenum)plane; \
@@ -4579,7 +4580,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glColor4f
 #define push_glColor4f(red, green, blue, alpha) { \
-    glColor4f_PACKED *packed_data = malloc(sizeof(glColor4f_PACKED)); \
+    glColor4f_PACKED *packed_data = je_malloc(sizeof(glColor4f_PACKED)); \
     packed_data->format = glColor4f_FORMAT; \
     packed_data->func = gl4es_glColor4f; \
     packed_data->args.a1 = (GLfloat)red; \
@@ -4591,7 +4592,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glColor4ub
 #define push_glColor4ub(red, green, blue, alpha) { \
-    glColor4ub_PACKED *packed_data = malloc(sizeof(glColor4ub_PACKED)); \
+    glColor4ub_PACKED *packed_data = je_malloc(sizeof(glColor4ub_PACKED)); \
     packed_data->format = glColor4ub_FORMAT; \
     packed_data->func = gl4es_glColor4ub; \
     packed_data->args.a1 = (GLubyte)red; \
@@ -4603,7 +4604,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glColor4x
 #define push_glColor4x(red, green, blue, alpha) { \
-    glColor4x_PACKED *packed_data = malloc(sizeof(glColor4x_PACKED)); \
+    glColor4x_PACKED *packed_data = je_malloc(sizeof(glColor4x_PACKED)); \
     packed_data->format = glColor4x_FORMAT; \
     packed_data->func = gl4es_glColor4x; \
     packed_data->args.a1 = (GLfixed)red; \
@@ -4615,7 +4616,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glColorMask
 #define push_glColorMask(red, green, blue, alpha) { \
-    glColorMask_PACKED *packed_data = malloc(sizeof(glColorMask_PACKED)); \
+    glColorMask_PACKED *packed_data = je_malloc(sizeof(glColorMask_PACKED)); \
     packed_data->format = glColorMask_FORMAT; \
     packed_data->func = gl4es_glColorMask; \
     packed_data->args.a1 = (GLboolean)red; \
@@ -4627,7 +4628,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glColorPointer
 #define push_glColorPointer(size, type, stride, pointer) { \
-    glColorPointer_PACKED *packed_data = malloc(sizeof(glColorPointer_PACKED)); \
+    glColorPointer_PACKED *packed_data = je_malloc(sizeof(glColorPointer_PACKED)); \
     packed_data->format = glColorPointer_FORMAT; \
     packed_data->func = gl4es_glColorPointer; \
     packed_data->args.a1 = (GLint)size; \
@@ -4639,7 +4640,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCompileShader
 #define push_glCompileShader(shader) { \
-    glCompileShader_PACKED *packed_data = malloc(sizeof(glCompileShader_PACKED)); \
+    glCompileShader_PACKED *packed_data = je_malloc(sizeof(glCompileShader_PACKED)); \
     packed_data->format = glCompileShader_FORMAT; \
     packed_data->func = gl4es_glCompileShader; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -4648,7 +4649,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCompressedTexImage2D
 #define push_glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data) { \
-    glCompressedTexImage2D_PACKED *packed_data = malloc(sizeof(glCompressedTexImage2D_PACKED)); \
+    glCompressedTexImage2D_PACKED *packed_data = je_malloc(sizeof(glCompressedTexImage2D_PACKED)); \
     packed_data->format = glCompressedTexImage2D_FORMAT; \
     packed_data->func = gl4es_glCompressedTexImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4664,7 +4665,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCompressedTexSubImage2D
 #define push_glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data) { \
-    glCompressedTexSubImage2D_PACKED *packed_data = malloc(sizeof(glCompressedTexSubImage2D_PACKED)); \
+    glCompressedTexSubImage2D_PACKED *packed_data = je_malloc(sizeof(glCompressedTexSubImage2D_PACKED)); \
     packed_data->format = glCompressedTexSubImage2D_FORMAT; \
     packed_data->func = gl4es_glCompressedTexSubImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4681,7 +4682,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCopyTexImage2D
 #define push_glCopyTexImage2D(target, level, internalformat, x, y, width, height, border) { \
-    glCopyTexImage2D_PACKED *packed_data = malloc(sizeof(glCopyTexImage2D_PACKED)); \
+    glCopyTexImage2D_PACKED *packed_data = je_malloc(sizeof(glCopyTexImage2D_PACKED)); \
     packed_data->format = glCopyTexImage2D_FORMAT; \
     packed_data->func = gl4es_glCopyTexImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4697,7 +4698,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCopyTexSubImage2D
 #define push_glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height) { \
-    glCopyTexSubImage2D_PACKED *packed_data = malloc(sizeof(glCopyTexSubImage2D_PACKED)); \
+    glCopyTexSubImage2D_PACKED *packed_data = je_malloc(sizeof(glCopyTexSubImage2D_PACKED)); \
     packed_data->format = glCopyTexSubImage2D_FORMAT; \
     packed_data->func = gl4es_glCopyTexSubImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -4713,7 +4714,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCreateProgram
 #define push_glCreateProgram() { \
-    glCreateProgram_PACKED *packed_data = malloc(sizeof(glCreateProgram_PACKED)); \
+    glCreateProgram_PACKED *packed_data = je_malloc(sizeof(glCreateProgram_PACKED)); \
     packed_data->format = glCreateProgram_FORMAT; \
     packed_data->func = gl4es_glCreateProgram; \
     glPushCall((void *)packed_data); \
@@ -4721,7 +4722,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCreateShader
 #define push_glCreateShader(type) { \
-    glCreateShader_PACKED *packed_data = malloc(sizeof(glCreateShader_PACKED)); \
+    glCreateShader_PACKED *packed_data = je_malloc(sizeof(glCreateShader_PACKED)); \
     packed_data->format = glCreateShader_FORMAT; \
     packed_data->func = gl4es_glCreateShader; \
     packed_data->args.a1 = (GLenum)type; \
@@ -4730,7 +4731,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glCullFace
 #define push_glCullFace(mode) { \
-    glCullFace_PACKED *packed_data = malloc(sizeof(glCullFace_PACKED)); \
+    glCullFace_PACKED *packed_data = je_malloc(sizeof(glCullFace_PACKED)); \
     packed_data->format = glCullFace_FORMAT; \
     packed_data->func = gl4es_glCullFace; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -4739,7 +4740,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteBuffers
 #define push_glDeleteBuffers(n, buffer) { \
-    glDeleteBuffers_PACKED *packed_data = malloc(sizeof(glDeleteBuffers_PACKED)); \
+    glDeleteBuffers_PACKED *packed_data = je_malloc(sizeof(glDeleteBuffers_PACKED)); \
     packed_data->format = glDeleteBuffers_FORMAT; \
     packed_data->func = gl4es_glDeleteBuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -4749,7 +4750,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteFramebuffers
 #define push_glDeleteFramebuffers(n, framebuffers) { \
-    glDeleteFramebuffers_PACKED *packed_data = malloc(sizeof(glDeleteFramebuffers_PACKED)); \
+    glDeleteFramebuffers_PACKED *packed_data = je_malloc(sizeof(glDeleteFramebuffers_PACKED)); \
     packed_data->format = glDeleteFramebuffers_FORMAT; \
     packed_data->func = gl4es_glDeleteFramebuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -4759,7 +4760,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteProgram
 #define push_glDeleteProgram(program) { \
-    glDeleteProgram_PACKED *packed_data = malloc(sizeof(glDeleteProgram_PACKED)); \
+    glDeleteProgram_PACKED *packed_data = je_malloc(sizeof(glDeleteProgram_PACKED)); \
     packed_data->format = glDeleteProgram_FORMAT; \
     packed_data->func = gl4es_glDeleteProgram; \
     packed_data->args.a1 = (GLuint)program; \
@@ -4768,7 +4769,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteRenderbuffers
 #define push_glDeleteRenderbuffers(n, renderbuffers) { \
-    glDeleteRenderbuffers_PACKED *packed_data = malloc(sizeof(glDeleteRenderbuffers_PACKED)); \
+    glDeleteRenderbuffers_PACKED *packed_data = je_malloc(sizeof(glDeleteRenderbuffers_PACKED)); \
     packed_data->format = glDeleteRenderbuffers_FORMAT; \
     packed_data->func = gl4es_glDeleteRenderbuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -4778,7 +4779,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteShader
 #define push_glDeleteShader(shader) { \
-    glDeleteShader_PACKED *packed_data = malloc(sizeof(glDeleteShader_PACKED)); \
+    glDeleteShader_PACKED *packed_data = je_malloc(sizeof(glDeleteShader_PACKED)); \
     packed_data->format = glDeleteShader_FORMAT; \
     packed_data->func = gl4es_glDeleteShader; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -4787,7 +4788,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDeleteTextures
 #define push_glDeleteTextures(n, textures) { \
-    glDeleteTextures_PACKED *packed_data = malloc(sizeof(glDeleteTextures_PACKED)); \
+    glDeleteTextures_PACKED *packed_data = je_malloc(sizeof(glDeleteTextures_PACKED)); \
     packed_data->format = glDeleteTextures_FORMAT; \
     packed_data->func = gl4es_glDeleteTextures; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -4797,7 +4798,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDepthFunc
 #define push_glDepthFunc(func) { \
-    glDepthFunc_PACKED *packed_data = malloc(sizeof(glDepthFunc_PACKED)); \
+    glDepthFunc_PACKED *packed_data = je_malloc(sizeof(glDepthFunc_PACKED)); \
     packed_data->format = glDepthFunc_FORMAT; \
     packed_data->func = gl4es_glDepthFunc; \
     packed_data->args.a1 = (GLenum)func; \
@@ -4806,7 +4807,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDepthMask
 #define push_glDepthMask(flag) { \
-    glDepthMask_PACKED *packed_data = malloc(sizeof(glDepthMask_PACKED)); \
+    glDepthMask_PACKED *packed_data = je_malloc(sizeof(glDepthMask_PACKED)); \
     packed_data->format = glDepthMask_FORMAT; \
     packed_data->func = gl4es_glDepthMask; \
     packed_data->args.a1 = (GLboolean)flag; \
@@ -4815,7 +4816,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDepthRangef
 #define push_glDepthRangef(Near, Far) { \
-    glDepthRangef_PACKED *packed_data = malloc(sizeof(glDepthRangef_PACKED)); \
+    glDepthRangef_PACKED *packed_data = je_malloc(sizeof(glDepthRangef_PACKED)); \
     packed_data->format = glDepthRangef_FORMAT; \
     packed_data->func = gl4es_glDepthRangef; \
     packed_data->args.a1 = (GLclampf)Near; \
@@ -4825,7 +4826,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDepthRangex
 #define push_glDepthRangex(Near, Far) { \
-    glDepthRangex_PACKED *packed_data = malloc(sizeof(glDepthRangex_PACKED)); \
+    glDepthRangex_PACKED *packed_data = je_malloc(sizeof(glDepthRangex_PACKED)); \
     packed_data->format = glDepthRangex_FORMAT; \
     packed_data->func = gl4es_glDepthRangex; \
     packed_data->args.a1 = (GLclampx)Near; \
@@ -4835,7 +4836,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDetachShader
 #define push_glDetachShader(program, shader) { \
-    glDetachShader_PACKED *packed_data = malloc(sizeof(glDetachShader_PACKED)); \
+    glDetachShader_PACKED *packed_data = je_malloc(sizeof(glDetachShader_PACKED)); \
     packed_data->format = glDetachShader_FORMAT; \
     packed_data->func = gl4es_glDetachShader; \
     packed_data->args.a1 = (GLuint)program; \
@@ -4845,7 +4846,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDisable
 #define push_glDisable(cap) { \
-    glDisable_PACKED *packed_data = malloc(sizeof(glDisable_PACKED)); \
+    glDisable_PACKED *packed_data = je_malloc(sizeof(glDisable_PACKED)); \
     packed_data->format = glDisable_FORMAT; \
     packed_data->func = gl4es_glDisable; \
     packed_data->args.a1 = (GLenum)cap; \
@@ -4854,7 +4855,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDisableClientState
 #define push_glDisableClientState(array) { \
-    glDisableClientState_PACKED *packed_data = malloc(sizeof(glDisableClientState_PACKED)); \
+    glDisableClientState_PACKED *packed_data = je_malloc(sizeof(glDisableClientState_PACKED)); \
     packed_data->format = glDisableClientState_FORMAT; \
     packed_data->func = gl4es_glDisableClientState; \
     packed_data->args.a1 = (GLenum)array; \
@@ -4863,7 +4864,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDisableVertexAttribArray
 #define push_glDisableVertexAttribArray(index) { \
-    glDisableVertexAttribArray_PACKED *packed_data = malloc(sizeof(glDisableVertexAttribArray_PACKED)); \
+    glDisableVertexAttribArray_PACKED *packed_data = je_malloc(sizeof(glDisableVertexAttribArray_PACKED)); \
     packed_data->format = glDisableVertexAttribArray_FORMAT; \
     packed_data->func = gl4es_glDisableVertexAttribArray; \
     packed_data->args.a1 = (GLuint)index; \
@@ -4872,7 +4873,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDrawArrays
 #define push_glDrawArrays(mode, first, count) { \
-    glDrawArrays_PACKED *packed_data = malloc(sizeof(glDrawArrays_PACKED)); \
+    glDrawArrays_PACKED *packed_data = je_malloc(sizeof(glDrawArrays_PACKED)); \
     packed_data->format = glDrawArrays_FORMAT; \
     packed_data->func = gl4es_glDrawArrays; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -4883,7 +4884,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDrawBuffers
 #define push_glDrawBuffers(n, bufs) { \
-    glDrawBuffers_PACKED *packed_data = malloc(sizeof(glDrawBuffers_PACKED)); \
+    glDrawBuffers_PACKED *packed_data = je_malloc(sizeof(glDrawBuffers_PACKED)); \
     packed_data->format = glDrawBuffers_FORMAT; \
     packed_data->func = gl4es_glDrawBuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -4893,7 +4894,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDrawElements
 #define push_glDrawElements(mode, count, type, indices) { \
-    glDrawElements_PACKED *packed_data = malloc(sizeof(glDrawElements_PACKED)); \
+    glDrawElements_PACKED *packed_data = je_malloc(sizeof(glDrawElements_PACKED)); \
     packed_data->format = glDrawElements_FORMAT; \
     packed_data->func = gl4es_glDrawElements; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -4905,7 +4906,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDrawTexf
 #define push_glDrawTexf(x, y, z, width, height) { \
-    glDrawTexf_PACKED *packed_data = malloc(sizeof(glDrawTexf_PACKED)); \
+    glDrawTexf_PACKED *packed_data = je_malloc(sizeof(glDrawTexf_PACKED)); \
     packed_data->format = glDrawTexf_FORMAT; \
     packed_data->func = gl4es_glDrawTexf; \
     packed_data->args.a1 = (GLfloat)x; \
@@ -4918,7 +4919,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glDrawTexi
 #define push_glDrawTexi(x, y, z, width, height) { \
-    glDrawTexi_PACKED *packed_data = malloc(sizeof(glDrawTexi_PACKED)); \
+    glDrawTexi_PACKED *packed_data = je_malloc(sizeof(glDrawTexi_PACKED)); \
     packed_data->format = glDrawTexi_FORMAT; \
     packed_data->func = gl4es_glDrawTexi; \
     packed_data->args.a1 = (GLint)x; \
@@ -4931,7 +4932,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glEnable
 #define push_glEnable(cap) { \
-    glEnable_PACKED *packed_data = malloc(sizeof(glEnable_PACKED)); \
+    glEnable_PACKED *packed_data = je_malloc(sizeof(glEnable_PACKED)); \
     packed_data->format = glEnable_FORMAT; \
     packed_data->func = gl4es_glEnable; \
     packed_data->args.a1 = (GLenum)cap; \
@@ -4940,7 +4941,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glEnableClientState
 #define push_glEnableClientState(array) { \
-    glEnableClientState_PACKED *packed_data = malloc(sizeof(glEnableClientState_PACKED)); \
+    glEnableClientState_PACKED *packed_data = je_malloc(sizeof(glEnableClientState_PACKED)); \
     packed_data->format = glEnableClientState_FORMAT; \
     packed_data->func = gl4es_glEnableClientState; \
     packed_data->args.a1 = (GLenum)array; \
@@ -4949,7 +4950,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glEnableVertexAttribArray
 #define push_glEnableVertexAttribArray(index) { \
-    glEnableVertexAttribArray_PACKED *packed_data = malloc(sizeof(glEnableVertexAttribArray_PACKED)); \
+    glEnableVertexAttribArray_PACKED *packed_data = je_malloc(sizeof(glEnableVertexAttribArray_PACKED)); \
     packed_data->format = glEnableVertexAttribArray_FORMAT; \
     packed_data->func = gl4es_glEnableVertexAttribArray; \
     packed_data->args.a1 = (GLuint)index; \
@@ -4958,7 +4959,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFinish
 #define push_glFinish() { \
-    glFinish_PACKED *packed_data = malloc(sizeof(glFinish_PACKED)); \
+    glFinish_PACKED *packed_data = je_malloc(sizeof(glFinish_PACKED)); \
     packed_data->format = glFinish_FORMAT; \
     packed_data->func = gl4es_glFinish; \
     glPushCall((void *)packed_data); \
@@ -4966,7 +4967,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFlush
 #define push_glFlush() { \
-    glFlush_PACKED *packed_data = malloc(sizeof(glFlush_PACKED)); \
+    glFlush_PACKED *packed_data = je_malloc(sizeof(glFlush_PACKED)); \
     packed_data->format = glFlush_FORMAT; \
     packed_data->func = gl4es_glFlush; \
     glPushCall((void *)packed_data); \
@@ -4974,7 +4975,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogCoordPointer
 #define push_glFogCoordPointer(type, stride, pointer) { \
-    glFogCoordPointer_PACKED *packed_data = malloc(sizeof(glFogCoordPointer_PACKED)); \
+    glFogCoordPointer_PACKED *packed_data = je_malloc(sizeof(glFogCoordPointer_PACKED)); \
     packed_data->format = glFogCoordPointer_FORMAT; \
     packed_data->func = gl4es_glFogCoordPointer; \
     packed_data->args.a1 = (GLenum)type; \
@@ -4985,7 +4986,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogCoordf
 #define push_glFogCoordf(coord) { \
-    glFogCoordf_PACKED *packed_data = malloc(sizeof(glFogCoordf_PACKED)); \
+    glFogCoordf_PACKED *packed_data = je_malloc(sizeof(glFogCoordf_PACKED)); \
     packed_data->format = glFogCoordf_FORMAT; \
     packed_data->func = gl4es_glFogCoordf; \
     packed_data->args.a1 = (GLfloat)coord; \
@@ -4994,7 +4995,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogCoordfv
 #define push_glFogCoordfv(coord) { \
-    glFogCoordfv_PACKED *packed_data = malloc(sizeof(glFogCoordfv_PACKED)); \
+    glFogCoordfv_PACKED *packed_data = je_malloc(sizeof(glFogCoordfv_PACKED)); \
     packed_data->format = glFogCoordfv_FORMAT; \
     packed_data->func = gl4es_glFogCoordfv; \
     packed_data->args.a1 = (GLfloat *)coord; \
@@ -5003,7 +5004,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogf
 #define push_glFogf(pname, param) { \
-    glFogf_PACKED *packed_data = malloc(sizeof(glFogf_PACKED)); \
+    glFogf_PACKED *packed_data = je_malloc(sizeof(glFogf_PACKED)); \
     packed_data->format = glFogf_FORMAT; \
     packed_data->func = gl4es_glFogf; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5013,7 +5014,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogfv
 #define push_glFogfv(pname, params) { \
-    glFogfv_PACKED *packed_data = malloc(sizeof(glFogfv_PACKED)); \
+    glFogfv_PACKED *packed_data = je_malloc(sizeof(glFogfv_PACKED)); \
     packed_data->format = glFogfv_FORMAT; \
     packed_data->func = gl4es_glFogfv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5023,7 +5024,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogx
 #define push_glFogx(pname, param) { \
-    glFogx_PACKED *packed_data = malloc(sizeof(glFogx_PACKED)); \
+    glFogx_PACKED *packed_data = je_malloc(sizeof(glFogx_PACKED)); \
     packed_data->format = glFogx_FORMAT; \
     packed_data->func = gl4es_glFogx; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5033,7 +5034,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFogxv
 #define push_glFogxv(pname, params) { \
-    glFogxv_PACKED *packed_data = malloc(sizeof(glFogxv_PACKED)); \
+    glFogxv_PACKED *packed_data = je_malloc(sizeof(glFogxv_PACKED)); \
     packed_data->format = glFogxv_FORMAT; \
     packed_data->func = gl4es_glFogxv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5043,7 +5044,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFramebufferRenderbuffer
 #define push_glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer) { \
-    glFramebufferRenderbuffer_PACKED *packed_data = malloc(sizeof(glFramebufferRenderbuffer_PACKED)); \
+    glFramebufferRenderbuffer_PACKED *packed_data = je_malloc(sizeof(glFramebufferRenderbuffer_PACKED)); \
     packed_data->format = glFramebufferRenderbuffer_FORMAT; \
     packed_data->func = gl4es_glFramebufferRenderbuffer; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5055,7 +5056,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFramebufferTexture2D
 #define push_glFramebufferTexture2D(target, attachment, textarget, texture, level) { \
-    glFramebufferTexture2D_PACKED *packed_data = malloc(sizeof(glFramebufferTexture2D_PACKED)); \
+    glFramebufferTexture2D_PACKED *packed_data = je_malloc(sizeof(glFramebufferTexture2D_PACKED)); \
     packed_data->format = glFramebufferTexture2D_FORMAT; \
     packed_data->func = gl4es_glFramebufferTexture2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5068,7 +5069,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFrontFace
 #define push_glFrontFace(mode) { \
-    glFrontFace_PACKED *packed_data = malloc(sizeof(glFrontFace_PACKED)); \
+    glFrontFace_PACKED *packed_data = je_malloc(sizeof(glFrontFace_PACKED)); \
     packed_data->format = glFrontFace_FORMAT; \
     packed_data->func = gl4es_glFrontFace; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -5077,7 +5078,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFrustumf
 #define push_glFrustumf(left, right, bottom, top, Near, Far) { \
-    glFrustumf_PACKED *packed_data = malloc(sizeof(glFrustumf_PACKED)); \
+    glFrustumf_PACKED *packed_data = je_malloc(sizeof(glFrustumf_PACKED)); \
     packed_data->format = glFrustumf_FORMAT; \
     packed_data->func = gl4es_glFrustumf; \
     packed_data->args.a1 = (GLfloat)left; \
@@ -5091,7 +5092,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glFrustumx
 #define push_glFrustumx(left, right, bottom, top, Near, Far) { \
-    glFrustumx_PACKED *packed_data = malloc(sizeof(glFrustumx_PACKED)); \
+    glFrustumx_PACKED *packed_data = je_malloc(sizeof(glFrustumx_PACKED)); \
     packed_data->format = glFrustumx_FORMAT; \
     packed_data->func = gl4es_glFrustumx; \
     packed_data->args.a1 = (GLfixed)left; \
@@ -5105,7 +5106,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGenBuffers
 #define push_glGenBuffers(n, buffer) { \
-    glGenBuffers_PACKED *packed_data = malloc(sizeof(glGenBuffers_PACKED)); \
+    glGenBuffers_PACKED *packed_data = je_malloc(sizeof(glGenBuffers_PACKED)); \
     packed_data->format = glGenBuffers_FORMAT; \
     packed_data->func = gl4es_glGenBuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -5115,7 +5116,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGenFramebuffers
 #define push_glGenFramebuffers(n, ids) { \
-    glGenFramebuffers_PACKED *packed_data = malloc(sizeof(glGenFramebuffers_PACKED)); \
+    glGenFramebuffers_PACKED *packed_data = je_malloc(sizeof(glGenFramebuffers_PACKED)); \
     packed_data->format = glGenFramebuffers_FORMAT; \
     packed_data->func = gl4es_glGenFramebuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -5125,7 +5126,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGenRenderbuffers
 #define push_glGenRenderbuffers(n, renderbuffers) { \
-    glGenRenderbuffers_PACKED *packed_data = malloc(sizeof(glGenRenderbuffers_PACKED)); \
+    glGenRenderbuffers_PACKED *packed_data = je_malloc(sizeof(glGenRenderbuffers_PACKED)); \
     packed_data->format = glGenRenderbuffers_FORMAT; \
     packed_data->func = gl4es_glGenRenderbuffers; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -5135,7 +5136,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGenTextures
 #define push_glGenTextures(n, textures) { \
-    glGenTextures_PACKED *packed_data = malloc(sizeof(glGenTextures_PACKED)); \
+    glGenTextures_PACKED *packed_data = je_malloc(sizeof(glGenTextures_PACKED)); \
     packed_data->format = glGenTextures_FORMAT; \
     packed_data->func = gl4es_glGenTextures; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -5145,7 +5146,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGenerateMipmap
 #define push_glGenerateMipmap(target) { \
-    glGenerateMipmap_PACKED *packed_data = malloc(sizeof(glGenerateMipmap_PACKED)); \
+    glGenerateMipmap_PACKED *packed_data = je_malloc(sizeof(glGenerateMipmap_PACKED)); \
     packed_data->format = glGenerateMipmap_FORMAT; \
     packed_data->func = gl4es_glGenerateMipmap; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5154,7 +5155,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetActiveAttrib
 #define push_glGetActiveAttrib(program, index, bufSize, length, size, type, name) { \
-    glGetActiveAttrib_PACKED *packed_data = malloc(sizeof(glGetActiveAttrib_PACKED)); \
+    glGetActiveAttrib_PACKED *packed_data = je_malloc(sizeof(glGetActiveAttrib_PACKED)); \
     packed_data->format = glGetActiveAttrib_FORMAT; \
     packed_data->func = gl4es_glGetActiveAttrib; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5169,7 +5170,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetActiveUniform
 #define push_glGetActiveUniform(program, index, bufSize, length, size, type, name) { \
-    glGetActiveUniform_PACKED *packed_data = malloc(sizeof(glGetActiveUniform_PACKED)); \
+    glGetActiveUniform_PACKED *packed_data = je_malloc(sizeof(glGetActiveUniform_PACKED)); \
     packed_data->format = glGetActiveUniform_FORMAT; \
     packed_data->func = gl4es_glGetActiveUniform; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5184,7 +5185,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetAttachedShaders
 #define push_glGetAttachedShaders(program, maxCount, count, obj) { \
-    glGetAttachedShaders_PACKED *packed_data = malloc(sizeof(glGetAttachedShaders_PACKED)); \
+    glGetAttachedShaders_PACKED *packed_data = je_malloc(sizeof(glGetAttachedShaders_PACKED)); \
     packed_data->format = glGetAttachedShaders_FORMAT; \
     packed_data->func = gl4es_glGetAttachedShaders; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5196,7 +5197,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetAttribLocation
 #define push_glGetAttribLocation(program, name) { \
-    glGetAttribLocation_PACKED *packed_data = malloc(sizeof(glGetAttribLocation_PACKED)); \
+    glGetAttribLocation_PACKED *packed_data = je_malloc(sizeof(glGetAttribLocation_PACKED)); \
     packed_data->format = glGetAttribLocation_FORMAT; \
     packed_data->func = gl4es_glGetAttribLocation; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5206,7 +5207,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetBooleanv
 #define push_glGetBooleanv(pname, params) { \
-    glGetBooleanv_PACKED *packed_data = malloc(sizeof(glGetBooleanv_PACKED)); \
+    glGetBooleanv_PACKED *packed_data = je_malloc(sizeof(glGetBooleanv_PACKED)); \
     packed_data->format = glGetBooleanv_FORMAT; \
     packed_data->func = gl4es_glGetBooleanv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5216,7 +5217,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetBufferParameteriv
 #define push_glGetBufferParameteriv(target, pname, params) { \
-    glGetBufferParameteriv_PACKED *packed_data = malloc(sizeof(glGetBufferParameteriv_PACKED)); \
+    glGetBufferParameteriv_PACKED *packed_data = je_malloc(sizeof(glGetBufferParameteriv_PACKED)); \
     packed_data->format = glGetBufferParameteriv_FORMAT; \
     packed_data->func = gl4es_glGetBufferParameteriv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5227,7 +5228,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetClipPlanef
 #define push_glGetClipPlanef(plane, equation) { \
-    glGetClipPlanef_PACKED *packed_data = malloc(sizeof(glGetClipPlanef_PACKED)); \
+    glGetClipPlanef_PACKED *packed_data = je_malloc(sizeof(glGetClipPlanef_PACKED)); \
     packed_data->format = glGetClipPlanef_FORMAT; \
     packed_data->func = gl4es_glGetClipPlanef; \
     packed_data->args.a1 = (GLenum)plane; \
@@ -5237,7 +5238,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetClipPlanex
 #define push_glGetClipPlanex(plane, equation) { \
-    glGetClipPlanex_PACKED *packed_data = malloc(sizeof(glGetClipPlanex_PACKED)); \
+    glGetClipPlanex_PACKED *packed_data = je_malloc(sizeof(glGetClipPlanex_PACKED)); \
     packed_data->format = glGetClipPlanex_FORMAT; \
     packed_data->func = gl4es_glGetClipPlanex; \
     packed_data->args.a1 = (GLenum)plane; \
@@ -5247,7 +5248,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetError
 #define push_glGetError() { \
-    glGetError_PACKED *packed_data = malloc(sizeof(glGetError_PACKED)); \
+    glGetError_PACKED *packed_data = je_malloc(sizeof(glGetError_PACKED)); \
     packed_data->format = glGetError_FORMAT; \
     packed_data->func = gl4es_glGetError; \
     glPushCall((void *)packed_data); \
@@ -5255,7 +5256,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetFixedv
 #define push_glGetFixedv(pname, params) { \
-    glGetFixedv_PACKED *packed_data = malloc(sizeof(glGetFixedv_PACKED)); \
+    glGetFixedv_PACKED *packed_data = je_malloc(sizeof(glGetFixedv_PACKED)); \
     packed_data->format = glGetFixedv_FORMAT; \
     packed_data->func = gl4es_glGetFixedv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5265,7 +5266,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetFloatv
 #define push_glGetFloatv(pname, params) { \
-    glGetFloatv_PACKED *packed_data = malloc(sizeof(glGetFloatv_PACKED)); \
+    glGetFloatv_PACKED *packed_data = je_malloc(sizeof(glGetFloatv_PACKED)); \
     packed_data->format = glGetFloatv_FORMAT; \
     packed_data->func = gl4es_glGetFloatv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5275,7 +5276,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetFramebufferAttachmentParameteriv
 #define push_glGetFramebufferAttachmentParameteriv(target, attachment, pname, params) { \
-    glGetFramebufferAttachmentParameteriv_PACKED *packed_data = malloc(sizeof(glGetFramebufferAttachmentParameteriv_PACKED)); \
+    glGetFramebufferAttachmentParameteriv_PACKED *packed_data = je_malloc(sizeof(glGetFramebufferAttachmentParameteriv_PACKED)); \
     packed_data->format = glGetFramebufferAttachmentParameteriv_FORMAT; \
     packed_data->func = gl4es_glGetFramebufferAttachmentParameteriv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5287,7 +5288,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetIntegerv
 #define push_glGetIntegerv(pname, params) { \
-    glGetIntegerv_PACKED *packed_data = malloc(sizeof(glGetIntegerv_PACKED)); \
+    glGetIntegerv_PACKED *packed_data = je_malloc(sizeof(glGetIntegerv_PACKED)); \
     packed_data->format = glGetIntegerv_FORMAT; \
     packed_data->func = gl4es_glGetIntegerv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5297,7 +5298,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetLightfv
 #define push_glGetLightfv(light, pname, params) { \
-    glGetLightfv_PACKED *packed_data = malloc(sizeof(glGetLightfv_PACKED)); \
+    glGetLightfv_PACKED *packed_data = je_malloc(sizeof(glGetLightfv_PACKED)); \
     packed_data->format = glGetLightfv_FORMAT; \
     packed_data->func = gl4es_glGetLightfv; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5308,7 +5309,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetLightxv
 #define push_glGetLightxv(light, pname, params) { \
-    glGetLightxv_PACKED *packed_data = malloc(sizeof(glGetLightxv_PACKED)); \
+    glGetLightxv_PACKED *packed_data = je_malloc(sizeof(glGetLightxv_PACKED)); \
     packed_data->format = glGetLightxv_FORMAT; \
     packed_data->func = gl4es_glGetLightxv; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5319,7 +5320,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetMaterialfv
 #define push_glGetMaterialfv(face, pname, params) { \
-    glGetMaterialfv_PACKED *packed_data = malloc(sizeof(glGetMaterialfv_PACKED)); \
+    glGetMaterialfv_PACKED *packed_data = je_malloc(sizeof(glGetMaterialfv_PACKED)); \
     packed_data->format = glGetMaterialfv_FORMAT; \
     packed_data->func = gl4es_glGetMaterialfv; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5330,7 +5331,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetMaterialxv
 #define push_glGetMaterialxv(face, pname, params) { \
-    glGetMaterialxv_PACKED *packed_data = malloc(sizeof(glGetMaterialxv_PACKED)); \
+    glGetMaterialxv_PACKED *packed_data = je_malloc(sizeof(glGetMaterialxv_PACKED)); \
     packed_data->format = glGetMaterialxv_FORMAT; \
     packed_data->func = gl4es_glGetMaterialxv; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5341,7 +5342,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetPointerv
 #define push_glGetPointerv(pname, params) { \
-    glGetPointerv_PACKED *packed_data = malloc(sizeof(glGetPointerv_PACKED)); \
+    glGetPointerv_PACKED *packed_data = je_malloc(sizeof(glGetPointerv_PACKED)); \
     packed_data->format = glGetPointerv_FORMAT; \
     packed_data->func = gl4es_glGetPointerv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5351,7 +5352,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetProgramBinary
 #define push_glGetProgramBinary(program, bufSize, length, binaryFormat, binary) { \
-    glGetProgramBinary_PACKED *packed_data = malloc(sizeof(glGetProgramBinary_PACKED)); \
+    glGetProgramBinary_PACKED *packed_data = je_malloc(sizeof(glGetProgramBinary_PACKED)); \
     packed_data->format = glGetProgramBinary_FORMAT; \
     packed_data->func = gl4es_glGetProgramBinary; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5364,7 +5365,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetProgramInfoLog
 #define push_glGetProgramInfoLog(program, bufSize, length, infoLog) { \
-    glGetProgramInfoLog_PACKED *packed_data = malloc(sizeof(glGetProgramInfoLog_PACKED)); \
+    glGetProgramInfoLog_PACKED *packed_data = je_malloc(sizeof(glGetProgramInfoLog_PACKED)); \
     packed_data->format = glGetProgramInfoLog_FORMAT; \
     packed_data->func = gl4es_glGetProgramInfoLog; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5376,7 +5377,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetProgramiv
 #define push_glGetProgramiv(program, pname, params) { \
-    glGetProgramiv_PACKED *packed_data = malloc(sizeof(glGetProgramiv_PACKED)); \
+    glGetProgramiv_PACKED *packed_data = je_malloc(sizeof(glGetProgramiv_PACKED)); \
     packed_data->format = glGetProgramiv_FORMAT; \
     packed_data->func = gl4es_glGetProgramiv; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5387,7 +5388,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetRenderbufferParameteriv
 #define push_glGetRenderbufferParameteriv(target, pname, params) { \
-    glGetRenderbufferParameteriv_PACKED *packed_data = malloc(sizeof(glGetRenderbufferParameteriv_PACKED)); \
+    glGetRenderbufferParameteriv_PACKED *packed_data = je_malloc(sizeof(glGetRenderbufferParameteriv_PACKED)); \
     packed_data->format = glGetRenderbufferParameteriv_FORMAT; \
     packed_data->func = gl4es_glGetRenderbufferParameteriv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5398,7 +5399,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetShaderInfoLog
 #define push_glGetShaderInfoLog(shader, bufSize, length, infoLog) { \
-    glGetShaderInfoLog_PACKED *packed_data = malloc(sizeof(glGetShaderInfoLog_PACKED)); \
+    glGetShaderInfoLog_PACKED *packed_data = je_malloc(sizeof(glGetShaderInfoLog_PACKED)); \
     packed_data->format = glGetShaderInfoLog_FORMAT; \
     packed_data->func = gl4es_glGetShaderInfoLog; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -5410,7 +5411,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetShaderPrecisionFormat
 #define push_glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision) { \
-    glGetShaderPrecisionFormat_PACKED *packed_data = malloc(sizeof(glGetShaderPrecisionFormat_PACKED)); \
+    glGetShaderPrecisionFormat_PACKED *packed_data = je_malloc(sizeof(glGetShaderPrecisionFormat_PACKED)); \
     packed_data->format = glGetShaderPrecisionFormat_FORMAT; \
     packed_data->func = gl4es_glGetShaderPrecisionFormat; \
     packed_data->args.a1 = (GLenum)shadertype; \
@@ -5422,7 +5423,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetShaderSource
 #define push_glGetShaderSource(shader, bufSize, length, source) { \
-    glGetShaderSource_PACKED *packed_data = malloc(sizeof(glGetShaderSource_PACKED)); \
+    glGetShaderSource_PACKED *packed_data = je_malloc(sizeof(glGetShaderSource_PACKED)); \
     packed_data->format = glGetShaderSource_FORMAT; \
     packed_data->func = gl4es_glGetShaderSource; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -5434,7 +5435,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetShaderiv
 #define push_glGetShaderiv(shader, pname, params) { \
-    glGetShaderiv_PACKED *packed_data = malloc(sizeof(glGetShaderiv_PACKED)); \
+    glGetShaderiv_PACKED *packed_data = je_malloc(sizeof(glGetShaderiv_PACKED)); \
     packed_data->format = glGetShaderiv_FORMAT; \
     packed_data->func = gl4es_glGetShaderiv; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -5445,7 +5446,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetString
 #define push_glGetString(name) { \
-    glGetString_PACKED *packed_data = malloc(sizeof(glGetString_PACKED)); \
+    glGetString_PACKED *packed_data = je_malloc(sizeof(glGetString_PACKED)); \
     packed_data->format = glGetString_FORMAT; \
     packed_data->func = gl4es_glGetString; \
     packed_data->args.a1 = (GLenum)name; \
@@ -5454,7 +5455,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexEnvfv
 #define push_glGetTexEnvfv(target, pname, params) { \
-    glGetTexEnvfv_PACKED *packed_data = malloc(sizeof(glGetTexEnvfv_PACKED)); \
+    glGetTexEnvfv_PACKED *packed_data = je_malloc(sizeof(glGetTexEnvfv_PACKED)); \
     packed_data->format = glGetTexEnvfv_FORMAT; \
     packed_data->func = gl4es_glGetTexEnvfv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5465,7 +5466,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexEnviv
 #define push_glGetTexEnviv(target, pname, params) { \
-    glGetTexEnviv_PACKED *packed_data = malloc(sizeof(glGetTexEnviv_PACKED)); \
+    glGetTexEnviv_PACKED *packed_data = je_malloc(sizeof(glGetTexEnviv_PACKED)); \
     packed_data->format = glGetTexEnviv_FORMAT; \
     packed_data->func = gl4es_glGetTexEnviv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5476,7 +5477,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexEnvxv
 #define push_glGetTexEnvxv(target, pname, params) { \
-    glGetTexEnvxv_PACKED *packed_data = malloc(sizeof(glGetTexEnvxv_PACKED)); \
+    glGetTexEnvxv_PACKED *packed_data = je_malloc(sizeof(glGetTexEnvxv_PACKED)); \
     packed_data->format = glGetTexEnvxv_FORMAT; \
     packed_data->func = gl4es_glGetTexEnvxv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5487,7 +5488,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexParameterfv
 #define push_glGetTexParameterfv(target, pname, params) { \
-    glGetTexParameterfv_PACKED *packed_data = malloc(sizeof(glGetTexParameterfv_PACKED)); \
+    glGetTexParameterfv_PACKED *packed_data = je_malloc(sizeof(glGetTexParameterfv_PACKED)); \
     packed_data->format = glGetTexParameterfv_FORMAT; \
     packed_data->func = gl4es_glGetTexParameterfv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5498,7 +5499,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexParameteriv
 #define push_glGetTexParameteriv(target, pname, params) { \
-    glGetTexParameteriv_PACKED *packed_data = malloc(sizeof(glGetTexParameteriv_PACKED)); \
+    glGetTexParameteriv_PACKED *packed_data = je_malloc(sizeof(glGetTexParameteriv_PACKED)); \
     packed_data->format = glGetTexParameteriv_FORMAT; \
     packed_data->func = gl4es_glGetTexParameteriv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5509,7 +5510,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetTexParameterxv
 #define push_glGetTexParameterxv(target, pname, params) { \
-    glGetTexParameterxv_PACKED *packed_data = malloc(sizeof(glGetTexParameterxv_PACKED)); \
+    glGetTexParameterxv_PACKED *packed_data = je_malloc(sizeof(glGetTexParameterxv_PACKED)); \
     packed_data->format = glGetTexParameterxv_FORMAT; \
     packed_data->func = gl4es_glGetTexParameterxv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5520,7 +5521,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetUniformLocation
 #define push_glGetUniformLocation(program, name) { \
-    glGetUniformLocation_PACKED *packed_data = malloc(sizeof(glGetUniformLocation_PACKED)); \
+    glGetUniformLocation_PACKED *packed_data = je_malloc(sizeof(glGetUniformLocation_PACKED)); \
     packed_data->format = glGetUniformLocation_FORMAT; \
     packed_data->func = gl4es_glGetUniformLocation; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5530,7 +5531,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetUniformfv
 #define push_glGetUniformfv(program, location, params) { \
-    glGetUniformfv_PACKED *packed_data = malloc(sizeof(glGetUniformfv_PACKED)); \
+    glGetUniformfv_PACKED *packed_data = je_malloc(sizeof(glGetUniformfv_PACKED)); \
     packed_data->format = glGetUniformfv_FORMAT; \
     packed_data->func = gl4es_glGetUniformfv; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5541,7 +5542,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetUniformiv
 #define push_glGetUniformiv(program, location, params) { \
-    glGetUniformiv_PACKED *packed_data = malloc(sizeof(glGetUniformiv_PACKED)); \
+    glGetUniformiv_PACKED *packed_data = je_malloc(sizeof(glGetUniformiv_PACKED)); \
     packed_data->format = glGetUniformiv_FORMAT; \
     packed_data->func = gl4es_glGetUniformiv; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5552,7 +5553,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetVertexAttribPointerv
 #define push_glGetVertexAttribPointerv(index, pname, pointer) { \
-    glGetVertexAttribPointerv_PACKED *packed_data = malloc(sizeof(glGetVertexAttribPointerv_PACKED)); \
+    glGetVertexAttribPointerv_PACKED *packed_data = je_malloc(sizeof(glGetVertexAttribPointerv_PACKED)); \
     packed_data->format = glGetVertexAttribPointerv_FORMAT; \
     packed_data->func = gl4es_glGetVertexAttribPointerv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -5563,7 +5564,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetVertexAttribfv
 #define push_glGetVertexAttribfv(index, pname, params) { \
-    glGetVertexAttribfv_PACKED *packed_data = malloc(sizeof(glGetVertexAttribfv_PACKED)); \
+    glGetVertexAttribfv_PACKED *packed_data = je_malloc(sizeof(glGetVertexAttribfv_PACKED)); \
     packed_data->format = glGetVertexAttribfv_FORMAT; \
     packed_data->func = gl4es_glGetVertexAttribfv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -5574,7 +5575,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glGetVertexAttribiv
 #define push_glGetVertexAttribiv(index, pname, params) { \
-    glGetVertexAttribiv_PACKED *packed_data = malloc(sizeof(glGetVertexAttribiv_PACKED)); \
+    glGetVertexAttribiv_PACKED *packed_data = je_malloc(sizeof(glGetVertexAttribiv_PACKED)); \
     packed_data->format = glGetVertexAttribiv_FORMAT; \
     packed_data->func = gl4es_glGetVertexAttribiv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -5585,7 +5586,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glHint
 #define push_glHint(target, mode) { \
-    glHint_PACKED *packed_data = malloc(sizeof(glHint_PACKED)); \
+    glHint_PACKED *packed_data = je_malloc(sizeof(glHint_PACKED)); \
     packed_data->format = glHint_FORMAT; \
     packed_data->func = gl4es_glHint; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5595,7 +5596,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsBuffer
 #define push_glIsBuffer(buffer) { \
-    glIsBuffer_PACKED *packed_data = malloc(sizeof(glIsBuffer_PACKED)); \
+    glIsBuffer_PACKED *packed_data = je_malloc(sizeof(glIsBuffer_PACKED)); \
     packed_data->format = glIsBuffer_FORMAT; \
     packed_data->func = gl4es_glIsBuffer; \
     packed_data->args.a1 = (GLuint)buffer; \
@@ -5604,7 +5605,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsEnabled
 #define push_glIsEnabled(cap) { \
-    glIsEnabled_PACKED *packed_data = malloc(sizeof(glIsEnabled_PACKED)); \
+    glIsEnabled_PACKED *packed_data = je_malloc(sizeof(glIsEnabled_PACKED)); \
     packed_data->format = glIsEnabled_FORMAT; \
     packed_data->func = gl4es_glIsEnabled; \
     packed_data->args.a1 = (GLenum)cap; \
@@ -5613,7 +5614,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsFramebuffer
 #define push_glIsFramebuffer(framebuffer) { \
-    glIsFramebuffer_PACKED *packed_data = malloc(sizeof(glIsFramebuffer_PACKED)); \
+    glIsFramebuffer_PACKED *packed_data = je_malloc(sizeof(glIsFramebuffer_PACKED)); \
     packed_data->format = glIsFramebuffer_FORMAT; \
     packed_data->func = gl4es_glIsFramebuffer; \
     packed_data->args.a1 = (GLuint)framebuffer; \
@@ -5622,7 +5623,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsProgram
 #define push_glIsProgram(program) { \
-    glIsProgram_PACKED *packed_data = malloc(sizeof(glIsProgram_PACKED)); \
+    glIsProgram_PACKED *packed_data = je_malloc(sizeof(glIsProgram_PACKED)); \
     packed_data->format = glIsProgram_FORMAT; \
     packed_data->func = gl4es_glIsProgram; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5631,7 +5632,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsRenderbuffer
 #define push_glIsRenderbuffer(renderbuffer) { \
-    glIsRenderbuffer_PACKED *packed_data = malloc(sizeof(glIsRenderbuffer_PACKED)); \
+    glIsRenderbuffer_PACKED *packed_data = je_malloc(sizeof(glIsRenderbuffer_PACKED)); \
     packed_data->format = glIsRenderbuffer_FORMAT; \
     packed_data->func = gl4es_glIsRenderbuffer; \
     packed_data->args.a1 = (GLuint)renderbuffer; \
@@ -5640,7 +5641,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsShader
 #define push_glIsShader(shader) { \
-    glIsShader_PACKED *packed_data = malloc(sizeof(glIsShader_PACKED)); \
+    glIsShader_PACKED *packed_data = je_malloc(sizeof(glIsShader_PACKED)); \
     packed_data->format = glIsShader_FORMAT; \
     packed_data->func = gl4es_glIsShader; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -5649,7 +5650,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glIsTexture
 #define push_glIsTexture(texture) { \
-    glIsTexture_PACKED *packed_data = malloc(sizeof(glIsTexture_PACKED)); \
+    glIsTexture_PACKED *packed_data = je_malloc(sizeof(glIsTexture_PACKED)); \
     packed_data->format = glIsTexture_FORMAT; \
     packed_data->func = gl4es_glIsTexture; \
     packed_data->args.a1 = (GLuint)texture; \
@@ -5658,7 +5659,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightModelf
 #define push_glLightModelf(pname, param) { \
-    glLightModelf_PACKED *packed_data = malloc(sizeof(glLightModelf_PACKED)); \
+    glLightModelf_PACKED *packed_data = je_malloc(sizeof(glLightModelf_PACKED)); \
     packed_data->format = glLightModelf_FORMAT; \
     packed_data->func = gl4es_glLightModelf; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5668,7 +5669,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightModelfv
 #define push_glLightModelfv(pname, params) { \
-    glLightModelfv_PACKED *packed_data = malloc(sizeof(glLightModelfv_PACKED)); \
+    glLightModelfv_PACKED *packed_data = je_malloc(sizeof(glLightModelfv_PACKED)); \
     packed_data->format = glLightModelfv_FORMAT; \
     packed_data->func = gl4es_glLightModelfv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5678,7 +5679,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightModelx
 #define push_glLightModelx(pname, param) { \
-    glLightModelx_PACKED *packed_data = malloc(sizeof(glLightModelx_PACKED)); \
+    glLightModelx_PACKED *packed_data = je_malloc(sizeof(glLightModelx_PACKED)); \
     packed_data->format = glLightModelx_FORMAT; \
     packed_data->func = gl4es_glLightModelx; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5688,7 +5689,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightModelxv
 #define push_glLightModelxv(pname, params) { \
-    glLightModelxv_PACKED *packed_data = malloc(sizeof(glLightModelxv_PACKED)); \
+    glLightModelxv_PACKED *packed_data = je_malloc(sizeof(glLightModelxv_PACKED)); \
     packed_data->format = glLightModelxv_FORMAT; \
     packed_data->func = gl4es_glLightModelxv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5698,7 +5699,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightf
 #define push_glLightf(light, pname, param) { \
-    glLightf_PACKED *packed_data = malloc(sizeof(glLightf_PACKED)); \
+    glLightf_PACKED *packed_data = je_malloc(sizeof(glLightf_PACKED)); \
     packed_data->format = glLightf_FORMAT; \
     packed_data->func = gl4es_glLightf; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5709,7 +5710,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightfv
 #define push_glLightfv(light, pname, params) { \
-    glLightfv_PACKED *packed_data = malloc(sizeof(glLightfv_PACKED)); \
+    glLightfv_PACKED *packed_data = je_malloc(sizeof(glLightfv_PACKED)); \
     packed_data->format = glLightfv_FORMAT; \
     packed_data->func = gl4es_glLightfv; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5720,7 +5721,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightx
 #define push_glLightx(light, pname, param) { \
-    glLightx_PACKED *packed_data = malloc(sizeof(glLightx_PACKED)); \
+    glLightx_PACKED *packed_data = je_malloc(sizeof(glLightx_PACKED)); \
     packed_data->format = glLightx_FORMAT; \
     packed_data->func = gl4es_glLightx; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5731,7 +5732,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLightxv
 #define push_glLightxv(light, pname, params) { \
-    glLightxv_PACKED *packed_data = malloc(sizeof(glLightxv_PACKED)); \
+    glLightxv_PACKED *packed_data = je_malloc(sizeof(glLightxv_PACKED)); \
     packed_data->format = glLightxv_FORMAT; \
     packed_data->func = gl4es_glLightxv; \
     packed_data->args.a1 = (GLenum)light; \
@@ -5742,7 +5743,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLineWidth
 #define push_glLineWidth(width) { \
-    glLineWidth_PACKED *packed_data = malloc(sizeof(glLineWidth_PACKED)); \
+    glLineWidth_PACKED *packed_data = je_malloc(sizeof(glLineWidth_PACKED)); \
     packed_data->format = glLineWidth_FORMAT; \
     packed_data->func = gl4es_glLineWidth; \
     packed_data->args.a1 = (GLfloat)width; \
@@ -5751,7 +5752,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLineWidthx
 #define push_glLineWidthx(width) { \
-    glLineWidthx_PACKED *packed_data = malloc(sizeof(glLineWidthx_PACKED)); \
+    glLineWidthx_PACKED *packed_data = je_malloc(sizeof(glLineWidthx_PACKED)); \
     packed_data->format = glLineWidthx_FORMAT; \
     packed_data->func = gl4es_glLineWidthx; \
     packed_data->args.a1 = (GLfixed)width; \
@@ -5760,7 +5761,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLinkProgram
 #define push_glLinkProgram(program) { \
-    glLinkProgram_PACKED *packed_data = malloc(sizeof(glLinkProgram_PACKED)); \
+    glLinkProgram_PACKED *packed_data = je_malloc(sizeof(glLinkProgram_PACKED)); \
     packed_data->format = glLinkProgram_FORMAT; \
     packed_data->func = gl4es_glLinkProgram; \
     packed_data->args.a1 = (GLuint)program; \
@@ -5769,7 +5770,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLoadIdentity
 #define push_glLoadIdentity() { \
-    glLoadIdentity_PACKED *packed_data = malloc(sizeof(glLoadIdentity_PACKED)); \
+    glLoadIdentity_PACKED *packed_data = je_malloc(sizeof(glLoadIdentity_PACKED)); \
     packed_data->format = glLoadIdentity_FORMAT; \
     packed_data->func = gl4es_glLoadIdentity; \
     glPushCall((void *)packed_data); \
@@ -5777,7 +5778,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLoadMatrixf
 #define push_glLoadMatrixf(m) { \
-    glLoadMatrixf_PACKED *packed_data = malloc(sizeof(glLoadMatrixf_PACKED)); \
+    glLoadMatrixf_PACKED *packed_data = je_malloc(sizeof(glLoadMatrixf_PACKED)); \
     packed_data->format = glLoadMatrixf_FORMAT; \
     packed_data->func = gl4es_glLoadMatrixf; \
     packed_data->args.a1 = (GLfloat *)m; \
@@ -5786,7 +5787,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLoadMatrixx
 #define push_glLoadMatrixx(m) { \
-    glLoadMatrixx_PACKED *packed_data = malloc(sizeof(glLoadMatrixx_PACKED)); \
+    glLoadMatrixx_PACKED *packed_data = je_malloc(sizeof(glLoadMatrixx_PACKED)); \
     packed_data->format = glLoadMatrixx_FORMAT; \
     packed_data->func = gl4es_glLoadMatrixx; \
     packed_data->args.a1 = (GLfixed *)m; \
@@ -5795,7 +5796,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glLogicOp
 #define push_glLogicOp(opcode) { \
-    glLogicOp_PACKED *packed_data = malloc(sizeof(glLogicOp_PACKED)); \
+    glLogicOp_PACKED *packed_data = je_malloc(sizeof(glLogicOp_PACKED)); \
     packed_data->format = glLogicOp_FORMAT; \
     packed_data->func = gl4es_glLogicOp; \
     packed_data->args.a1 = (GLenum)opcode; \
@@ -5804,7 +5805,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMaterialf
 #define push_glMaterialf(face, pname, param) { \
-    glMaterialf_PACKED *packed_data = malloc(sizeof(glMaterialf_PACKED)); \
+    glMaterialf_PACKED *packed_data = je_malloc(sizeof(glMaterialf_PACKED)); \
     packed_data->format = glMaterialf_FORMAT; \
     packed_data->func = gl4es_glMaterialf; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5815,7 +5816,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMaterialfv
 #define push_glMaterialfv(face, pname, params) { \
-    glMaterialfv_PACKED *packed_data = malloc(sizeof(glMaterialfv_PACKED)); \
+    glMaterialfv_PACKED *packed_data = je_malloc(sizeof(glMaterialfv_PACKED)); \
     packed_data->format = glMaterialfv_FORMAT; \
     packed_data->func = gl4es_glMaterialfv; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5826,7 +5827,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMaterialx
 #define push_glMaterialx(face, pname, param) { \
-    glMaterialx_PACKED *packed_data = malloc(sizeof(glMaterialx_PACKED)); \
+    glMaterialx_PACKED *packed_data = je_malloc(sizeof(glMaterialx_PACKED)); \
     packed_data->format = glMaterialx_FORMAT; \
     packed_data->func = gl4es_glMaterialx; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5837,7 +5838,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMaterialxv
 #define push_glMaterialxv(face, pname, params) { \
-    glMaterialxv_PACKED *packed_data = malloc(sizeof(glMaterialxv_PACKED)); \
+    glMaterialxv_PACKED *packed_data = je_malloc(sizeof(glMaterialxv_PACKED)); \
     packed_data->format = glMaterialxv_FORMAT; \
     packed_data->func = gl4es_glMaterialxv; \
     packed_data->args.a1 = (GLenum)face; \
@@ -5848,7 +5849,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMatrixMode
 #define push_glMatrixMode(mode) { \
-    glMatrixMode_PACKED *packed_data = malloc(sizeof(glMatrixMode_PACKED)); \
+    glMatrixMode_PACKED *packed_data = je_malloc(sizeof(glMatrixMode_PACKED)); \
     packed_data->format = glMatrixMode_FORMAT; \
     packed_data->func = gl4es_glMatrixMode; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -5857,7 +5858,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultMatrixf
 #define push_glMultMatrixf(m) { \
-    glMultMatrixf_PACKED *packed_data = malloc(sizeof(glMultMatrixf_PACKED)); \
+    glMultMatrixf_PACKED *packed_data = je_malloc(sizeof(glMultMatrixf_PACKED)); \
     packed_data->format = glMultMatrixf_FORMAT; \
     packed_data->func = gl4es_glMultMatrixf; \
     packed_data->args.a1 = (GLfloat *)m; \
@@ -5866,7 +5867,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultMatrixx
 #define push_glMultMatrixx(m) { \
-    glMultMatrixx_PACKED *packed_data = malloc(sizeof(glMultMatrixx_PACKED)); \
+    glMultMatrixx_PACKED *packed_data = je_malloc(sizeof(glMultMatrixx_PACKED)); \
     packed_data->format = glMultMatrixx_FORMAT; \
     packed_data->func = gl4es_glMultMatrixx; \
     packed_data->args.a1 = (GLfixed *)m; \
@@ -5875,7 +5876,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultiDrawArrays
 #define push_glMultiDrawArrays(mode, first, count, primcount) { \
-    glMultiDrawArrays_PACKED *packed_data = malloc(sizeof(glMultiDrawArrays_PACKED)); \
+    glMultiDrawArrays_PACKED *packed_data = je_malloc(sizeof(glMultiDrawArrays_PACKED)); \
     packed_data->format = glMultiDrawArrays_FORMAT; \
     packed_data->func = gl4es_glMultiDrawArrays; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -5887,7 +5888,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultiDrawElements
 #define push_glMultiDrawElements(mode, count, type, indices, primcount) { \
-    glMultiDrawElements_PACKED *packed_data = malloc(sizeof(glMultiDrawElements_PACKED)); \
+    glMultiDrawElements_PACKED *packed_data = je_malloc(sizeof(glMultiDrawElements_PACKED)); \
     packed_data->format = glMultiDrawElements_FORMAT; \
     packed_data->func = gl4es_glMultiDrawElements; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -5900,7 +5901,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultiTexCoord4f
 #define push_glMultiTexCoord4f(target, s, t, r, q) { \
-    glMultiTexCoord4f_PACKED *packed_data = malloc(sizeof(glMultiTexCoord4f_PACKED)); \
+    glMultiTexCoord4f_PACKED *packed_data = je_malloc(sizeof(glMultiTexCoord4f_PACKED)); \
     packed_data->format = glMultiTexCoord4f_FORMAT; \
     packed_data->func = gl4es_glMultiTexCoord4f; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5913,7 +5914,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glMultiTexCoord4x
 #define push_glMultiTexCoord4x(target, s, t, r, q) { \
-    glMultiTexCoord4x_PACKED *packed_data = malloc(sizeof(glMultiTexCoord4x_PACKED)); \
+    glMultiTexCoord4x_PACKED *packed_data = je_malloc(sizeof(glMultiTexCoord4x_PACKED)); \
     packed_data->format = glMultiTexCoord4x_FORMAT; \
     packed_data->func = gl4es_glMultiTexCoord4x; \
     packed_data->args.a1 = (GLenum)target; \
@@ -5926,7 +5927,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glNormal3f
 #define push_glNormal3f(nx, ny, nz) { \
-    glNormal3f_PACKED *packed_data = malloc(sizeof(glNormal3f_PACKED)); \
+    glNormal3f_PACKED *packed_data = je_malloc(sizeof(glNormal3f_PACKED)); \
     packed_data->format = glNormal3f_FORMAT; \
     packed_data->func = gl4es_glNormal3f; \
     packed_data->args.a1 = (GLfloat)nx; \
@@ -5937,7 +5938,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glNormal3x
 #define push_glNormal3x(nx, ny, nz) { \
-    glNormal3x_PACKED *packed_data = malloc(sizeof(glNormal3x_PACKED)); \
+    glNormal3x_PACKED *packed_data = je_malloc(sizeof(glNormal3x_PACKED)); \
     packed_data->format = glNormal3x_FORMAT; \
     packed_data->func = gl4es_glNormal3x; \
     packed_data->args.a1 = (GLfixed)nx; \
@@ -5948,7 +5949,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glNormalPointer
 #define push_glNormalPointer(type, stride, pointer) { \
-    glNormalPointer_PACKED *packed_data = malloc(sizeof(glNormalPointer_PACKED)); \
+    glNormalPointer_PACKED *packed_data = je_malloc(sizeof(glNormalPointer_PACKED)); \
     packed_data->format = glNormalPointer_FORMAT; \
     packed_data->func = gl4es_glNormalPointer; \
     packed_data->args.a1 = (GLenum)type; \
@@ -5959,7 +5960,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glOrthof
 #define push_glOrthof(left, right, bottom, top, Near, Far) { \
-    glOrthof_PACKED *packed_data = malloc(sizeof(glOrthof_PACKED)); \
+    glOrthof_PACKED *packed_data = je_malloc(sizeof(glOrthof_PACKED)); \
     packed_data->format = glOrthof_FORMAT; \
     packed_data->func = gl4es_glOrthof; \
     packed_data->args.a1 = (GLfloat)left; \
@@ -5973,7 +5974,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glOrthox
 #define push_glOrthox(left, right, bottom, top, Near, Far) { \
-    glOrthox_PACKED *packed_data = malloc(sizeof(glOrthox_PACKED)); \
+    glOrthox_PACKED *packed_data = je_malloc(sizeof(glOrthox_PACKED)); \
     packed_data->format = glOrthox_FORMAT; \
     packed_data->func = gl4es_glOrthox; \
     packed_data->args.a1 = (GLfixed)left; \
@@ -5987,7 +5988,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPixelStorei
 #define push_glPixelStorei(pname, param) { \
-    glPixelStorei_PACKED *packed_data = malloc(sizeof(glPixelStorei_PACKED)); \
+    glPixelStorei_PACKED *packed_data = je_malloc(sizeof(glPixelStorei_PACKED)); \
     packed_data->format = glPixelStorei_FORMAT; \
     packed_data->func = gl4es_glPixelStorei; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -5997,7 +5998,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointParameterf
 #define push_glPointParameterf(pname, param) { \
-    glPointParameterf_PACKED *packed_data = malloc(sizeof(glPointParameterf_PACKED)); \
+    glPointParameterf_PACKED *packed_data = je_malloc(sizeof(glPointParameterf_PACKED)); \
     packed_data->format = glPointParameterf_FORMAT; \
     packed_data->func = gl4es_glPointParameterf; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -6007,7 +6008,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointParameterfv
 #define push_glPointParameterfv(pname, params) { \
-    glPointParameterfv_PACKED *packed_data = malloc(sizeof(glPointParameterfv_PACKED)); \
+    glPointParameterfv_PACKED *packed_data = je_malloc(sizeof(glPointParameterfv_PACKED)); \
     packed_data->format = glPointParameterfv_FORMAT; \
     packed_data->func = gl4es_glPointParameterfv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -6017,7 +6018,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointParameterx
 #define push_glPointParameterx(pname, param) { \
-    glPointParameterx_PACKED *packed_data = malloc(sizeof(glPointParameterx_PACKED)); \
+    glPointParameterx_PACKED *packed_data = je_malloc(sizeof(glPointParameterx_PACKED)); \
     packed_data->format = glPointParameterx_FORMAT; \
     packed_data->func = gl4es_glPointParameterx; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -6027,7 +6028,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointParameterxv
 #define push_glPointParameterxv(pname, params) { \
-    glPointParameterxv_PACKED *packed_data = malloc(sizeof(glPointParameterxv_PACKED)); \
+    glPointParameterxv_PACKED *packed_data = je_malloc(sizeof(glPointParameterxv_PACKED)); \
     packed_data->format = glPointParameterxv_FORMAT; \
     packed_data->func = gl4es_glPointParameterxv; \
     packed_data->args.a1 = (GLenum)pname; \
@@ -6037,7 +6038,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointSize
 #define push_glPointSize(size) { \
-    glPointSize_PACKED *packed_data = malloc(sizeof(glPointSize_PACKED)); \
+    glPointSize_PACKED *packed_data = je_malloc(sizeof(glPointSize_PACKED)); \
     packed_data->format = glPointSize_FORMAT; \
     packed_data->func = gl4es_glPointSize; \
     packed_data->args.a1 = (GLfloat)size; \
@@ -6046,7 +6047,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointSizePointerOES
 #define push_glPointSizePointerOES(type, stride, pointer) { \
-    glPointSizePointerOES_PACKED *packed_data = malloc(sizeof(glPointSizePointerOES_PACKED)); \
+    glPointSizePointerOES_PACKED *packed_data = je_malloc(sizeof(glPointSizePointerOES_PACKED)); \
     packed_data->format = glPointSizePointerOES_FORMAT; \
     packed_data->func = gl4es_glPointSizePointerOES; \
     packed_data->args.a1 = (GLenum)type; \
@@ -6057,7 +6058,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPointSizex
 #define push_glPointSizex(size) { \
-    glPointSizex_PACKED *packed_data = malloc(sizeof(glPointSizex_PACKED)); \
+    glPointSizex_PACKED *packed_data = je_malloc(sizeof(glPointSizex_PACKED)); \
     packed_data->format = glPointSizex_FORMAT; \
     packed_data->func = gl4es_glPointSizex; \
     packed_data->args.a1 = (GLfixed)size; \
@@ -6066,7 +6067,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPolygonOffset
 #define push_glPolygonOffset(factor, units) { \
-    glPolygonOffset_PACKED *packed_data = malloc(sizeof(glPolygonOffset_PACKED)); \
+    glPolygonOffset_PACKED *packed_data = je_malloc(sizeof(glPolygonOffset_PACKED)); \
     packed_data->format = glPolygonOffset_FORMAT; \
     packed_data->func = gl4es_glPolygonOffset; \
     packed_data->args.a1 = (GLfloat)factor; \
@@ -6076,7 +6077,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPolygonOffsetx
 #define push_glPolygonOffsetx(factor, units) { \
-    glPolygonOffsetx_PACKED *packed_data = malloc(sizeof(glPolygonOffsetx_PACKED)); \
+    glPolygonOffsetx_PACKED *packed_data = je_malloc(sizeof(glPolygonOffsetx_PACKED)); \
     packed_data->format = glPolygonOffsetx_FORMAT; \
     packed_data->func = gl4es_glPolygonOffsetx; \
     packed_data->args.a1 = (GLfixed)factor; \
@@ -6086,7 +6087,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPopMatrix
 #define push_glPopMatrix() { \
-    glPopMatrix_PACKED *packed_data = malloc(sizeof(glPopMatrix_PACKED)); \
+    glPopMatrix_PACKED *packed_data = je_malloc(sizeof(glPopMatrix_PACKED)); \
     packed_data->format = glPopMatrix_FORMAT; \
     packed_data->func = gl4es_glPopMatrix; \
     glPushCall((void *)packed_data); \
@@ -6094,7 +6095,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glProgramBinary
 #define push_glProgramBinary(program, binaryFormat, binary, length) { \
-    glProgramBinary_PACKED *packed_data = malloc(sizeof(glProgramBinary_PACKED)); \
+    glProgramBinary_PACKED *packed_data = je_malloc(sizeof(glProgramBinary_PACKED)); \
     packed_data->format = glProgramBinary_FORMAT; \
     packed_data->func = gl4es_glProgramBinary; \
     packed_data->args.a1 = (GLuint)program; \
@@ -6106,7 +6107,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glPushMatrix
 #define push_glPushMatrix() { \
-    glPushMatrix_PACKED *packed_data = malloc(sizeof(glPushMatrix_PACKED)); \
+    glPushMatrix_PACKED *packed_data = je_malloc(sizeof(glPushMatrix_PACKED)); \
     packed_data->format = glPushMatrix_FORMAT; \
     packed_data->func = gl4es_glPushMatrix; \
     glPushCall((void *)packed_data); \
@@ -6114,7 +6115,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glReadPixels
 #define push_glReadPixels(x, y, width, height, format, type, pixels) { \
-    glReadPixels_PACKED *packed_data = malloc(sizeof(glReadPixels_PACKED)); \
+    glReadPixels_PACKED *packed_data = je_malloc(sizeof(glReadPixels_PACKED)); \
     packed_data->format = glReadPixels_FORMAT; \
     packed_data->func = gl4es_glReadPixels; \
     packed_data->args.a1 = (GLint)x; \
@@ -6129,7 +6130,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glReleaseShaderCompiler
 #define push_glReleaseShaderCompiler() { \
-    glReleaseShaderCompiler_PACKED *packed_data = malloc(sizeof(glReleaseShaderCompiler_PACKED)); \
+    glReleaseShaderCompiler_PACKED *packed_data = je_malloc(sizeof(glReleaseShaderCompiler_PACKED)); \
     packed_data->format = glReleaseShaderCompiler_FORMAT; \
     packed_data->func = gl4es_glReleaseShaderCompiler; \
     glPushCall((void *)packed_data); \
@@ -6137,7 +6138,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glRenderbufferStorage
 #define push_glRenderbufferStorage(target, internalformat, width, height) { \
-    glRenderbufferStorage_PACKED *packed_data = malloc(sizeof(glRenderbufferStorage_PACKED)); \
+    glRenderbufferStorage_PACKED *packed_data = je_malloc(sizeof(glRenderbufferStorage_PACKED)); \
     packed_data->format = glRenderbufferStorage_FORMAT; \
     packed_data->func = gl4es_glRenderbufferStorage; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6149,7 +6150,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glRotatef
 #define push_glRotatef(angle, x, y, z) { \
-    glRotatef_PACKED *packed_data = malloc(sizeof(glRotatef_PACKED)); \
+    glRotatef_PACKED *packed_data = je_malloc(sizeof(glRotatef_PACKED)); \
     packed_data->format = glRotatef_FORMAT; \
     packed_data->func = gl4es_glRotatef; \
     packed_data->args.a1 = (GLfloat)angle; \
@@ -6161,7 +6162,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glRotatex
 #define push_glRotatex(angle, x, y, z) { \
-    glRotatex_PACKED *packed_data = malloc(sizeof(glRotatex_PACKED)); \
+    glRotatex_PACKED *packed_data = je_malloc(sizeof(glRotatex_PACKED)); \
     packed_data->format = glRotatex_FORMAT; \
     packed_data->func = gl4es_glRotatex; \
     packed_data->args.a1 = (GLfixed)angle; \
@@ -6173,7 +6174,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glSampleCoverage
 #define push_glSampleCoverage(value, invert) { \
-    glSampleCoverage_PACKED *packed_data = malloc(sizeof(glSampleCoverage_PACKED)); \
+    glSampleCoverage_PACKED *packed_data = je_malloc(sizeof(glSampleCoverage_PACKED)); \
     packed_data->format = glSampleCoverage_FORMAT; \
     packed_data->func = gl4es_glSampleCoverage; \
     packed_data->args.a1 = (GLclampf)value; \
@@ -6183,7 +6184,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glSampleCoveragex
 #define push_glSampleCoveragex(value, invert) { \
-    glSampleCoveragex_PACKED *packed_data = malloc(sizeof(glSampleCoveragex_PACKED)); \
+    glSampleCoveragex_PACKED *packed_data = je_malloc(sizeof(glSampleCoveragex_PACKED)); \
     packed_data->format = glSampleCoveragex_FORMAT; \
     packed_data->func = gl4es_glSampleCoveragex; \
     packed_data->args.a1 = (GLclampx)value; \
@@ -6193,7 +6194,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glScalef
 #define push_glScalef(x, y, z) { \
-    glScalef_PACKED *packed_data = malloc(sizeof(glScalef_PACKED)); \
+    glScalef_PACKED *packed_data = je_malloc(sizeof(glScalef_PACKED)); \
     packed_data->format = glScalef_FORMAT; \
     packed_data->func = gl4es_glScalef; \
     packed_data->args.a1 = (GLfloat)x; \
@@ -6204,7 +6205,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glScalex
 #define push_glScalex(x, y, z) { \
-    glScalex_PACKED *packed_data = malloc(sizeof(glScalex_PACKED)); \
+    glScalex_PACKED *packed_data = je_malloc(sizeof(glScalex_PACKED)); \
     packed_data->format = glScalex_FORMAT; \
     packed_data->func = gl4es_glScalex; \
     packed_data->args.a1 = (GLfixed)x; \
@@ -6215,7 +6216,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glScissor
 #define push_glScissor(x, y, width, height) { \
-    glScissor_PACKED *packed_data = malloc(sizeof(glScissor_PACKED)); \
+    glScissor_PACKED *packed_data = je_malloc(sizeof(glScissor_PACKED)); \
     packed_data->format = glScissor_FORMAT; \
     packed_data->func = gl4es_glScissor; \
     packed_data->args.a1 = (GLint)x; \
@@ -6227,7 +6228,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glShadeModel
 #define push_glShadeModel(mode) { \
-    glShadeModel_PACKED *packed_data = malloc(sizeof(glShadeModel_PACKED)); \
+    glShadeModel_PACKED *packed_data = je_malloc(sizeof(glShadeModel_PACKED)); \
     packed_data->format = glShadeModel_FORMAT; \
     packed_data->func = gl4es_glShadeModel; \
     packed_data->args.a1 = (GLenum)mode; \
@@ -6236,7 +6237,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glShaderBinary
 #define push_glShaderBinary(n, shaders, binaryformat, binary, length) { \
-    glShaderBinary_PACKED *packed_data = malloc(sizeof(glShaderBinary_PACKED)); \
+    glShaderBinary_PACKED *packed_data = je_malloc(sizeof(glShaderBinary_PACKED)); \
     packed_data->format = glShaderBinary_FORMAT; \
     packed_data->func = gl4es_glShaderBinary; \
     packed_data->args.a1 = (GLsizei)n; \
@@ -6249,7 +6250,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glShaderSource
 #define push_glShaderSource(shader, count, string, length) { \
-    glShaderSource_PACKED *packed_data = malloc(sizeof(glShaderSource_PACKED)); \
+    glShaderSource_PACKED *packed_data = je_malloc(sizeof(glShaderSource_PACKED)); \
     packed_data->format = glShaderSource_FORMAT; \
     packed_data->func = gl4es_glShaderSource; \
     packed_data->args.a1 = (GLuint)shader; \
@@ -6261,7 +6262,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilFunc
 #define push_glStencilFunc(func, ref, mask) { \
-    glStencilFunc_PACKED *packed_data = malloc(sizeof(glStencilFunc_PACKED)); \
+    glStencilFunc_PACKED *packed_data = je_malloc(sizeof(glStencilFunc_PACKED)); \
     packed_data->format = glStencilFunc_FORMAT; \
     packed_data->func = gl4es_glStencilFunc; \
     packed_data->args.a1 = (GLenum)func; \
@@ -6272,7 +6273,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilFuncSeparate
 #define push_glStencilFuncSeparate(face, func, ref, mask) { \
-    glStencilFuncSeparate_PACKED *packed_data = malloc(sizeof(glStencilFuncSeparate_PACKED)); \
+    glStencilFuncSeparate_PACKED *packed_data = je_malloc(sizeof(glStencilFuncSeparate_PACKED)); \
     packed_data->format = glStencilFuncSeparate_FORMAT; \
     packed_data->func = gl4es_glStencilFuncSeparate; \
     packed_data->args.a1 = (GLenum)face; \
@@ -6284,7 +6285,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilMask
 #define push_glStencilMask(mask) { \
-    glStencilMask_PACKED *packed_data = malloc(sizeof(glStencilMask_PACKED)); \
+    glStencilMask_PACKED *packed_data = je_malloc(sizeof(glStencilMask_PACKED)); \
     packed_data->format = glStencilMask_FORMAT; \
     packed_data->func = gl4es_glStencilMask; \
     packed_data->args.a1 = (GLuint)mask; \
@@ -6293,7 +6294,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilMaskSeparate
 #define push_glStencilMaskSeparate(face, mask) { \
-    glStencilMaskSeparate_PACKED *packed_data = malloc(sizeof(glStencilMaskSeparate_PACKED)); \
+    glStencilMaskSeparate_PACKED *packed_data = je_malloc(sizeof(glStencilMaskSeparate_PACKED)); \
     packed_data->format = glStencilMaskSeparate_FORMAT; \
     packed_data->func = gl4es_glStencilMaskSeparate; \
     packed_data->args.a1 = (GLenum)face; \
@@ -6303,7 +6304,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilOp
 #define push_glStencilOp(fail, zfail, zpass) { \
-    glStencilOp_PACKED *packed_data = malloc(sizeof(glStencilOp_PACKED)); \
+    glStencilOp_PACKED *packed_data = je_malloc(sizeof(glStencilOp_PACKED)); \
     packed_data->format = glStencilOp_FORMAT; \
     packed_data->func = gl4es_glStencilOp; \
     packed_data->args.a1 = (GLenum)fail; \
@@ -6314,7 +6315,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glStencilOpSeparate
 #define push_glStencilOpSeparate(face, sfail, zfail, zpass) { \
-    glStencilOpSeparate_PACKED *packed_data = malloc(sizeof(glStencilOpSeparate_PACKED)); \
+    glStencilOpSeparate_PACKED *packed_data = je_malloc(sizeof(glStencilOpSeparate_PACKED)); \
     packed_data->format = glStencilOpSeparate_FORMAT; \
     packed_data->func = gl4es_glStencilOpSeparate; \
     packed_data->args.a1 = (GLenum)face; \
@@ -6326,7 +6327,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexCoordPointer
 #define push_glTexCoordPointer(size, type, stride, pointer) { \
-    glTexCoordPointer_PACKED *packed_data = malloc(sizeof(glTexCoordPointer_PACKED)); \
+    glTexCoordPointer_PACKED *packed_data = je_malloc(sizeof(glTexCoordPointer_PACKED)); \
     packed_data->format = glTexCoordPointer_FORMAT; \
     packed_data->func = gl4es_glTexCoordPointer; \
     packed_data->args.a1 = (GLint)size; \
@@ -6338,7 +6339,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnvf
 #define push_glTexEnvf(target, pname, param) { \
-    glTexEnvf_PACKED *packed_data = malloc(sizeof(glTexEnvf_PACKED)); \
+    glTexEnvf_PACKED *packed_data = je_malloc(sizeof(glTexEnvf_PACKED)); \
     packed_data->format = glTexEnvf_FORMAT; \
     packed_data->func = gl4es_glTexEnvf; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6349,7 +6350,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnvfv
 #define push_glTexEnvfv(target, pname, params) { \
-    glTexEnvfv_PACKED *packed_data = malloc(sizeof(glTexEnvfv_PACKED)); \
+    glTexEnvfv_PACKED *packed_data = je_malloc(sizeof(glTexEnvfv_PACKED)); \
     packed_data->format = glTexEnvfv_FORMAT; \
     packed_data->func = gl4es_glTexEnvfv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6360,7 +6361,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnvi
 #define push_glTexEnvi(target, pname, param) { \
-    glTexEnvi_PACKED *packed_data = malloc(sizeof(glTexEnvi_PACKED)); \
+    glTexEnvi_PACKED *packed_data = je_malloc(sizeof(glTexEnvi_PACKED)); \
     packed_data->format = glTexEnvi_FORMAT; \
     packed_data->func = gl4es_glTexEnvi; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6371,7 +6372,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnviv
 #define push_glTexEnviv(target, pname, params) { \
-    glTexEnviv_PACKED *packed_data = malloc(sizeof(glTexEnviv_PACKED)); \
+    glTexEnviv_PACKED *packed_data = je_malloc(sizeof(glTexEnviv_PACKED)); \
     packed_data->format = glTexEnviv_FORMAT; \
     packed_data->func = gl4es_glTexEnviv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6382,7 +6383,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnvx
 #define push_glTexEnvx(target, pname, param) { \
-    glTexEnvx_PACKED *packed_data = malloc(sizeof(glTexEnvx_PACKED)); \
+    glTexEnvx_PACKED *packed_data = je_malloc(sizeof(glTexEnvx_PACKED)); \
     packed_data->format = glTexEnvx_FORMAT; \
     packed_data->func = gl4es_glTexEnvx; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6393,7 +6394,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexEnvxv
 #define push_glTexEnvxv(target, pname, params) { \
-    glTexEnvxv_PACKED *packed_data = malloc(sizeof(glTexEnvxv_PACKED)); \
+    glTexEnvxv_PACKED *packed_data = je_malloc(sizeof(glTexEnvxv_PACKED)); \
     packed_data->format = glTexEnvxv_FORMAT; \
     packed_data->func = gl4es_glTexEnvxv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6404,7 +6405,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexGenfv
 #define push_glTexGenfv(coord, pname, params) { \
-    glTexGenfv_PACKED *packed_data = malloc(sizeof(glTexGenfv_PACKED)); \
+    glTexGenfv_PACKED *packed_data = je_malloc(sizeof(glTexGenfv_PACKED)); \
     packed_data->format = glTexGenfv_FORMAT; \
     packed_data->func = gl4es_glTexGenfv; \
     packed_data->args.a1 = (GLenum)coord; \
@@ -6415,7 +6416,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexGeni
 #define push_glTexGeni(coord, pname, param) { \
-    glTexGeni_PACKED *packed_data = malloc(sizeof(glTexGeni_PACKED)); \
+    glTexGeni_PACKED *packed_data = je_malloc(sizeof(glTexGeni_PACKED)); \
     packed_data->format = glTexGeni_FORMAT; \
     packed_data->func = gl4es_glTexGeni; \
     packed_data->args.a1 = (GLenum)coord; \
@@ -6426,7 +6427,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexImage2D
 #define push_glTexImage2D(target, level, internalformat, width, height, border, format, type, data) { \
-    glTexImage2D_PACKED *packed_data = malloc(sizeof(glTexImage2D_PACKED)); \
+    glTexImage2D_PACKED *packed_data = je_malloc(sizeof(glTexImage2D_PACKED)); \
     packed_data->format = glTexImage2D_FORMAT; \
     packed_data->func = gl4es_glTexImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6443,7 +6444,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameterf
 #define push_glTexParameterf(target, pname, param) { \
-    glTexParameterf_PACKED *packed_data = malloc(sizeof(glTexParameterf_PACKED)); \
+    glTexParameterf_PACKED *packed_data = je_malloc(sizeof(glTexParameterf_PACKED)); \
     packed_data->format = glTexParameterf_FORMAT; \
     packed_data->func = gl4es_glTexParameterf; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6454,7 +6455,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameterfv
 #define push_glTexParameterfv(target, pname, params) { \
-    glTexParameterfv_PACKED *packed_data = malloc(sizeof(glTexParameterfv_PACKED)); \
+    glTexParameterfv_PACKED *packed_data = je_malloc(sizeof(glTexParameterfv_PACKED)); \
     packed_data->format = glTexParameterfv_FORMAT; \
     packed_data->func = gl4es_glTexParameterfv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6465,7 +6466,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameteri
 #define push_glTexParameteri(target, pname, param) { \
-    glTexParameteri_PACKED *packed_data = malloc(sizeof(glTexParameteri_PACKED)); \
+    glTexParameteri_PACKED *packed_data = je_malloc(sizeof(glTexParameteri_PACKED)); \
     packed_data->format = glTexParameteri_FORMAT; \
     packed_data->func = gl4es_glTexParameteri; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6476,7 +6477,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameteriv
 #define push_glTexParameteriv(target, pname, params) { \
-    glTexParameteriv_PACKED *packed_data = malloc(sizeof(glTexParameteriv_PACKED)); \
+    glTexParameteriv_PACKED *packed_data = je_malloc(sizeof(glTexParameteriv_PACKED)); \
     packed_data->format = glTexParameteriv_FORMAT; \
     packed_data->func = gl4es_glTexParameteriv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6487,7 +6488,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameterx
 #define push_glTexParameterx(target, pname, param) { \
-    glTexParameterx_PACKED *packed_data = malloc(sizeof(glTexParameterx_PACKED)); \
+    glTexParameterx_PACKED *packed_data = je_malloc(sizeof(glTexParameterx_PACKED)); \
     packed_data->format = glTexParameterx_FORMAT; \
     packed_data->func = gl4es_glTexParameterx; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6498,7 +6499,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexParameterxv
 #define push_glTexParameterxv(target, pname, params) { \
-    glTexParameterxv_PACKED *packed_data = malloc(sizeof(glTexParameterxv_PACKED)); \
+    glTexParameterxv_PACKED *packed_data = je_malloc(sizeof(glTexParameterxv_PACKED)); \
     packed_data->format = glTexParameterxv_FORMAT; \
     packed_data->func = gl4es_glTexParameterxv; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6509,7 +6510,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTexSubImage2D
 #define push_glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, data) { \
-    glTexSubImage2D_PACKED *packed_data = malloc(sizeof(glTexSubImage2D_PACKED)); \
+    glTexSubImage2D_PACKED *packed_data = je_malloc(sizeof(glTexSubImage2D_PACKED)); \
     packed_data->format = glTexSubImage2D_FORMAT; \
     packed_data->func = gl4es_glTexSubImage2D; \
     packed_data->args.a1 = (GLenum)target; \
@@ -6526,7 +6527,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTranslatef
 #define push_glTranslatef(x, y, z) { \
-    glTranslatef_PACKED *packed_data = malloc(sizeof(glTranslatef_PACKED)); \
+    glTranslatef_PACKED *packed_data = je_malloc(sizeof(glTranslatef_PACKED)); \
     packed_data->format = glTranslatef_FORMAT; \
     packed_data->func = gl4es_glTranslatef; \
     packed_data->args.a1 = (GLfloat)x; \
@@ -6537,7 +6538,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glTranslatex
 #define push_glTranslatex(x, y, z) { \
-    glTranslatex_PACKED *packed_data = malloc(sizeof(glTranslatex_PACKED)); \
+    glTranslatex_PACKED *packed_data = je_malloc(sizeof(glTranslatex_PACKED)); \
     packed_data->format = glTranslatex_FORMAT; \
     packed_data->func = gl4es_glTranslatex; \
     packed_data->args.a1 = (GLfixed)x; \
@@ -6548,7 +6549,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform1f
 #define push_glUniform1f(location, v0) { \
-    glUniform1f_PACKED *packed_data = malloc(sizeof(glUniform1f_PACKED)); \
+    glUniform1f_PACKED *packed_data = je_malloc(sizeof(glUniform1f_PACKED)); \
     packed_data->format = glUniform1f_FORMAT; \
     packed_data->func = gl4es_glUniform1f; \
     packed_data->args.a1 = (GLint)location; \
@@ -6558,7 +6559,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform1fv
 #define push_glUniform1fv(location, count, value) { \
-    glUniform1fv_PACKED *packed_data = malloc(sizeof(glUniform1fv_PACKED)); \
+    glUniform1fv_PACKED *packed_data = je_malloc(sizeof(glUniform1fv_PACKED)); \
     packed_data->format = glUniform1fv_FORMAT; \
     packed_data->func = gl4es_glUniform1fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6569,7 +6570,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform1i
 #define push_glUniform1i(location, v0) { \
-    glUniform1i_PACKED *packed_data = malloc(sizeof(glUniform1i_PACKED)); \
+    glUniform1i_PACKED *packed_data = je_malloc(sizeof(glUniform1i_PACKED)); \
     packed_data->format = glUniform1i_FORMAT; \
     packed_data->func = gl4es_glUniform1i; \
     packed_data->args.a1 = (GLint)location; \
@@ -6579,7 +6580,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform1iv
 #define push_glUniform1iv(location, count, value) { \
-    glUniform1iv_PACKED *packed_data = malloc(sizeof(glUniform1iv_PACKED)); \
+    glUniform1iv_PACKED *packed_data = je_malloc(sizeof(glUniform1iv_PACKED)); \
     packed_data->format = glUniform1iv_FORMAT; \
     packed_data->func = gl4es_glUniform1iv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6590,7 +6591,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform2f
 #define push_glUniform2f(location, v0, v1) { \
-    glUniform2f_PACKED *packed_data = malloc(sizeof(glUniform2f_PACKED)); \
+    glUniform2f_PACKED *packed_data = je_malloc(sizeof(glUniform2f_PACKED)); \
     packed_data->format = glUniform2f_FORMAT; \
     packed_data->func = gl4es_glUniform2f; \
     packed_data->args.a1 = (GLint)location; \
@@ -6601,7 +6602,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform2fv
 #define push_glUniform2fv(location, count, value) { \
-    glUniform2fv_PACKED *packed_data = malloc(sizeof(glUniform2fv_PACKED)); \
+    glUniform2fv_PACKED *packed_data = je_malloc(sizeof(glUniform2fv_PACKED)); \
     packed_data->format = glUniform2fv_FORMAT; \
     packed_data->func = gl4es_glUniform2fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6612,7 +6613,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform2i
 #define push_glUniform2i(location, v0, v1) { \
-    glUniform2i_PACKED *packed_data = malloc(sizeof(glUniform2i_PACKED)); \
+    glUniform2i_PACKED *packed_data = je_malloc(sizeof(glUniform2i_PACKED)); \
     packed_data->format = glUniform2i_FORMAT; \
     packed_data->func = gl4es_glUniform2i; \
     packed_data->args.a1 = (GLint)location; \
@@ -6623,7 +6624,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform2iv
 #define push_glUniform2iv(location, count, value) { \
-    glUniform2iv_PACKED *packed_data = malloc(sizeof(glUniform2iv_PACKED)); \
+    glUniform2iv_PACKED *packed_data = je_malloc(sizeof(glUniform2iv_PACKED)); \
     packed_data->format = glUniform2iv_FORMAT; \
     packed_data->func = gl4es_glUniform2iv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6634,7 +6635,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform3f
 #define push_glUniform3f(location, v0, v1, v2) { \
-    glUniform3f_PACKED *packed_data = malloc(sizeof(glUniform3f_PACKED)); \
+    glUniform3f_PACKED *packed_data = je_malloc(sizeof(glUniform3f_PACKED)); \
     packed_data->format = glUniform3f_FORMAT; \
     packed_data->func = gl4es_glUniform3f; \
     packed_data->args.a1 = (GLint)location; \
@@ -6646,7 +6647,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform3fv
 #define push_glUniform3fv(location, count, value) { \
-    glUniform3fv_PACKED *packed_data = malloc(sizeof(glUniform3fv_PACKED)); \
+    glUniform3fv_PACKED *packed_data = je_malloc(sizeof(glUniform3fv_PACKED)); \
     packed_data->format = glUniform3fv_FORMAT; \
     packed_data->func = gl4es_glUniform3fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6657,7 +6658,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform3i
 #define push_glUniform3i(location, v0, v1, v2) { \
-    glUniform3i_PACKED *packed_data = malloc(sizeof(glUniform3i_PACKED)); \
+    glUniform3i_PACKED *packed_data = je_malloc(sizeof(glUniform3i_PACKED)); \
     packed_data->format = glUniform3i_FORMAT; \
     packed_data->func = gl4es_glUniform3i; \
     packed_data->args.a1 = (GLint)location; \
@@ -6669,7 +6670,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform3iv
 #define push_glUniform3iv(location, count, value) { \
-    glUniform3iv_PACKED *packed_data = malloc(sizeof(glUniform3iv_PACKED)); \
+    glUniform3iv_PACKED *packed_data = je_malloc(sizeof(glUniform3iv_PACKED)); \
     packed_data->format = glUniform3iv_FORMAT; \
     packed_data->func = gl4es_glUniform3iv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6680,7 +6681,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform4f
 #define push_glUniform4f(location, v0, v1, v2, v3) { \
-    glUniform4f_PACKED *packed_data = malloc(sizeof(glUniform4f_PACKED)); \
+    glUniform4f_PACKED *packed_data = je_malloc(sizeof(glUniform4f_PACKED)); \
     packed_data->format = glUniform4f_FORMAT; \
     packed_data->func = gl4es_glUniform4f; \
     packed_data->args.a1 = (GLint)location; \
@@ -6693,7 +6694,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform4fv
 #define push_glUniform4fv(location, count, value) { \
-    glUniform4fv_PACKED *packed_data = malloc(sizeof(glUniform4fv_PACKED)); \
+    glUniform4fv_PACKED *packed_data = je_malloc(sizeof(glUniform4fv_PACKED)); \
     packed_data->format = glUniform4fv_FORMAT; \
     packed_data->func = gl4es_glUniform4fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6704,7 +6705,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform4i
 #define push_glUniform4i(location, v0, v1, v2, v3) { \
-    glUniform4i_PACKED *packed_data = malloc(sizeof(glUniform4i_PACKED)); \
+    glUniform4i_PACKED *packed_data = je_malloc(sizeof(glUniform4i_PACKED)); \
     packed_data->format = glUniform4i_FORMAT; \
     packed_data->func = gl4es_glUniform4i; \
     packed_data->args.a1 = (GLint)location; \
@@ -6717,7 +6718,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniform4iv
 #define push_glUniform4iv(location, count, value) { \
-    glUniform4iv_PACKED *packed_data = malloc(sizeof(glUniform4iv_PACKED)); \
+    glUniform4iv_PACKED *packed_data = je_malloc(sizeof(glUniform4iv_PACKED)); \
     packed_data->format = glUniform4iv_FORMAT; \
     packed_data->func = gl4es_glUniform4iv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6728,7 +6729,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniformMatrix2fv
 #define push_glUniformMatrix2fv(location, count, transpose, value) { \
-    glUniformMatrix2fv_PACKED *packed_data = malloc(sizeof(glUniformMatrix2fv_PACKED)); \
+    glUniformMatrix2fv_PACKED *packed_data = je_malloc(sizeof(glUniformMatrix2fv_PACKED)); \
     packed_data->format = glUniformMatrix2fv_FORMAT; \
     packed_data->func = gl4es_glUniformMatrix2fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6740,7 +6741,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniformMatrix3fv
 #define push_glUniformMatrix3fv(location, count, transpose, value) { \
-    glUniformMatrix3fv_PACKED *packed_data = malloc(sizeof(glUniformMatrix3fv_PACKED)); \
+    glUniformMatrix3fv_PACKED *packed_data = je_malloc(sizeof(glUniformMatrix3fv_PACKED)); \
     packed_data->format = glUniformMatrix3fv_FORMAT; \
     packed_data->func = gl4es_glUniformMatrix3fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6752,7 +6753,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUniformMatrix4fv
 #define push_glUniformMatrix4fv(location, count, transpose, value) { \
-    glUniformMatrix4fv_PACKED *packed_data = malloc(sizeof(glUniformMatrix4fv_PACKED)); \
+    glUniformMatrix4fv_PACKED *packed_data = je_malloc(sizeof(glUniformMatrix4fv_PACKED)); \
     packed_data->format = glUniformMatrix4fv_FORMAT; \
     packed_data->func = gl4es_glUniformMatrix4fv; \
     packed_data->args.a1 = (GLint)location; \
@@ -6764,7 +6765,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glUseProgram
 #define push_glUseProgram(program) { \
-    glUseProgram_PACKED *packed_data = malloc(sizeof(glUseProgram_PACKED)); \
+    glUseProgram_PACKED *packed_data = je_malloc(sizeof(glUseProgram_PACKED)); \
     packed_data->format = glUseProgram_FORMAT; \
     packed_data->func = gl4es_glUseProgram; \
     packed_data->args.a1 = (GLuint)program; \
@@ -6773,7 +6774,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glValidateProgram
 #define push_glValidateProgram(program) { \
-    glValidateProgram_PACKED *packed_data = malloc(sizeof(glValidateProgram_PACKED)); \
+    glValidateProgram_PACKED *packed_data = je_malloc(sizeof(glValidateProgram_PACKED)); \
     packed_data->format = glValidateProgram_FORMAT; \
     packed_data->func = gl4es_glValidateProgram; \
     packed_data->args.a1 = (GLuint)program; \
@@ -6782,7 +6783,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib1f
 #define push_glVertexAttrib1f(index, x) { \
-    glVertexAttrib1f_PACKED *packed_data = malloc(sizeof(glVertexAttrib1f_PACKED)); \
+    glVertexAttrib1f_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib1f_PACKED)); \
     packed_data->format = glVertexAttrib1f_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib1f; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6792,7 +6793,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib1fv
 #define push_glVertexAttrib1fv(index, v) { \
-    glVertexAttrib1fv_PACKED *packed_data = malloc(sizeof(glVertexAttrib1fv_PACKED)); \
+    glVertexAttrib1fv_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib1fv_PACKED)); \
     packed_data->format = glVertexAttrib1fv_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib1fv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6802,7 +6803,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib2f
 #define push_glVertexAttrib2f(index, x, y) { \
-    glVertexAttrib2f_PACKED *packed_data = malloc(sizeof(glVertexAttrib2f_PACKED)); \
+    glVertexAttrib2f_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib2f_PACKED)); \
     packed_data->format = glVertexAttrib2f_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib2f; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6813,7 +6814,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib2fv
 #define push_glVertexAttrib2fv(index, v) { \
-    glVertexAttrib2fv_PACKED *packed_data = malloc(sizeof(glVertexAttrib2fv_PACKED)); \
+    glVertexAttrib2fv_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib2fv_PACKED)); \
     packed_data->format = glVertexAttrib2fv_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib2fv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6823,7 +6824,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib3f
 #define push_glVertexAttrib3f(index, x, y, z) { \
-    glVertexAttrib3f_PACKED *packed_data = malloc(sizeof(glVertexAttrib3f_PACKED)); \
+    glVertexAttrib3f_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib3f_PACKED)); \
     packed_data->format = glVertexAttrib3f_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib3f; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6835,7 +6836,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib3fv
 #define push_glVertexAttrib3fv(index, v) { \
-    glVertexAttrib3fv_PACKED *packed_data = malloc(sizeof(glVertexAttrib3fv_PACKED)); \
+    glVertexAttrib3fv_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib3fv_PACKED)); \
     packed_data->format = glVertexAttrib3fv_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib3fv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6845,7 +6846,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib4f
 #define push_glVertexAttrib4f(index, x, y, z, w) { \
-    glVertexAttrib4f_PACKED *packed_data = malloc(sizeof(glVertexAttrib4f_PACKED)); \
+    glVertexAttrib4f_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib4f_PACKED)); \
     packed_data->format = glVertexAttrib4f_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib4f; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6858,7 +6859,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttrib4fv
 #define push_glVertexAttrib4fv(index, v) { \
-    glVertexAttrib4fv_PACKED *packed_data = malloc(sizeof(glVertexAttrib4fv_PACKED)); \
+    glVertexAttrib4fv_PACKED *packed_data = je_malloc(sizeof(glVertexAttrib4fv_PACKED)); \
     packed_data->format = glVertexAttrib4fv_FORMAT; \
     packed_data->func = gl4es_glVertexAttrib4fv; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6868,7 +6869,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttribPointer
 #define push_glVertexAttribPointer(index, size, type, normalized, stride, pointer) { \
-    glVertexAttribPointer_PACKED *packed_data = malloc(sizeof(glVertexAttribPointer_PACKED)); \
+    glVertexAttribPointer_PACKED *packed_data = je_malloc(sizeof(glVertexAttribPointer_PACKED)); \
     packed_data->format = glVertexAttribPointer_FORMAT; \
     packed_data->func = gl4es_glVertexAttribPointer; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6882,7 +6883,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexAttribIPointer
 #define push_glVertexAttribIPointer(index, size, type, stride, pointer) { \
-    glVertexAttribIPointer_PACKED *packed_data = malloc(sizeof(glVertexAttribIPointer_PACKED)); \
+    glVertexAttribIPointer_PACKED *packed_data = je_malloc(sizeof(glVertexAttribIPointer_PACKED)); \
     packed_data->format = glVertexAttribIPointer_FORMAT; \
     packed_data->func = gl4es_glVertexAttribIPointer; \
     packed_data->args.a1 = (GLuint)index; \
@@ -6895,7 +6896,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glVertexPointer
 #define push_glVertexPointer(size, type, stride, pointer) { \
-    glVertexPointer_PACKED *packed_data = malloc(sizeof(glVertexPointer_PACKED)); \
+    glVertexPointer_PACKED *packed_data = je_malloc(sizeof(glVertexPointer_PACKED)); \
     packed_data->format = glVertexPointer_FORMAT; \
     packed_data->func = gl4es_glVertexPointer; \
     packed_data->args.a1 = (GLint)size; \
@@ -6907,7 +6908,7 @@ typedef GLint (*glGetProgramResourceLocationIndexEXT_PTR)(glGetProgramResourceLo
 #endif
 #ifndef direct_glViewport
 #define push_glViewport(x, y, width, height) { \
-    glViewport_PACKED *packed_data = malloc(sizeof(glViewport_PACKED)); \
+    glViewport_PACKED *packed_data = je_malloc(sizeof(glViewport_PACKED)); \
     packed_data->format = glViewport_FORMAT; \
     packed_data->func = gl4es_glViewport; \
     packed_data->args.a1 = (GLint)x; \
