@@ -40,9 +40,6 @@ set(SPIRV_CROSS_CLI            OFF CACHE BOOL "Disable CLI binary" FORCE)
 set(SPIRV_CROSS_STATIC         ON  CACHE BOOL "Prefer static libs" FORCE)
 set(SPIRV_CROSS_ENABLE_UTIL    OFF  CACHE BOOL "Disable util" FORCE)
 
-add_subdirectory(3rdparty/glslang)
-add_subdirectory(3rdparty/SPIRV-Cross)
-
 enable_language(CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -56,12 +53,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto -mllvm -polly-run-inliner -mllvm -polly-run-dce -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fvisibility=hidden -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -Wno-unicode-whitespace -Wno-format -Wno-unused-function -DUseFastSTL -DUseJEMALLOC -pthread -DNO_GBM -DDEFAULT_ES=3")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -flto -O3 -Wl,--strip-all -fvisibility=hidden -Wl,-O3 -Wl,--gc-sections -Wl,--as-needed")
 
 if(ANDROID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11")
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include )
+
+add_subdirectory(3rdparty/glslang)
+add_subdirectory(3rdparty/SPIRV-Cross)
 
 set(C_SRC_FILES
     src/gl/string_utils.c
@@ -184,10 +185,6 @@ endif()
 
 target_include_directories(ng_gl4es PUBLIC
     ${CMAKE_SOURCE_DIR}/include
-)
-
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    LINK_FLAGS "-Wl,--strip-all -fuse-ld=lld -flto -O3 -Wl,--strip-all -fvisibility=hidden -Wl,-O3 -Wl,--gc-sections -Wl,--as-needed"
 )
 
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE 
