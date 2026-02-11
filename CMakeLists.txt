@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ng_gl4es)
 
+set(CMAKE_ANDROID_LD "lld")
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTOSupported OUTPUT LTOError)
@@ -21,10 +25,10 @@ endif()
 
 set(ENABLE_RTTI                ON  CACHE BOOL "Enables RTTI (will be took by glslang)" FORCE)
 set(ENABLE_HLSL                OFF CACHE BOOL "Disable HLSL input for glslang" FORCE)
-set(BUILD_EXTERNAL             OFF CACHE BOOL "Disable build external dependencies for glslang" FORCE)
-set(ENABLE_GLSLANG_BINARIES    OFF CACHE BOOL "Disable glslangValidator/spirv-remap" FORCE)
-set(ENABLE_OPT                 OFF CACHE BOOL "Disable SPIRV-Tools opt usage in glslang" FORCE)
-set(BUILD_EXTERNAL             OFF CACHE BOOL "Don't build external deps in External/" FORCE)
+set(BUILD_EXTERNAL             ON CACHE BOOL "Disable build external dependencies for glslang" FORCE)
+set(ENABLE_GLSLANG_BINARIES    ON CACHE BOOL "Disable glslangValidator/spirv-remap" FORCE)
+set(ENABLE_OPT                 ON CACHE BOOL "Disable SPIRV-Tools opt usage in glslang" FORCE)
+set(BUILD_EXTERNAL             ON CACHE BOOL "Don't build external deps in External/" FORCE)
 
 set(SPIRV_CROSS_ENABLE_C_API   ON  CACHE BOOL "Enable C API" FORCE)
 set(SPIRV_CROSS_ENABLE_GLSL    ON  CACHE BOOL "Enable GLSL backend" FORCE)
@@ -47,11 +51,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto -mllvm -polly-run-inliner -mllvm -polly-run-dce -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fvisibility=hidden -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -stdlib=libc++ -Wno-unicode-whitespace -Wno-format -Wno-unused-function -Wno-vla-cxx-extension -DUseFastSTL -frtti -DUseJEMALLOC -pthread")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DNO_GBM -DDEFAULT_ES=3 -fvisibility=hidden")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto -mllvm -polly-run-inliner -mllvm -polly-run-dce -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -fvisibility=hidden -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -Wno-unicode-whitespace -Wno-format -Wno-unused-function -DUseFastSTL -DUseJEMALLOC -pthread -DNO_GBM -DDEFAULT_ES=3")
 
 if(ANDROID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11")
@@ -182,7 +186,7 @@ target_include_directories(ng_gl4es PUBLIC
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    LINK_FLAGS "-Wl,--strip-all"
+    LINK_FLAGS "-Wl,--strip-all -fuse-ld=lld -flto -O3 -Wl,--strip-all -fvisibility=hidden -Wl,-O3 -Wl,--gc-sections -Wl,--as-needed"
 )
 
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE 
