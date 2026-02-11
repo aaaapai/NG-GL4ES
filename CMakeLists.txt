@@ -184,3 +184,7 @@ target_include_directories(ng_gl4es PUBLIC
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     LINK_FLAGS "-Wl,--strip-all"
 )
+
+target_link_options(${CMAKE_PROJECT_NAME} PRIVATE 
+    "LINKER:--version-script=${CMAKE_SOURCE_DIR}/src/ngg-version.script"
+)
