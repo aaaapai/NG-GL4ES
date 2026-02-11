@@ -233,7 +233,12 @@ static const char* gl4es_ftransformSource = "\n"
                                             " return gl_ModelViewProjectionMatrix * gl_Vertex;\n"
                                             "}\n";
 
-static const char* gl4es_dummyClipVertex = "vec4 dummyClipVertex_%d";
+
+static const char* gl4es_ClipVertex = "vec4 gl4es_ClipVertex;\n";
+static const char* gl4es_ClipVertexSource = "gl4es_ClipVertex";
+static const char* gl4es_ClipVertex_clip =
+"\nif(any(lessThanEqual(gl4es_ClipVertex.xyz, vec3(-gl4es_ClipVertex.w)))"
+" || any(greaterThanEqual(gl4es_ClipVertex.xyz, vec3(gl4es_ClipVertex.w)))) discard;\n";
 
 static const char* gl_TexCoordSource = "gl_TexCoord[";
 
@@ -247,19 +252,19 @@ static const char* GLESHeader[] = {"#version 100\n%sprecision %s float;\nprecisi
                                    "#version 320 es\n%sprecision %s float;\nprecision %s int;\n"};
 
 static const char* gl4es_transpose = "mat2 gl4es_transpose(mat2 m) {\n"
-                                     " return mat2(m[0][0], m[0][1],\n"
-                                     "             m[1][0], m[1][1]);\n"
+                                     " return mat2(m[0][0], m[1][0],\n"
+                                     "             m[0][1], m[1][1]);\n"
                                      "}\n"
                                      "mat3 gl4es_transpose(mat3 m) {\n"
-                                     " return mat3(m[0][0], m[0][1], m[0][2],\n"
-                                     "             m[1][0], m[1][1], m[1][2],\n"
-                                     "             m[2][0], m[2][1], m[2][2]);\n"
+                                     " return mat3(m[0][0], m[1][0], m[2][0],\n"
+                                     "             m[0][1], m[1][1], m[2][1],\n"
+                                     "             m[0][2], m[1][2], m[2][2]);\n"
                                      "}\n"
                                      "mat4 gl4es_transpose(mat4 m) {\n"
-                                     " return mat4(m[0][0], m[0][1], m[0][2], m[0][3],\n"
-                                     "             m[1][0], m[1][1], m[1][2], m[1][3],\n"
-                                     "             m[2][0], m[2][1], m[2][2], m[2][3],\n"
-                                     "             m[3][0], m[3][1], m[3][2], m[3][3]);\n"
+                                     " return mat4(m[0][0], m[1][0], m[2][0], m[3][0],\n"
+                                     "             m[0][1], m[1][1], m[2][1], m[3][1],\n"
+                                     "             m[0][2], m[1][2], m[2][2], m[3][2],\n"
+                                     "             m[0][3], m[1][3], m[2][3], m[3][3]);\n"
                                      "}\n";
 
 static const char* HackAltPow = "float pow(float f, int a) {\n"
@@ -978,7 +983,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
     int maskbefore = 4 | (isVertex ? 1 : 2);
     int maskafter = 8 | (isVertex ? 1 : 2);
     if ((globals4es.dbgshaderconv & maskbefore) == maskbefore) {
-        printf("Shader source%s:\n%s\n", pEntry, fpeShader ? " (FPEShader generated)" : "");
+        printf("Shader source%s:\n%s\n", fpeShader ? " (FPEShader generated)" : "", pEntry);
     }
     int comments = globals4es.comments;
 
@@ -1177,6 +1182,20 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
             Tmp = InplaceInsert(GetLine(Tmp, headline), textureCubeGradAlt, Tmp, &tmpsize);
         }
     }
+
+    
+  // Some drivers have troubles with "\\\r\n" or "\\\n" sequences on preprocessor macros 
+  newptr = Tmp;
+  while (*newptr!=0x00) {
+    if (*newptr == '\\') {
+      if (*(newptr+1) == '\r' && *(newptr+2) == '\n')
+        memmove(newptr, newptr+3, strlen(newptr+3)+1);
+      else if (*(newptr+1) == '\n')
+        memmove(newptr, newptr+2, strlen(newptr+2)+1);
+    }
+    newptr++;
+    }
+
     // now check to remove trailling "f" after float, as it's not supported too
     newptr = Tmp;
     // simple state machine...
@@ -1640,13 +1659,18 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
         Tmp = InplaceReplace(Tmp, &tmpsize, "gl_MaxTextureCoords", "_gl4es_MaxTextureCoords");
     }
     if (strstr(Tmp, "gl_ClipVertex")) {
-        // gl_ClipVertex is not handled for now
-        // Proper way would be to copy handling from fpe_shader, but then, need to use gl_ClipPlane...
-        static int ncv = 0;
-        char CV[60];
-        sprintf(CV, gl4es_dummyClipVertex, ncv);
-        ++ncv;
-        Tmp = InplaceReplace(Tmp, &tmpsize, "gl_ClipVertex", CV);
+        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, 2), gl4es_ClipVertex, Tmp, &tmpsize);
+        headline+=gl4es_countline(gl4es_ClipVertex);
+        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_ClipVertex", gl4es_ClipVertexSource);
+        need->need_clipvertex = 1;
+    } else if(isVertex && need && need->need_clipvertex) {
+        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, 2), gl4es_ClipVertex, Tmp, &tmpsize);
+        headline+=gl4es_countline(gl4es_ClipVertex);
+        char *p = strchr(gl4es_find_string_nc(Tmp, "main"), '{'); // find the openning curly bracket of main
+        if(p) {
+          // add regular clipping at start of main
+          Tmp = gl4es_inplace_insert(p+1, gl4es_ClipVertex_clip, Tmp, &tmpsize);
+        }
     }
     // oldprogram uniforms...
     if (FindString(Tmp, gl_ProgramEnv)) {
@@ -1778,6 +1802,8 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
         printf("New Shader source:\n%s\n", Tmp);
     }
     // clean preproc'd source
+    if(versionString != NULL)
+    free(versionString);
     if (pEntry != pBuffer) free(pBuffer);
     return Tmp;
 }
