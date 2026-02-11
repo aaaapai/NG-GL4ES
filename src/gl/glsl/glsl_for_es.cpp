@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include "../../../version.h"
+#include <jemalloc/jemalloc.h>
 
 extern "C"
 {
@@ -338,7 +339,7 @@ char* GLSLtoGLSLES_c(const char* glsl_code, GLenum glsl_type, unsigned int essl_
     std::string result = GLSLtoGLSLES(glsl_code, glsl_type, essl_version, glsl_version, tmp_return_code);
     *return_code = tmp_return_code;
 
-    char* cstr = (char*)malloc(result.size() + 1);
+    char* cstr = (char*)je_malloc(result.size() + 1);
     if (!cstr) {
         *return_code = -1;
         return nullptr;
