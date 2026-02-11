@@ -21,6 +21,8 @@ int NO_OPERATOR_VALUE = 9999;
 #include <ctype.h>
 #include <stdbool.h>
 
+#include <jemalloc/jemalloc.h>
+
 // ������������������ȡ���������飨���� mat2, mat3, mat4, vec2, vec3, vec4 ���͵Ĵ�����
 int parse_floats_from_string(const char* str, GLfloat* outValues, int maxCount) {
     int count = 0;
@@ -156,7 +158,7 @@ char* process_uniform_declarations(char* glslCode, uniforms_declarations uniform
     char name[256], type[256], initial_value[1024];
     int modifiedCodeIndex = 0;
     size_t maxLength = 1024 * 10;
-    char* modifiedGlslCode = (char*)malloc(maxLength * sizeof(char));
+    char* modifiedGlslCode = (char*)je_malloc(maxLength * sizeof(char));
     if (!modifiedGlslCode) return glslCode;
 
     name[0] = type[0] = initial_value[0] = '\0';
@@ -271,13 +273,13 @@ char* process_uniform_declarations(char* glslCode, uniforms_declarations uniform
                         len = (int)length;
                     } else {
                         fprintf(stderr, "Error: Not enough space in buffer\n");
-                        free(modifiedGlslCode);
+                        je_free(modifiedGlslCode);
                         return glslCode;
                     }
                 }
 
                 if (len < 0 || len >= spaceLeft) {
-                    free(modifiedGlslCode);
+                    je_free(modifiedGlslCode);
                     return glslCode;
                 }
                 modifiedCodeIndex += len;
@@ -292,7 +294,7 @@ char* process_uniform_declarations(char* glslCode, uniforms_declarations uniform
                 int len = snprintf(modifiedGlslCode + modifiedCodeIndex, spaceLeft, "uniform%s %s %s;", precision, type,
                                    name);
                 if (len < 0 || len >= spaceLeft) {
-                    free(modifiedGlslCode);
+                    je_free(modifiedGlslCode);
                     return glslCode;
                 }
                 modifiedCodeIndex += len;
@@ -308,9 +310,9 @@ char* process_uniform_declarations(char* glslCode, uniforms_declarations uniform
 
         if (modifiedCodeIndex >= (int)maxLength - 1) {
             maxLength *= 2;
-            char* tmp = (char*)realloc(modifiedGlslCode, maxLength);
+            char* tmp = (char*)je_realloc(modifiedGlslCode, maxLength);
             if (!tmp) {
-                free(modifiedGlslCode);
+                je_free(modifiedGlslCode);
                 return glslCode;
             }
             modifiedGlslCode = tmp;
@@ -620,7 +622,7 @@ char* BackportConstArrays(char* source, int* sourceLength) {
             source = InplaceReplaceByIndex(source, sourceLength, entryEnd, entryEnd + 1, ";}"); // +2 - 1
             // Build the string to insert
             int indexStringLength = (j == 0 ? 1 : (int)(log10(j) + 1));
-            char* replacementString = malloc(19 + indexStringLength + 1);
+            char* replacementString = je_malloc(19 + indexStringLength + 1);
             replacementString[19 + indexStringLength + 1] = '\0';
             memcpy(replacementString, "if(index==", 10);
             sprintf(replacementString + 10, "%d", j);
@@ -630,7 +632,7 @@ char* BackportConstArrays(char* source, int* sourceLength) {
             source = InplaceInsertByIndex(source, sourceLength, entryStart, replacementString);
 
             entryStart = entryEnd + 19 + indexStringLength + 2;
-            free(replacementString);
+            je_free(replacementString);
         }
 
         // The replacement string is not needed anymore
@@ -657,7 +659,7 @@ char* BackportConstArrays(char* source, int* sourceLength) {
             k = nextPos;
         }
 
-        free(variableName);
+        je_free(variableName);
 
     } else {
         // Nothing, go to the next loop iteration
@@ -671,10 +673,10 @@ char* BackportConstArrays(char* source, int* sourceLength) {
  * @param source The shader as a string
  * @param startString The start of the substring
  * @param endString The end of the substring
- * @return A newly allocated substring. Don't forget to free() it !
+ * @return A newly allocated substring. Don't forget to je_free() it !
  */
 char* ExtractString(char* source, int startString, int endString) {
-    char* subString = malloc((endString - startString) + 1);
+    char* subString = je_malloc((endString - startString) + 1);
     subString[(endString - startString) + 1] = '\0';
     memcpy(subString, source + startString, (endString - startString));
     return subString;
@@ -694,7 +696,7 @@ char* ReplaceFragmentOut(char* source, int* sourceLength) {
     GetNextWord(source, t2, &t1, &t2);            // Catches the variableName
 
     // Load the variable inside another string
-    char* variableName = malloc(t2 - t1 + 1);
+    char* variableName = je_malloc(t2 - t1 + 1);
     variableName[t2 - t1 + 1] = '\0';
     memcpy(variableName, source + t1, t2 - t1);
 
@@ -704,7 +706,7 @@ char* ReplaceFragmentOut(char* source, int* sourceLength) {
     // Replacing occurrences of the variable
     source = ReplaceVariableName(source, sourceLength, variableName, "gl_FragColor");
 
-    free(variableName);
+    je_free(variableName);
 
     return source;
 }
@@ -878,7 +880,7 @@ char* ReplaceModOperator(char* source, int* sourceLength) {
         char* rightOperand = GetOperandFromOperator(source, i, 1, endPtr);
 
         // Generate a model string to be inserted
-        char* replacementString = malloc(strlen(modelString) + 1);
+        char* replacementString = je_malloc(strlen(modelString) + 1);
         strcpy(replacementString, modelString);
         int replacementSize = strlen(replacementString);
         replacementString = InplaceReplace(replacementString, &replacementSize, "x", leftOperand);
@@ -887,10 +889,10 @@ char* ReplaceModOperator(char* source, int* sourceLength) {
         // Insert the new string
         source = InplaceReplaceByIndex(source, sourceLength, startIndex, endIndex, replacementString);
 
-        // Free all the temporary strings
-        free(leftOperand);
-        free(rightOperand);
-        free(replacementString);
+        // je_free all the temporary strings
+        je_free(leftOperand);
+        je_free(rightOperand);
+        je_free(replacementString);
     }
 
     return source;
@@ -1189,7 +1191,7 @@ char* GetOperandFromOperator(char* source, int operatorIndex, int rightOperand, 
     }
 
     // At this point, we know both the start and end point of our operand, let's copy it
-    char* operand = malloc(operandEndIndex - operandStartIndex + 2);
+    char* operand = je_malloc(operandEndIndex - operandStartIndex + 2);
     memcpy(operand, source + operandStartIndex, operandEndIndex - operandStartIndex + 1);
     // Make sure the string is null terminated
     operand[operandEndIndex - operandStartIndex + 1] = '\0';
@@ -1376,8 +1378,8 @@ char* RemoveUnsupportedExtensions(char* source) {
  */
 char* ReplaceVariableName(char* source, int* sourceLength, char* initialName, char* newName) {
 
-    char* toReplace = malloc(strlen(initialName) + 3);
-    char* replacement = malloc(strlen(newName) + 3);
+    char* toReplace = je_malloc(strlen(initialName) + 3);
+    char* replacement = je_malloc(strlen(newName) + 3);
     char* charBefore = "{}([];+-*/~!%<>,&| \n\t";
     char* charAfter = ")[];+-*/%<>;,|&. \n\t";
 
@@ -1402,8 +1404,8 @@ char* ReplaceVariableName(char* source, int* sourceLength, char* initialName, ch
         }
     }
 
-    free(toReplace);
-    free(replacement);
+    je_free(toReplace);
+    je_free(replacement);
 
     return source;
 }
