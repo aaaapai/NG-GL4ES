@@ -4,6 +4,8 @@
 #include "init.h"
 #include "matrix.h"
 
+#include <jemalloc/jemalloc.h>
+
 void push_hit() {
     // push current hit to hit list, and re-init current hit
     if (glstate->selectbuf.hit) {
@@ -81,7 +83,7 @@ void APIENTRY_GL4ES gl4es_glInitNames(void) {
 	}
 	//TODO list stuffs
 	if (glstate->namestack.names == 0) {
-		glstate->namestack.names = (GLuint*)malloc(1024*sizeof(GLuint));
+		glstate->namestack.names = (GLuint*)je_malloc(1024*sizeof(GLuint));
 	}
 	glstate->namestack.top = 0;
     noerrorShim();
@@ -329,7 +331,7 @@ void select_glDrawArrays(const vertexattrib_t* vtx, GLenum mode, GLuint first, G
 				return;		// Should never go there!
 		}
 	}
-	free(vert);
+	je_free(vert);
 	if(found) {
 		if (zmin<glstate->selectbuf.zmin) 	glstate->selectbuf.zmin=zmin;
 		if (zmax>glstate->selectbuf.zmax) 	glstate->selectbuf.zmax=zmax;
@@ -490,7 +492,7 @@ void select_glDrawElements(const vertexattrib_t* vtx, GLenum mode, GLuint count,
 			}
 		}
 	}
-	free(vert);
+	je_free(vert);
 	if(found) {
 		if (zmin<glstate->selectbuf.zmin) 	glstate->selectbuf.zmin=zmin;
 		if (zmax>glstate->selectbuf.zmax) 	glstate->selectbuf.zmax=zmax;

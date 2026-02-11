@@ -9,6 +9,8 @@
 #include "loader.h"
 #include "oldprogram.h"
 
+#include <jemalloc/jemalloc.h>
+
 glstate_t *glstate = NULL;
 
 glstate_t default_glstate = {0};
@@ -26,8 +28,8 @@ static void free_renderbuffer(glrenderbuffer_t *rend)
         gles_glDeleteRenderbuffers(1, &rend->secondarybuffer);
     if(rend->renderbuffer)
         gles_glDeleteRenderbuffers(1, &rend->renderbuffer);
-    // the texture will be free by the free of the texture list, as it's referenced there...
-    free(rend);
+    // the texture will be je_free by the je_free of the texture list, as it's referenced there...
+    je_free(rend);
 }
 
 static void free_framebuffer(glframebuffer_t *fb)
@@ -37,8 +39,8 @@ static void free_framebuffer(glframebuffer_t *fb)
         return;
     if(fb->id)
         gles_glDeleteFramebuffers(1, &fb->id);
-    // the texture will be free by the free of the texture list, as it's referenced there...
-    free(fb);
+    // the texture will be je_free by the je_free of the texture list, as it's referenced there...
+    je_free(fb);
 }
 
 static void free_texture(gltexture_t *tex)
@@ -49,9 +51,9 @@ static void free_texture(gltexture_t *tex)
     if(tex->glname)
         gles_glDeleteTextures(1, &tex->glname);
     if(tex->data)
-        free(tex->data);
+        je_free(tex->data);
     // renderbuffer linked to this texture will be freed by the free_renderbuffer function.
-    free(tex);
+    je_free(tex);
 }
 
 void CopyGLEShard(void* dst, const void* src)
@@ -62,7 +64,7 @@ void CopyGLEShard(void* dst, const void* src)
 }
 
 void* NewGLState(void* shared_glstate, int es2only) {
-    glstate_t *glstate = (shared_glstate!=DEFAULT_STATE)?((glstate_t*)calloc(1, sizeof(glstate_t))):&default_glstate;
+    glstate_t *glstate = (shared_glstate!=DEFAULT_STATE)?((glstate_t*)je_calloc(1, sizeof(glstate_t))):&default_glstate;
 #if defined(AMIGAOS4) || defined(__EMSCRIPTEN__)
     int def = 0;
     if(shared_glstate==DEFAULT_STATE)
@@ -73,7 +75,7 @@ void* NewGLState(void* shared_glstate, int es2only) {
     if(shared_glstate) {
         glstate_t* copy_state = (glstate_t*)shared_glstate;
         if(!copy_state->shared_cnt) {
-            copy_state->shared_cnt = (int*)malloc(sizeof(int));
+            copy_state->shared_cnt = (int*)je_malloc(sizeof(int));
             (*copy_state->shared_cnt) = 2;
         } else
             (*copy_state->shared_cnt)++;
@@ -121,7 +123,7 @@ void* NewGLState(void* shared_glstate, int es2only) {
         int ret;
         khash_t(buff) *list = glstate->buffers = kh_init(buff);
         k = kh_put(buff, list, 0, &ret);
-        glbuffer_t *buff = kh_value(list, k) = calloc(1, sizeof(glbuffer_t));
+        glbuffer_t *buff = kh_value(list, k) = je_calloc(1, sizeof(glbuffer_t));
         /*buff->buffer = 0;
         buff->type = 0;
         buff->data = NULL;*/
@@ -137,7 +139,7 @@ void* NewGLState(void* shared_glstate, int es2only) {
         int ret;
         khash_t(glvao) *list = glstate->vaos = kh_init(glvao);
         k = kh_put(glvao, list, 0, &ret);
-        glvao_t *glvao = kh_value(list, k) = malloc(sizeof(glvao_t));
+        glvao_t *glvao = kh_value(list, k) = je_malloc(sizeof(glvao_t));
         // new vao is binded to default vbo
         VaoInit(glvao);
         // just put is number
@@ -156,13 +158,13 @@ void* NewGLState(void* shared_glstate, int es2only) {
     // actual_tex2d
     if(!shared_glstate)
     {
-        glstate->actual_tex2d = (GLuint*)calloc(MAX_TEX, sizeof(GLuint));
+        glstate->actual_tex2d = (GLuint*)je_calloc(MAX_TEX, sizeof(GLuint));
     }
     // glsl
-    glstate->gleshard = (gleshard_t*)calloc(1, sizeof(gleshard_t)); // Not shared!
+    glstate->gleshard = (gleshard_t*)je_calloc(1, sizeof(gleshard_t)); // Not shared!
     if(!shared_glstate)
     {
-        glstate->glsl = (glsl_t*)malloc(sizeof(glsl_t));
+        glstate->glsl = (glsl_t*)je_malloc(sizeof(glsl_t));
         memset(glstate->glsl, 0, sizeof(glsl_t));
         InitOldProgramMap(glstate);
     }
@@ -200,13 +202,13 @@ void* NewGLState(void* shared_glstate, int es2only) {
     // line stipple
     glstate->linestipple.factor = 1;
     glstate->linestipple.pattern = 0xFFFF;
-    glstate->linestipple.data = (GLubyte *)malloc(sizeof(GLubyte) * 16);
+    glstate->linestipple.data = (GLubyte *)je_malloc(sizeof(GLubyte) * 16);
         memset(glstate->linestipple.data, 0xff, sizeof(GLubyte) * 16);
     glstate->linestipple.texture = 0;    
     
     // fpe
     if(hardext.esversion>1) {
-        glstate->fpe_state = (fpe_state_t*)calloc(1, sizeof(fpe_state_t));
+        glstate->fpe_state = (fpe_state_t*)je_calloc(1, sizeof(fpe_state_t));
         glstate->glsl->es2 = es2only;
         fpe_Init(glstate);
     }
@@ -228,8 +230,8 @@ void* NewGLState(void* shared_glstate, int es2only) {
         }
         // now add default "0" texture => no, because tex 0 is not shared....
         /*k = kh_put(tex, list, 0, &ret);
-        glstate->texture.zero = tex = kh_value(list, k) = malloc(sizeof(gltexture_t));*/
-        glstate->texture.zero = tex = calloc(1, sizeof(gltexture_t));
+        glstate->texture.zero = tex = kh_value(list, k) = je_malloc(sizeof(gltexture_t));*/
+        glstate->texture.zero = tex = je_calloc(1, sizeof(gltexture_t));
         tex->adjustxy[0] = tex->adjustxy[1] = 1.f;
         tex->mipmap_auto = (globals4es.automipmap==1);
         tex->mipmap_need = (globals4es.automipmap==1)?1:0;
@@ -348,7 +350,7 @@ void* NewGLState(void* shared_glstate, int es2only) {
 
     // fpe
     if(hardext.esversion>1) {
-        glstate->fpe_state = (fpe_state_t*)calloc(1, sizeof(fpe_state_t));
+        glstate->fpe_state = (fpe_state_t*)je_calloc(1, sizeof(fpe_state_t));
         glstate->glsl->es2 = es2only;
         if(!shared_glstate)
             fpe_Init(glstate);
@@ -405,7 +407,7 @@ void* NewGLState(void* shared_glstate, int es2only) {
         int ret;
         khash_t(renderbufferlist_t) *list = glstate->fbo.renderbufferlist = kh_init(renderbufferlist_t);
         k = kh_put(renderbufferlist_t, list, 0, &ret);
-        glrenderbuffer_t *rend = kh_value(list, k) = calloc(1, sizeof(glrenderbuffer_t));
+        glrenderbuffer_t *rend = kh_value(list, k) = je_calloc(1, sizeof(glrenderbuffer_t));
         glstate->fbo.default_rb = rend;
     }
     // add default Framebuffer
@@ -415,12 +417,12 @@ void* NewGLState(void* shared_glstate, int es2only) {
         int ret;
         khash_t(framebufferlist_t) *list = glstate->fbo.framebufferlist = kh_init(framebufferlist_t);
         k = kh_put(framebufferlist_t, list, 0, &ret);
-        glframebuffer_t *fb = kh_value(list, k) = calloc(1, sizeof(glframebuffer_t));
+        glframebuffer_t *fb = kh_value(list, k) = je_calloc(1, sizeof(glframebuffer_t));
         fb->width = glstate->fbo.mainfbo_width;
         fb->height = glstate->fbo.mainfbo_height;
         glstate->fbo.fbo_0 = fb;
         if(globals4es.recyclefbo) {
-            glstate->fbo.old = (oldfbos_t*)calloc(1, sizeof(oldfbos_t));
+            glstate->fbo.old = (oldfbos_t*)je_calloc(1, sizeof(oldfbos_t));
         }
     }
     glstate->fbo.current_fb = glstate->fbo.fbo_0;
@@ -463,7 +465,7 @@ void DeleteGLState(void* oldstate) {
 
     if(state->shared_cnt) {
         if(!--(*state->shared_cnt)) {
-            free(state->shared_cnt);
+            je_free(state->shared_cnt);
             state->shared_cnt = 0;
         }
     }
@@ -474,7 +476,7 @@ void DeleteGLState(void* oldstate) {
         glstate = (oldstate==DEFAULT_STATE)?NULL:&default_glstate;
 
     if(!state->shared_cnt)
-        free(state->actual_tex2d);
+        je_free(state->actual_tex2d);
     
     #define free_hashmap(T, N, K, F)        \
     if(state->N)                            \
@@ -485,73 +487,73 @@ void DeleteGLState(void* oldstate) {
         )                                   \
         kh_destroy(K, state->N);            \
     }
-    free_hashmap(glvao_t, vaos, glvao, free);
+    free_hashmap(glvao_t, vaos, glvao, je_free);
     if(!state->shared_cnt) {
-        free_hashmap(glbuffer_t, buffers, buff, free);
+        free_hashmap(glbuffer_t, buffers, buff, je_free);
         free_hashmap(gltexture_t, texture.list, tex, free_texture);
         free_hashmap(renderlist_t, headlists, gllisthead, free_renderlist);
         free_hashmap(glrenderbuffer_t, fbo.renderbufferlist, renderbufferlist_t, free_renderbuffer);
         free_hashmap(glframebuffer_t, fbo.framebufferlist, framebufferlist_t, free_framebuffer);
-        free_hashmap(glsampler_t, samplers.samplerlist, samplerlist_t, free);
-        free_hashmap(glquery_t, queries.querylist, queries, free);
+        free_hashmap(glsampler_t, samplers.samplerlist, samplerlist_t, je_free);
+        free_hashmap(glquery_t, queries.querylist, queries, je_free);
     }
     #undef free_hashmap
-    // free texture zero as it's not in the list anymore
-    free(state->texture.zero);
-    // free eval maps
+    // je_free texture zero as it's not in the list anymore
+    je_free(state->texture.zero);
+    // je_free eval maps
     #define freemap(dims, name)                              \
     { map_statef_t *m = (map_statef_t *)state->map##dims.name; \
     if (m) {                                                \
-        free((void *)m->points);                            \
-        free(m);                                            \
+        je_free((void *)m->points);                            \
+        je_free(m);                                            \
     } }
     freemap(1, vertex3); freemap(1, vertex4); freemap(1, index); freemap(1, color4); freemap(1, normal); 
     freemap(1, texture1); freemap(1, texture2); freemap(1, texture3); freemap(1, texture4);   
     freemap(2, vertex3); freemap(2, vertex4); freemap(2, index); freemap(2, color4); freemap(2, normal); 
     freemap(2, texture1); freemap(2, texture2); freemap(2, texture3); freemap(2, texture4);   
     #undef freemap
-    // free active list
+    // je_free active list
     if(!state->shared_cnt && state->list.active) free_renderlist(state->list.active);
 
-    // free matrix stack
+    // je_free matrix stack
     #define free_matrix(A)                  \
         if (state->A) {                   \
-    	    free(state->A->stack);    \
-            free(state->A);               \
+    	    je_free(state->A->stack);    \
+            je_free(state->A);               \
         }
 	free_matrix(projection_matrix);
 	free_matrix(modelview_matrix);
 	for (int i=0; i<MAX_TEX; i++)
 		free_matrix(texture_matrix[i]);
-	free(state->texture_matrix);
+	je_free(state->texture_matrix);
 	for (int i=0; i<MAX_ARB_MATRIX; i++)
 		free_matrix(arb_matrix[i]);
     #undef free_matrix
     // states stack
     if(state->stack)
-        free(state->stack);
+        je_free(state->stack);
     if(state->clientStack)
-        free(state->clientStack);
+        je_free(state->clientStack);
     // linestipple
     if(state->linestipple.data)
-        free(state->linestipple.data);
+        je_free(state->linestipple.data);
     // raster / bitmap
     if(state->raster.data)
-        free(state->raster.data);
+        je_free(state->raster.data);
     if(state->raster.bitmap)
-        free(state->raster.bitmap);
+        je_free(state->raster.bitmap);
     // TODO: delete the "immediate" stuff and bitmap texture?
     // scratch buffer
     if(state->scratch)
-        free(state->scratch);
+        je_free(state->scratch);
     // merger buffers
     if(state->merger_master)
-        free(state->merger_master);
+        je_free(state->merger_master);
     if(state->merger_secondary)
-        free(state->merger_secondary);
+        je_free(state->merger_secondary);
     for(int a=0; a<MAX_TEX-2; ++a)
         if(state->merger_tex[a])
-            free(state->merger_tex[a]);
+            je_free(state->merger_tex[a]);
     // mainfbo
     if(!state->shared_cnt) {
         if(state->fbo.mainfbo_fbo)
@@ -561,45 +563,45 @@ void DeleteGLState(void* oldstate) {
     if(!state->shared_cnt && state->fbo.old) {
         LOAD_GLES2_OR_OES(glDeleteFramebuffers);
         gles_glDeleteFramebuffers(state->fbo.old->nbr, state->fbo.old->fbos);
-        free(state->fbo.old->fbos);
-        free(state->fbo.old);
+        je_free(state->fbo.old->fbos);
+        je_free(state->fbo.old);
     }
-    // free blit GLES2 stuff
+    // je_free blit GLES2 stuff
     if(state->blit) {
         //TODO: check if should delete GL object too
-        free(state->blit);
+        je_free(state->blit);
     }
     if(!state->shared_cnt) {
         FreeOldProgramMap(state);
-        free(state->glsl);
+        je_free(state->glsl);
         if(state->fpe_cache) {
             fpe_Dispose(state);
         }
     }
-    free(state->gleshard);  // Not shared!
+    je_free(state->gleshard);  // Not shared!
     // get extensions
     if(state->extensions)
-        free(state->extensions);
+        je_free(state->extensions);
     if(state->extensions_list) {
         for(int i=0; i<state->num_extensions; ++i)
-            free(state->extensions_list[i]);
-        free(state->extensions_list);
+            je_free(state->extensions_list[i]);
+        je_free(state->extensions_list);
     }
     // helper texture adjust
     for(int i=0; i<MAX_TEX; ++i) {
         if(state->helper_tex[i])
-            free(state->helper_tex[i]);
+            je_free(state->helper_tex[i]);
         if(state->texgened[i])
-            free(state->texgened[i]);
+            je_free(state->texgened[i]);
 
     }
-    //TODO: free sharderlist and programlist...
+    //TODO: je_free sharderlist and programlist...
 
-    // probably missing some things to free here!
+    // probably missing some things to je_free here!
 
     // all done
     if(oldstate!=DEFAULT_STATE)
-        free(state);
+        je_free(state);
     return;
 }
 

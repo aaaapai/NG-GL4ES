@@ -12,6 +12,8 @@
 #include "texture.h"
 #include "../../include/khash.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -57,7 +59,7 @@ void del_sampler(GLuint sampler) {
         LOAD_GLES(glDeleteSamplers);
         GLuint gles_id = s->glname;
         gles_glDeleteSamplers(1, &gles_id);
-        free(s);
+        je_free(s);
     }
 }
 
@@ -85,7 +87,7 @@ void gl4es_glGenSamplers(GLsizei n, GLuint* ids) {
     khash_t(samplerlist_t)* list = glstate->samplers.samplerlist;
     for (int i = 0; i < n; ++i) {
         k = kh_put(samplerlist_t, list, ids[i], &ret);
-        glsampler_t* sampler = kh_value(list, k) = malloc(sizeof(glsampler_t));
+        glsampler_t* sampler = kh_value(list, k) = je_malloc(sizeof(glsampler_t));
         init_sampler(sampler);
         sampler->glname = ids[i];
         LOAD_GLES(glSamplerParameteri);

@@ -27,6 +27,8 @@
 #include "logs.h"
 #include "config.h"
 
+#include <jemalloc/jemalloc.h>
+
 #ifdef _WIN32
 #ifdef _WINBASE_
 #define GSM_CAST(c) ((LPFILETIME)c)
@@ -67,7 +69,7 @@ void write_log(const char* format, ...) {
     fflush(file);
 }
 void clear_log() {
-    char* path = malloc(strlen(NGGDirectory) + strlen(LOG_FILE_PATH) + 1);
+    char* path = je_malloc(strlen(NGGDirectory) + strlen(LOG_FILE_PATH) + 1);
     strcpy(path, NGGDirectory);
     strcat(path, LOG_FILE_PATH);
     file = fopen(path, "w");
@@ -75,7 +77,7 @@ void clear_log() {
         DBG(LOGE("Failed to open log file '%s'", path);)
         return;
     }
-    free(path);
+    je_free(path);
 }
 
 int adjust_vertices(GLenum mode, int nb) {
@@ -849,7 +851,7 @@ GLuint APIENTRY_GL4ES gl4es_glGenLists(GLsizei range) {
     int start = glstate->list.count;
     glstate->list.count += range;
 
-    // check start -> start+range-1 is all free !
+    // check start -> start+range-1 is all je_free !
     int ok = 0;
     do {
         ok = 1;
@@ -922,7 +924,7 @@ void APIENTRY_GL4ES gl4es_glEndList(void) {
         }
     }
     if (glstate->list.compiling) {
-        // Free the previous list if it exist...
+        // je_free the previous list if it exist...
         free_renderlist(kh_value(lists, k));
         renderlist_t* l = kh_value(lists, k) = GetFirst(glstate->list.active);
         // set name
@@ -1227,8 +1229,8 @@ AliasExport(void, glClampColor, , (GLenum target, GLenum clamp));
 
 void gl4es_scratch(int alloc) {
     if (glstate->scratch_alloc < alloc) {
-        if (glstate->scratch) free(glstate->scratch);
-        glstate->scratch = malloc(alloc);
+        if (glstate->scratch) je_free(glstate->scratch);
+        glstate->scratch = je_malloc(alloc);
         glstate->scratch_alloc = alloc;
     }
 }

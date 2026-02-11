@@ -12,6 +12,7 @@
 #include "glsl/glsl_for_es.h"
 #include <ctype.h>
 #include <string.h>
+#include <jemalloc/jemalloc.h>
 
 // #define DEBUG
 #ifdef DEBUG
@@ -53,14 +54,14 @@ GLuint APIENTRY_GL4ES gl4es_glCreateShader(GLenum shaderType) {
     shader_t* glshader = NULL;
     if (k == kh_end(shaders)) {
         k = kh_put(shaderlist, shaders, shader, &ret);
-        glshader = kh_value(shaders, k) = (shader_t*)calloc(1, sizeof(shader_t));
+        glshader = kh_value(shaders, k) = (shader_t*)je_calloc(1, sizeof(shader_t));
     } else {
         glshader = kh_value(shaders, k);
     }
     glshader->id = shader;
     glshader->type = shaderType;
     if (glshader->source) {
-        free(glshader->source);
+        je_free(glshader->source);
         glshader->source = NULL;
     }
     glshader->need.need_texcoord = -1;
@@ -77,9 +78,9 @@ void actually_deleteshader(GLuint shader) {
         shader_t* glshader = kh_value(shaders, k);
         if (glshader->deleted && !glshader->attached) {
             kh_del(shaderlist, shaders, k);
-            if (glshader->source) free(glshader->source);
-            if (glshader->converted) free(glshader->converted);
-            free(glshader);
+            if (glshader->source) je_free(glshader->source);
+            if (glshader->converted) je_free(glshader->converted);
+            je_free(glshader);
         }
     }
 }
@@ -193,7 +194,7 @@ char* replace_version_line(const char* text) {
 
             if (strncmp(line_start + i, "#version", 8) == 0) {
                 size_t new_len = strlen(text) - len + replace_len;
-                char* new_text = malloc(new_len + 1);
+                char* new_text = je_malloc(new_len + 1);
                 if (!new_text) return NULL;
 
                 memcpy(new_text, text, line_start - text);
@@ -246,7 +247,7 @@ char* replace_version_line_460(const char* text) {
 
                 size_t suffix_len = strlen(suffix_start);
                 size_t new_total = prefix_len + new_version_len + suffix_len;
-                char* out = (char*)malloc(new_total + 1);
+                char* out = (char*)je_malloc(new_total + 1);
                 if (!out) return NULL;
 
                 memcpy(out, text, prefix_len);
@@ -351,7 +352,7 @@ char* replace_glFragColor(const char* src) {
     }
 
     size_t new_len = strlen(src) + count * (replacement_len - target_len) + 1;
-    char* result = (char*)malloc(new_len);
+    char* result = (char*)je_malloc(new_len);
     if (!result) return NULL;
 
     const char* src_p = src;
@@ -397,7 +398,7 @@ char* insert_gl_FragColor_if_missing(const char* shader) {
     }
 
     size_t new_len = strlen(shader) + strlen(insert_line) + 1;
-    char* new_shader = (char*)malloc(new_len);
+    char* new_shader = (char*)je_malloc(new_len);
     if (!new_shader) return NULL;
 
     size_t head_len = insert_pos - shader;
@@ -447,7 +448,7 @@ char* replace_fragdata0(const char* source) {
     }
 
     size_t new_len = strlen(source) + count * (replacement_len - target_len);
-    char* result = (char*)malloc(new_len + 1);
+    char* result = (char*)je_malloc(new_len + 1);
     if (!result) return NULL;
 
     const char* src = source;
@@ -472,7 +473,7 @@ char* mark_glsl_builtin_converted(const char* source) {
     size_t srcLen = strlen(source);
     size_t markLen = strlen(GLSL_CONVERTED_MARK);
 
-    char* result = (char*)malloc(srcLen + markLen + 2);
+    char* result = (char*)je_malloc(srcLen + markLen + 2);
     if (!result) return NULL;
 
     memcpy(result, source, srcLen);
@@ -533,13 +534,13 @@ static char* replace_all(const char* src, const char* old, const char* repl) {
         p += old_len;
     }
     if (count == 0) {
-        char* out = (char*)malloc(src_len + 1);
+        char* out = (char*)je_malloc(src_len + 1);
         if (out) memcpy(out, src, src_len + 1);
         return out;
     }
 
     size_t new_len = src_len + count * (repl_len - old_len);
-    char* out = (char*)malloc(new_len + 1);
+    char* out = (char*)je_malloc(new_len + 1);
     if (!out) return NULL;
 
     const char* cur = src;
@@ -563,7 +564,7 @@ static char* insert_after_first(const char* src, const char* anchor, const char*
     if (!src || !anchor || !insert_str) return NULL;
     const char* p = strstr(src, anchor);
     if (!p) {
-        char* out = (char*)malloc(strlen(src) + 1);
+        char* out = (char*)je_malloc(strlen(src) + 1);
         if (out) memcpy(out, src, strlen(src) + 1);
         return out;
     }
@@ -571,7 +572,7 @@ static char* insert_after_first(const char* src, const char* anchor, const char*
     size_t insert_len = strlen(insert_str);
     size_t src_len = strlen(src);
     size_t new_len = src_len + insert_len;
-    char* out = (char*)malloc(new_len + 1);
+    char* out = (char*)je_malloc(new_len + 1);
     if (!out) return NULL;
 
     memcpy(out, src, prefix_len);
@@ -597,16 +598,16 @@ char* bsl_patch(const char* glsl) {
     char* s = replace_all(glsl, old1, new1);
     if (!s) return NULL;
     char* s2 = replace_all(s, old2, new2);
-    free(s);
+    je_free(s);
     if (!s2) return NULL;
     char* s3 = replace_all(s2, old3, new3);
-    free(s2);
+    je_free(s2);
     if (!s3) return NULL;
     char* s4 = replace_all(s3, old4, new4);
-    free(s3);
+    je_free(s3);
     if (!s4) return NULL;
     char* s5 = replace_all(s4, old5, new5);
-    free(s4);
+    je_free(s4);
     if (!s5) return NULL;
 
     const char* trigger = "highp float quality[";
@@ -616,12 +617,12 @@ char* bsl_patch(const char* glsl) {
         const char* anchor0 = "layout(location = 0) out highp vec4 vgpu_FragData0;";
         const char* line0 = "\nlayout(location = 1) out highp vec4 vgpu_FragData1;";
         char* t = insert_after_first(cur, anchor0, line0);
-        free(cur);
+        je_free(cur);
         cur = t ? t : strdup("");
         const char* anchor1 = "vgpu_FragData0 = vec4(color, 1.0);";
         const char* line1 = "\nvgpu_FragData1 = vec4(color,1.0);";
         t = insert_after_first(cur, anchor1, line1);
-        free(cur);
+        je_free(cur);
         cur = t ? t : strdup("");
     }
     return cur;
@@ -640,8 +641,8 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
     int l = 0;
     for (int i = 0; i < count; i++)
         l += (length && length[i] >= 0) ? length[i] : strlen(string[i]);
-    if (glshader->source) free(glshader->source);
-    glshader->source = malloc(l + 1);
+    if (glshader->source) je_free(glshader->source);
+    glshader->source = je_malloc(l + 1);
     memset(glshader->source, 0, l + 1);
     if (length) {
         for (int i = 0; i < count; i++) {
@@ -679,7 +680,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                     char* convertedSource =
                         ConvertShaderBuiltInVariableOnly(glshader->source, glshader->type == GL_VERTEX_SHADER ? 1 : 0,
                                                          &glshader->need, isBuiltInVariableConverted ? 0 : 1);
-                    free(glshader->source);
+                    je_free(glshader->source);
                     if (glshader->type == GL_FRAGMENT_SHADER) {
                         if (contains_glFragColor(glshader->source)) {
                             convertedSource = replace_glFragColor(convertedSource);
@@ -695,7 +696,7 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                     int returnCode = 0; // TODO: handle returnCode
                     char* result = GLSLtoGLSLES_c(convertedSource, glshader->type, globals4es.esversion, glsl_version,
                                                   &returnCode);
-                    free(convertedSource);
+                    je_free(convertedSource);
                     glshader->converted =
                         strdup(result != NULL ? process_uniform_declarations(result, glshader->uniforms_declarations,
                                                                              &glshader->uniforms_declarations_count)
@@ -771,7 +772,7 @@ void redoShader(GLuint shader, shaderconv_need_t* need) {
     if (!glshader->converted) return;
     // test, if no changes, no need to reconvert & recompile...
     if (memcmp(&glshader->need, need, sizeof(shaderconv_need_t)) == 0) return;
-    free(glshader->converted);
+    je_free(glshader->converted);
     memcpy(&glshader->need, need, sizeof(shaderconv_need_t));
     if (is_direct_shader(glshader->source))
         glshader->converted = strdup(glshader->source);

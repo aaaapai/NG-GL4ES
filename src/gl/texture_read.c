@@ -16,6 +16,8 @@
 #include "pixel.h"
 #include "raster.h"
 
+#include <jemalloc/jemalloc.h>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -194,14 +196,14 @@ void APIENTRY_GL4ES gl4es_glCopyTexSubImage2D(GLenum target, GLint level, GLint 
         if ((bound->width == width) && (bound->height == height) && (xoffset == yoffset == 0)) {
             gl4es_glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buff);
         } else {
-            void* tmp = malloc(width*height*2);
+            void* tmp = je_malloc(width*height*2);
             gl4es_glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, tmp);
             for (int y=0; y<height; y++) {
     SHUT_LOGD("will memcpy!!!");
     SHUT_LOGD("will memcpy!!!!");
                 memcpy(buff+((yoffset+y)*bound->width+xoffset)*2, tmp+y*width*2, width*2);
             }
-            free(tmp);
+            je_free(tmp);
         }
     } else 
 #endif
@@ -297,7 +299,7 @@ void APIENTRY_GL4ES gl4es_glReadPixels(GLint x, GLint y, GLsizei width, GLsizei 
 
     int use_bgra = (glstate->readf == GL_BGRA && glstate->readt == GL_UNSIGNED_BYTE) ? 1 : 0;
 
-    GLvoid *pixels = malloc(width * height * 4);
+    GLvoid *pixels = je_malloc(width * height * 4);
     if (!pixels) {
         LOGE("Memory allocation failed for temporary pixel buffer\n");
         readfboEnd();
@@ -312,7 +314,7 @@ void APIENTRY_GL4ES gl4es_glReadPixels(GLint x, GLint y, GLsizei width, GLsizei 
              PrintEnum(use_bgra ? GL_BGRA : GL_RGBA), PrintEnum(format), PrintEnum(type));
     }
 
-    free(pixels);
+    je_free(pixels);
     readfboEnd();
 }
 
@@ -331,18 +333,18 @@ void APIENTRY_GL4ES gl4es_glGetTexImage(GLenum target, GLint level, GLenum forma
     int shrink = bound->shrink;
     if (level != 0) {
         //printf("STUBBED glGetTexImage with level=%i\n", level);
-        void* tmp = malloc(width*height*pixel_sizeof(format, type)); // tmp space...
+        void* tmp = je_malloc(width*height*pixel_sizeof(format, type)); // tmp space...
         void* tmp2;
         gl4es_glGetTexImage(map_tex_target(target), 0, format, type, tmp);
         for (int i=0; i<level; i++) {
             pixel_halfscale(tmp, &tmp2, width, height, format, type);
-            free(tmp);
+            je_free(tmp);
             tmp = tmp2;
             width = nlevel(width, 1);
             height = nlevel(height, 1);
         }
         memcpy(img, tmp, width*height*pixel_sizeof(format, type));
-        free(tmp);
+        je_free(tmp);
         return;
     }
     

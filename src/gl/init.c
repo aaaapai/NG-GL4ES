@@ -26,6 +26,8 @@
 #include "envvars.h"
 #include "config.h"
 
+#include <jemalloc/jemalloc.h>
+
 #if defined(__EMSCRIPTEN__)
 #define NO_INIT_CONSTRUCTOR
 #endif
@@ -112,7 +114,7 @@ __attribute__((constructor(101)))
 void initialize_gl4es() {
     NGGDirectory = (char*)GetEnvVar("NGG_DIR_PATH");
     if (!NGGDirectory || strlen(NGGDirectory) == 0) {
-        NGGDirectory = malloc(strlen(DEFAULT_NGG_DIRECTORY_PATH) + 1);
+        NGGDirectory = je_malloc(strlen(DEFAULT_NGG_DIRECTORY_PATH) + 1);
         strcpy(NGGDirectory, DEFAULT_NGG_DIRECTORY_PATH);
     }
 

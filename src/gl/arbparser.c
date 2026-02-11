@@ -6,6 +6,8 @@
 // MAX_TEX
 #include "../config.h"
 
+#include <jemalloc/jemalloc.h>
+
 // ARBCONV_DBG_RE - resolve* error ArbConverter debug logs
 #ifdef DEBUG
 #define ARBCONV_DBG_RE(...) SHUT_LOGD(__VA_ARGS__);
@@ -252,7 +254,7 @@ void copyToken(const sCurStatus* curStatus, char* dest) {
 }
 char *getToken(const sCurStatus* curStatus) {
 	// Allocate (exactly enough) space
-	char *tok = (char*)malloc((getTokenLength(curStatus) + 1) * sizeof(char));
+	char *tok = (char*)je_malloc((getTokenLength(curStatus) + 1) * sizeof(char));
 	
 	// Copy token
 	copyToken(curStatus, tok);
@@ -268,23 +270,23 @@ int resolveAttrib(sCurStatus_NewVar *newVar, int vertex) {
 		ARBCONV_DBG_RE("Failed to get attrib: (tok NULL)\n")
 		return 1;
 	} else if (vertex && !strcmp(tok, "vertex")) {
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		if (!tok) {
 			ARBCONV_DBG_RE("Failed to get attrib: vertex(tok NULL)\n")
 			return 1;
 		} else if (!strcmp(tok, "position")) {
 			// vertex.position => gl_Vertex
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("gl_Vertex"));
 			newVar->var->init.strings_total_len = 9;
 		} else if (!strcmp(tok, "normal")) {
 			// vertex.normal => vec4(gl_Normal, 1.)
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("vec4(gl_Normal, 1.)"));
 			newVar->var->init.strings_total_len = 19;
 		} else if (!strcmp(tok, "color")) {
-			free(tok);
+			je_free(tok);
 			
 			if (IS_NONE_OR_SWIZZLE) {
 				// vertex.color => gl_Color
@@ -296,42 +298,42 @@ int resolveAttrib(sCurStatus_NewVar *newVar, int vertex) {
 			tok = popFIFO((sArray*)newVar);
 			if (!strcmp(tok, "primary")) {
 				// vertex.color.primary => gl_Color
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_Color"));
 				newVar->var->init.strings_total_len = 8;
 			} else if (!strcmp(tok, "secondary")) {
 				// vertex.color.secondary => gl_SecondaryColor
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_SecondaryColor"));
 				newVar->var->init.strings_total_len = 17;
 			} else {
 				ARBCONV_DBG_RE("Failed to get attrib: vertex.color.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return 1;
 			}
 		} else if (!strcmp(tok, "fogcoord")) {
 			// vertex.fogcoord => gl_FogCoord
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("gl_FogCoord"));
 			newVar->var->init.strings_total_len = 11;
 		} else if (!strcmp(tok, "texcoord")) {
-			free(tok);
+			je_free(tok);
 			if (!IS_NONE_OR_SWIZZLE) {
 				tok = popFIFO((sArray*)newVar);
 				if ((tok[0] == '[') && (newVar->strLen >= 2) && (newVar->strParts[1][0] == ']')
 				 && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9')) {
-					free(tok);
+					je_free(tok);
 					char *tex = popFIFO((sArray*)newVar);
-					free(popFIFO((sArray*)newVar));
+					je_free(popFIFO((sArray*)newVar));
 					size_t bufLen = 16 + strlen(tex);
-					char *buf = (char*)malloc((bufLen + 1) * sizeof(char));
+					char *buf = (char*)je_malloc((bufLen + 1) * sizeof(char));
 					sprintf(buf, "gl_MultiTexCoord%s", tex);
-					free(tex);
+					je_free(tex);
 					pushArray((sArray*)&newVar->var->init, buf);
 					newVar->var->init.strings_total_len = bufLen;
 				} else {
 					ARBCONV_DBG_RE("Failed to get attrib: vertex.texcoord.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return 1;
 				}
 			} else {
@@ -339,41 +341,41 @@ int resolveAttrib(sCurStatus_NewVar *newVar, int vertex) {
 				newVar->var->init.strings_total_len = 17;
 			}
 		} else if (!strcmp(tok, "attrib")) {
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get attrib: vertex.attrib(tok NULL)\n")
 				return 1;
 			} else if ((tok[0] == '[') && (newVar->strLen >= 2) && (newVar->strParts[1][0] == ']')
 			 && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9')) {
-				free(tok);
+				je_free(tok);
 				char *attr = popFIFO((sArray*)newVar);
-				free(popFIFO((sArray*)newVar));
+				je_free(popFIFO((sArray*)newVar));
 				size_t bufLen = 16 + strlen(attr);
-				char *buf = (char*)malloc((bufLen + 1) * sizeof(char));
+				char *buf = (char*)je_malloc((bufLen + 1) * sizeof(char));
 				sprintf(buf, "gl_VertexAttrib_%s", attr);
-				free(attr);
+				je_free(attr);
 				pushArray((sArray*)&newVar->var->init, buf);
 				newVar->var->init.strings_total_len = bufLen;
 			} else {
 				ARBCONV_DBG_RE("Failed to get attrib: vertex.attrib.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return 1;
 			}
 		} else {
 			ARBCONV_DBG_RE("Failed to get attrib: vertex.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return 1;
 		}
 	} else if (!vertex && !strcmp(tok, "fragment")) {
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		
 		if (!tok) {
 			ARBCONV_DBG_RE("Failed to get attrib: fragment(tok NULL)\n")
 			return 1;
 		} else if (!strcmp(tok, "color")) {
-			free(tok);
+			je_free(tok);
 			
 			if (IS_NONE_OR_SWIZZLE) {
 				// fragment.color => gl_Color
@@ -385,37 +387,37 @@ int resolveAttrib(sCurStatus_NewVar *newVar, int vertex) {
 			tok = popFIFO((sArray*)newVar);
 			if (!strcmp(tok, "primary")) {
 				// fragment.color.primary => gl_Color
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_Color"));
 				newVar->var->init.strings_total_len = 8;
 			} else if (!strcmp(tok, "secondary")) {
 				// fragment.color.secondary => gl_SecondaryColor
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_SecondaryColor"));
 				newVar->var->init.strings_total_len = 17;
 			} else {
 				ARBCONV_DBG_RE("Failed to get attrib: fragment.color.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return 1;
 			}
 		} else if (!strcmp(tok, "texcoord")) {
-			free(tok);
+			je_free(tok);
 			if (!IS_NONE_OR_SWIZZLE) {
 				tok = popFIFO((sArray*)newVar);
 				if ((tok[0] == '[') && (newVar->strLen >= 2) && (newVar->strParts[1][0] == ']')
 				 && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9')) {
-					free(tok);
+					je_free(tok);
 					char *tex = popFIFO((sArray*)newVar);
-					free(popFIFO((sArray*)newVar));
+					je_free(popFIFO((sArray*)newVar));
 					size_t bufLen = 13 + strlen(tex);
-					char *buf = (char*)malloc((bufLen + 1) * sizeof(char));
+					char *buf = (char*)je_malloc((bufLen + 1) * sizeof(char));
 					sprintf(buf, "gl_TexCoord[%s]", tex);
 					pushArray((sArray*)&newVar->var->init, buf);
-					free(tex);
+					je_free(tex);
 					newVar->var->init.strings_total_len = bufLen;
 				} else {
 					ARBCONV_DBG_RE("Failed to get attrib: fragment.texcoord.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return 1;
 				}
 			} else {
@@ -424,22 +426,22 @@ int resolveAttrib(sCurStatus_NewVar *newVar, int vertex) {
 			}
 		} else if (!strcmp(tok, "fogcoord")) {
 			// fragment.fogcoord => vec4(gl_FogFragCoord, 0., 0., 1.)
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("vec4(gl_FogFragCoord, 0., 0., 1.)"));
 			newVar->var->init.strings_total_len = 33;
 		} else if (!strcmp(tok, "position")) {
 			// fragment.position => gl_FragCoord
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("gl_FragCoord"));
 			newVar->var->init.strings_total_len = 12;
 		} else {
 			ARBCONV_DBG_RE("Failed to get attrib: fragment.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return 1;
 		}
 	} else {
 		ARBCONV_DBG_RE("Failed to get attrib: %s\n", tok)
-		free(tok);
+		je_free(tok);
 		return 1;
 	}
 	/* TODO: (* todo, V done, X unsupported)
@@ -473,7 +475,7 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 		ARBCONV_DBG_RE("Failed to get output: (tok NULL)\n")
 		return 1;
 	} else if (vertex && !strcmp(tok, "result")) {
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		
 		if (!tok) {
@@ -481,11 +483,11 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 			return 1;
 		} else if (!strcmp(tok, "position")) {
 			// result.position => gl_Position
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("gl_Position"));
 			newVar->var->init.strings_total_len = 11;
 		} else if (!strcmp(tok, "color")) {
-			free(tok);
+			je_free(tok);
 			
 			if (IS_NONE_OR_SWIZZLE) {
 				// result.color => gl_FrontColor
@@ -496,7 +498,7 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 			
 			tok = popFIFO((sArray*)newVar);
 			if (!strcmp(tok, "front")) {
-				free(tok);
+				je_free(tok);
 				
 				if (IS_NONE_OR_SWIZZLE) {
 					// result.color.front => gl_FrontColor
@@ -507,21 +509,21 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 				tok = popFIFO((sArray*)newVar);
 				if (!strcmp(tok, "primary")) {
 					// result.color.front.primary => gl_FrontColor
-					free(tok);
+					je_free(tok);
 					pushArray((sArray*)&newVar->var->init, strdup("gl_FrontColor"));
 					newVar->var->init.strings_total_len = 13;
 				} else if (!strcmp(tok, "secondary")) {
 					// result.color.front.secondary => gl_FrontSecondaryColor
-					free(tok);
+					je_free(tok);
 					pushArray((sArray*)&newVar->var->init, strdup("gl_FrontSecondaryColor"));
 					newVar->var->init.strings_total_len = 22;
 				} else {
 					ARBCONV_DBG_RE("Failed to get output: result.color.front.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return 1;
 				}
 			} else if (!strcmp(tok, "back")) {
-				free(tok);
+				je_free(tok);
 				
 				if (IS_NONE_OR_SWIZZLE) {
 					// result.color.back => gl_BackColor
@@ -532,64 +534,64 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 				tok = popFIFO((sArray*)newVar);
 				if (!strcmp(tok, "primary")) {
 					// result.color.back.primary => gl_BackColor
-					free(tok);
+					je_free(tok);
 					pushArray((sArray*)&newVar->var->init, strdup("gl_BackColor"));
 					newVar->var->init.strings_total_len = 12;
 				} else if (!strcmp(tok, "secondary")) {
 					// result.color.back.secondary => gl_BackSecondaryColor
-					free(tok);
+					je_free(tok);
 					pushArray((sArray*)&newVar->var->init, strdup("gl_BackSecondaryColor"));
 					newVar->var->init.strings_total_len = 21;
 				} else {
 					ARBCONV_DBG_RE("Failed to get output: result.color.back.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return 1;
 				}
 			} else if (!strcmp(tok, "primary")) {
 				// result.color.primary => gl_FrontColor
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_FrontColor"));
 				newVar->var->init.strings_total_len = 13;
 			} else if (!strcmp(tok, "secondary")) {
 				// result.color.secondary => gl_FrontSecondaryColor
-				free(tok);
+				je_free(tok);
 				pushArray((sArray*)&newVar->var->init, strdup("gl_FrontSecondaryColor"));
 				newVar->var->init.strings_total_len = 22;
 			} else {
 				ARBCONV_DBG_RE("Failed to get output: result.color.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return 1;
 			}
 		} else if (!strcmp(tok, "fogcoord")) {
 			// result.fogcoord => gl_FogFragCoord
-			free(tok);
+			je_free(tok);
 			specialCases->hasFogFragCoord = 1;
 			pushArray((sArray*)&newVar->var->init, strdup("gl4es_FogFragCoordTemp"));
 			newVar->var->init.strings_total_len = 22;
 		} else if (!strcmp(tok, "pointsize")) {
 			// result.pointsize => gl_Point.size
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("vec4(gl_Point.size, 0., 0., 0.)"));
 			newVar->var->init.strings_total_len = 31;
 		} else if (!strcmp(tok, "texcoord")) {
-			free(tok);
+			je_free(tok);
 			if (!IS_NONE_OR_SWIZZLE) {
 				tok = popFIFO((sArray*)newVar);
 				if ((tok[0] == '[')
 				 && (newVar->strLen >= 2) && (newVar->strParts[1][0] == ']')
 				 && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9')) {
-					free(tok);
+					je_free(tok);
 					char *tex = popFIFO((sArray*)newVar);
-					free(popFIFO((sArray*)newVar));
+					je_free(popFIFO((sArray*)newVar));
 					size_t bufLen = 13 + strlen(tex);
-					char *buf = (char*)malloc((bufLen + 1) * sizeof(char));
+					char *buf = (char*)je_malloc((bufLen + 1) * sizeof(char));
 					sprintf(buf, "gl_TexCoord[%s]", tex);
 					pushArray((sArray*)&newVar->var->init, buf);
-					free(tex);
+					je_free(tex);
 					newVar->var->init.strings_total_len = bufLen;
 				} else {
 					ARBCONV_DBG_RE("Failed to get output: result.texcoord.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return 1;
 				}
 			} else {
@@ -598,11 +600,11 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 			}
 		} else {
 			ARBCONV_DBG_RE("Failed to get output: result.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return 1;
 		}
 	} else if (!vertex && !strcmp(tok, "result")) {
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		
 		if (!tok) {
@@ -610,23 +612,23 @@ int resolveOutput(sCurStatus_NewVar *newVar, int vertex, struct sSpecialCases *s
 			return 1;
 		} else if (!strcmp(tok, "color")) {
 			// result.color => gl_FragColor
-			free(tok);
+			je_free(tok);
 			pushArray((sArray*)&newVar->var->init, strdup("gl_FragColor"));
 			newVar->var->init.strings_total_len = 12;
 		} else if (!strcmp(tok, "depth")) {
 			// result.depth => gl_FragDepth
-			free(tok);
+			je_free(tok);
 			specialCases->isDepthReplacing = 1;
 			pushArray((sArray*)&newVar->var->init, strdup("gl4es_FragDepthTemp"));
 			newVar->var->init.strings_total_len = 12;
 		} else {
 			ARBCONV_DBG_RE("Failed to get output: result.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return 1;
 		}
 	} else {
 		ARBCONV_DBG_RE("Failed to get output: %s\n", tok)
-		free(tok);
+		je_free(tok);
 		return 1;
 	}
 	/* TODO: (V done)
@@ -668,7 +670,7 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 		ARBCONV_DBG_RE("Failed to get param: (tok NULL)\n")
 		return NULL;
 	} else if (!strcmp(tok, "state")) {
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		
 		if (!tok) {
@@ -678,18 +680,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 			size_t propLen;
 			const char *prop;
 			
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get param: state.material(tok NULL)\n")
 				return NULL;
 			} else if (!strcmp(tok, "front")) {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				mtxNameLen = 16;
 				matrixName = "gl_FrontMaterial";
 			} else if (!strcmp(tok, "back")) {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				mtxNameLen = 15;
 				matrixName = "gl_BackMaterial";
@@ -702,45 +704,45 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 				ARBCONV_DBG_RE("Failed to get param: [%s].(tok NULL)\n", matrixName)
 				return NULL;
 			} else if (!strcmp(tok, "ambient")) {
-				free(tok);
+				je_free(tok);
 				propLen = 7;
 				prop = "ambient";
 			} else if (!strcmp(tok, "diffuse")) {
-				free(tok);
+				je_free(tok);
 				propLen = 7;
 				prop = "diffuse";
 			} else if (!strcmp(tok, "specular")) {
-				free(tok);
+				je_free(tok);
 				propLen = 8;
 				prop = "specular";
 			} else if (!strcmp(tok, "emission")) {
-				free(tok);
+				je_free(tok);
 				propLen = 8;
 				prop = "emission";
 			} else if (!strcmp(tok, "shininess")) {
-				free(tok);
-				matrixNameMallocd = (char*)malloc((mtxNameLen + 17) * sizeof(char));
+				je_free(tok);
+				matrixNameMallocd = (char*)je_malloc((mtxNameLen + 17) * sizeof(char));
 				sprintf(matrixNameMallocd, "vec4(%s.shininess)", matrixName);
-				char **r = (char**)calloc(2, sizeof(char*));
+				char **r = (char**)je_calloc(2, sizeof(char*));
 				r[0] = matrixNameMallocd;
 				r[1] = NULL;
 				return r;
 			} else {
 				ARBCONV_DBG_RE("Failed to get param: [%s].%s\n", matrixName, tok)
-				free(tok);
+				je_free(tok);
 				return NULL;
 			}
 			
-			matrixNameMallocd = (char*)malloc((mtxNameLen + propLen + 2) * sizeof(char));
+			matrixNameMallocd = (char*)je_malloc((mtxNameLen + propLen + 2) * sizeof(char));
 			sprintf(matrixNameMallocd, "%s.%s", matrixName, prop);
-			char **r = (char**)calloc(2, sizeof(char*));
+			char **r = (char**)je_calloc(2, sizeof(char*));
 			r[0] = matrixNameMallocd;
 			r[1] = NULL;
 			return r;
 		} else if (!strcmp(tok, "light")) {
-			free(tok);
+			je_free(tok);
 			if (newVar->strParts[0][0] == '[') {
-				free(popFIFO((sArray*)newVar));
+				je_free(popFIFO((sArray*)newVar));
 				char *sln = popFIFO((sArray*)newVar);
 				
 				if ((sln[0] >= '0') && (sln[0] <= '9')) {
@@ -748,43 +750,43 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						ARBCONV_DBG_RE("Failed to get param: state.light[%s(not ])\n", sln)
 						return NULL;
 					}
-					free(popFIFO((sArray*)newVar));
+					je_free(popFIFO((sArray*)newVar));
 					
 					tok = popFIFO((sArray*)newVar);
 					if (!tok) {
 						ARBCONV_DBG_RE("Failed to get param: state.light[%s](tok NULL)\n", sln)
 						return NULL;
 					} else if (!strcmp(tok, "ambient")) {
-						free(tok);
+						je_free(tok);
 						mtxNameLen = 7;
 						matrixName = "ambient";
 					} else if (!strcmp(tok, "diffuse")) {
-						free(tok);
+						je_free(tok);
 						mtxNameLen = 7;
 						matrixName = "diffuse";
 					} else if (!strcmp(tok, "specular")) {
-						free(tok);
+						je_free(tok);
 						mtxNameLen = 8;
 						matrixName = "specular";
 					} else if (!strcmp(tok, "position")) {
-						free(tok);
+						je_free(tok);
 						mtxNameLen = 8;
 						matrixName = "position";
 					} else if (!strcmp(tok, "attenuation")) {
-						free(tok);
-						matrixNameMallocd = (char*)malloc((4 * strlen(sln) + 149) * sizeof(char));
+						je_free(tok);
+						matrixNameMallocd = (char*)je_malloc((4 * strlen(sln) + 149) * sizeof(char));
 						sprintf(
 							matrixNameMallocd,
 							"vec4(gl_LightSource[%s].constantAttenuation, gl_LightSource[%s].linearAttenuation, "
 							"gl_LightSource[%s].quadraticAttenuation, gl_LightSource[%s].spotExponent)",
 							sln, sln, sln, sln
 						);
-						char **r = (char**)calloc(2, sizeof(char*));
+						char **r = (char**)je_calloc(2, sizeof(char*));
 						r[0] = matrixNameMallocd;
 						r[1] = NULL;
 						return r;
 					} else if (!strcmp(tok, "spot")) {
-						free(tok);
+						je_free(tok);
 						tok = popFIFO((sArray*)newVar);
 						if (!tok) {
 							ARBCONV_DBG_RE("Failed to get param: state.light[%s].spot(tok NULL)\n", sln)
@@ -794,29 +796,29 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 							matrixName = "spotDirection";
 						} else {
 							ARBCONV_DBG_RE("Failed to get param: state.light[%s].spot.%s\n", sln, tok)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
 					} else if (!strcmp(tok, "half")) {
-						free(tok);
+						je_free(tok);
 						mtxNameLen = 10;
 						matrixName = "halfVector";
 					} else {
 						ARBCONV_DBG_RE("Failed to get param: state.light[%s].%s\n", sln, tok)
-						free(tok);
+						je_free(tok);
 						return NULL;
 					}
 					
-					matrixNameMallocd = (char*)malloc((mtxNameLen + strlen(sln) + 8) * sizeof(char));
+					matrixNameMallocd = (char*)je_malloc((mtxNameLen + strlen(sln) + 8) * sizeof(char));
 					sprintf(matrixNameMallocd, "gl_LightSource[%s].%s", sln, matrixName);
-					free(sln);
-					char **r = (char**)calloc(2, sizeof(char*));
+					je_free(sln);
+					char **r = (char**)je_calloc(2, sizeof(char*));
 					r[0] = matrixNameMallocd;
 					r[1] = NULL;
 					return r;
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: state.light.%s\n", sln)
-					free(sln);
+					je_free(sln);
 					return NULL;
 				}
 			} else {
@@ -824,66 +826,66 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 				return NULL;
 			}
 		} else if (!strcmp(tok, "lightmodel")) {
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get param: state.lightmodel(tok NULL)\n")
 				return NULL;
 			} else if (!strcmp(tok, "ambient")) {
-				free(tok);
-				char **r = (char**)calloc(2, sizeof(char*));
+				je_free(tok);
+				char **r = (char**)je_calloc(2, sizeof(char*));
 				r[0] = strdup("gl_LightModel.ambient");
 				r[1] = NULL;
 				return r;
 			} else if (!strcmp(tok, "scenecolor")) {
-				free(tok);
-				char **r = (char**)calloc(2, sizeof(char*));
+				je_free(tok);
+				char **r = (char**)je_calloc(2, sizeof(char*));
 				r[0] = strdup("gl_FrontLightModelProduct.sceneColor");
 				r[1] = NULL;
 				return r;
 			} else if (!strcmp(tok, "front")) {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				if (!tok) {
 					ARBCONV_DBG_RE("Failed to get param: state.lightmodel.front(tok NULL)\n")
 					return NULL;
 				} else if (!strcmp(tok, "scenecolor")) {
-					free(tok);
-					char **r = (char**)calloc(2, sizeof(char*));
+					je_free(tok);
+					char **r = (char**)je_calloc(2, sizeof(char*));
 					r[0] = strdup("gl_FrontLightModelProduct.sceneColor");
 					r[1] = NULL;
 					return r;
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: state.lightmodel.front.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return NULL;
 				}
 			} else if (!strcmp(tok, "back")) {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				if (!tok) {
 					ARBCONV_DBG_RE("Failed to get param: state.lightmodel.back(tok NULL)\n")
 					return NULL;
 				} else if (!strcmp(tok, "scenecolor")) {
-					free(tok);
-					char **r = (char**)calloc(2, sizeof(char*));
+					je_free(tok);
+					char **r = (char**)je_calloc(2, sizeof(char*));
 					r[0] = strdup("gl_BackLightModelProduct.sceneColor");
 					r[1] = NULL;
 					return r;
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: state.lightmodel.back.%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return NULL;
 				}
 			} else {
 				ARBCONV_DBG_RE("Failed to get param: state.lightmodel.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return NULL;
 			}
 		} else if (!strcmp(tok, "lightprod")) {
-			free(tok);
+			je_free(tok);
 			if (newVar->strParts[0][0] == '[') {
-				free(popFIFO((sArray*)newVar));
+				je_free(popFIFO((sArray*)newVar));
 				char *sln = popFIFO((sArray*)newVar);
 				size_t slnLen = strlen(sln);
 				
@@ -896,18 +898,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						return NULL;
 					}
 					
-					free(popFIFO((sArray*)newVar));
+					je_free(popFIFO((sArray*)newVar));
 					tok = popFIFO((sArray*)newVar);
 					if (!tok) {
 						ARBCONV_DBG_RE("Failed to get param: state.material(tok NULL)\n")
 						return NULL;
 					} else if (!strcmp(tok, "front")) {
-						free(tok);
+						je_free(tok);
 						tok = popFIFO((sArray*)newVar);
 						mtxNameLen = 20;
 						matrixName = "gl_FrontLightProduct";
 					} else if (!strcmp(tok, "back")) {
-						free(tok);
+						je_free(tok);
 						tok = popFIFO((sArray*)newVar);
 						mtxNameLen = 19;
 						matrixName = "gl_BackLightProduct";
@@ -920,33 +922,33 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						ARBCONV_DBG_RE("Failed to get param: [%s][%s](tok NULL)\n", matrixName, sln)
 						return NULL;
 					} else if (!strcmp(tok, "ambient")) {
-						free(tok);
+						je_free(tok);
 						propLen = 7;
 						prop = "ambient";
 					} else if (!strcmp(tok, "diffuse")) {
-						free(tok);
+						je_free(tok);
 						propLen = 7;
 						prop = "diffuse";
 					} else if (!strcmp(tok, "specular")) {
-						free(tok);
+						je_free(tok);
 						propLen = 8;
 						prop = "specular";
 					} else {
 						ARBCONV_DBG_RE("Failed to get param: [%s][%s].%s\n", matrixName, sln, tok)
-						free(tok);
+						je_free(tok);
 						return NULL;
 					}
 					
-					matrixNameMallocd = (char*)malloc((mtxNameLen + slnLen + propLen + 4) * sizeof(char));
+					matrixNameMallocd = (char*)je_malloc((mtxNameLen + slnLen + propLen + 4) * sizeof(char));
 					sprintf(matrixNameMallocd, "%s[%s].%s", matrixName, sln, prop);
-					free(sln);
-					char **r = (char**)calloc(2, sizeof(char*));;
+					je_free(sln);
+					char **r = (char**)je_calloc(2, sizeof(char*));;
 					r[0] = matrixNameMallocd;
 					r[1] = NULL;
 					return r;
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: state.lightprod.%s\n", sln)
-					free(sln);
+					je_free(sln);
 					return NULL;
 				}
 			} else {
@@ -956,38 +958,38 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 		} else if (!strcmp(tok, "matrix")) {
 			isMatrix = 1;
 			
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get param: state.matrix(tok NULL)\n")
 				return NULL;
 			} else if (!strcmp(tok, "modelview")) {
-				free(tok);
+				je_free(tok);
 				if (newVar->strLen && !IS_NEW_STR_OR_SWIZZLE(newVar->strParts[0], type)) {
 					int mvmtx = 0;
 					int mvmtxsz = 0;
 					if (newVar->strParts[0][0] == '[') {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						tok = popFIFO((sArray*)newVar);
 						for (char *numPtr = tok; *numPtr; ++numPtr) {
 							if ((*numPtr < '0') || (*numPtr > '9')) {
 								ARBCONV_DBG_RE("Failed to get param: state.modelview[(NaN)\n")
-								free(tok);
+								je_free(tok);
 								return NULL;
 							}
 							++mvmtxsz;
 							mvmtx = mvmtx * 10 + *numPtr - '0';
 						}
-						free(tok);
+						je_free(tok);
 						
 						tok = popFIFO((sArray*)newVar);
 						if (tok[0] != ']') {
 							ARBCONV_DBG_RE("Failed to get param: state.modelview[%d(not ])\n", mvmtx)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
-						free(tok);
+						je_free(tok);
 						
 						if (mvmtx != 0) {
 							ARBCONV_DBG_RE("Failed to get param: state.modelview[%d (!=0)]\n", mvmtx)
@@ -999,15 +1001,15 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						matrixName = "gl_ModelViewMatrixTranspose";
 						mtxNameLen = 27;
 					} else if (!strcmp(newVar->strParts[0], "invtrans")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewMatrixInverse";
 						mtxNameLen = 25;
 					} else if (!strcmp(newVar->strParts[0], "inverse")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewMatrixInverseTranspose";
 						mtxNameLen = 34;
 					} else if (!strcmp(newVar->strParts[0], "transpose")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewMatrix";
 						mtxNameLen = 18;
 					} else {
@@ -1021,28 +1023,28 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						 && ((newVar->strLen && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9'))
 						     || ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '[')
 						         && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')))) {
-							free(tok);
+							je_free(tok);
 							int freeLast = 0;
 							if (newVar->strParts[0][0] == '[') {
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 								freeLast = 1;
 							}
 							tok = popFIFO((sArray*)newVar);
 							for (char *numPtr = tok; *numPtr; ++numPtr) {
 								start = start * 10 + *numPtr - '0';
 							}
-							free(tok);
+							je_free(tok);
 							
 							if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.')
 							 && (newVar->strParts[0][1] == '.')
 							 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 								end = 0;
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 								tok = popFIFO((sArray*)newVar);
 								for (char *numPtr = tok; *numPtr; ++numPtr) {
 									end = end * 10 + *numPtr - '0';
 								}
-								free(tok);
+								je_free(tok);
 							} else {
 								end = start;
 							}
@@ -1052,18 +1054,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 									ARBCONV_DBG_RE("Failed to get param: [%s].row[%d..%d(not ])\n", matrixName, start, end)
 									return NULL;
 								}
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 							}
 						} else {
 							ARBCONV_DBG_RE("Failed to get param: [%s].%s\n", matrixName, tok)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
 					}
 					
 					/* if (mvmtxsz && mvmtx) {
 						mtxNameLen += 2 + mvmtxsz;
-						matrixNameMallocd = malloc((mtxNameLen + 1) * sizeof(char));
+						matrixNameMallocd = je_malloc((mtxNameLen + 1) * sizeof(char));
 						sprintf(matrixNameMallocd, "%s", matrixName);
 					} */
 				} else {
@@ -1071,18 +1073,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 					mtxNameLen = 27;
 				}
 			} else if (!strcmp(tok, "projection")) {
-				free(tok);
+				je_free(tok);
 				if (newVar->strLen && !IS_NEW_STR_OR_SWIZZLE(newVar->strParts[0], type)) {
 					if (!strcmp(newVar->strParts[0], "invtrans")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ProjectionMatrixInverse";
 						mtxNameLen = 35;
 					} else if (!strcmp(newVar->strParts[0], "inverse")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ProjectionMatrixInverseTranspose";
 						mtxNameLen = 44;
 					} else if (!strcmp(newVar->strParts[0], "transpose")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ProjectionMatrix";
 						mtxNameLen = 28;
 					} else {
@@ -1095,24 +1097,24 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						if (!strcmp(tok, "row")
 						 && (newVar->strLen >= 3) && (newVar->strParts[0][0] == '[')
 						 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
-							free(tok);
-							free(popFIFO((sArray*)newVar));
+							je_free(tok);
+							je_free(popFIFO((sArray*)newVar));
 							tok = popFIFO((sArray*)newVar);
 							for (char *numPtr = tok; *numPtr; ++numPtr) {
 								start = start * 10 + *numPtr - '0';
 							}
-							free(tok);
+							je_free(tok);
 							
 							if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.')
 							 && (newVar->strParts[0][1] == '.')
 							 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 								end = 0;
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 								tok = popFIFO((sArray*)newVar);
 								for (char *numPtr = tok; *numPtr; ++numPtr) {
 									end = end * 10 + *numPtr - '0';
 								}
-								free(tok);
+								je_free(tok);
 							} else {
 								end = start;
 							}
@@ -1120,13 +1122,13 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 							tok = popFIFO((sArray*)newVar);
 							if (tok[0] != ']') {
 								ARBCONV_DBG_RE("Failed to get param: [%s].row[%d..%d(not ])\n", matrixName, start, end)
-								free(tok);
+								je_free(tok);
 								return NULL;
 							}
-							free(tok);
+							je_free(tok);
 						} else {
 							ARBCONV_DBG_RE("Failed to get param: [%s].%s\n", matrixName, tok)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
 					}
@@ -1135,18 +1137,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 					mtxNameLen = 37;
 				}
 			} else if (!strcmp(tok, "mvp")) {
-				free(tok);
+				je_free(tok);
 				if (newVar->strLen && !IS_NEW_STR_OR_SWIZZLE(newVar->strParts[0], type)) {
 					if (!strcmp(newVar->strParts[0], "invtrans")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewProjectionMatrixInverse";
 						mtxNameLen = 35;
 					} else if (!strcmp(newVar->strParts[0], "inverse")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewProjectionMatrixInverseTranspose";
 						mtxNameLen = 44;
 					} else if (!strcmp(newVar->strParts[0], "transpose")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_ModelViewProjectionMatrix";
 						mtxNameLen = 28;
 					} else {
@@ -1159,24 +1161,24 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						if (!strcmp(tok, "row")
 						 && (newVar->strLen >= 3) && (newVar->strParts[0][0] == '[')
 						 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
-							free(tok);
-							free(popFIFO((sArray*)newVar));
+							je_free(tok);
+							je_free(popFIFO((sArray*)newVar));
 							tok = popFIFO((sArray*)newVar);
 							for (char *numPtr = tok; *numPtr; ++numPtr) {
 								start = start * 10 + *numPtr - '0';
 							}
-							free(tok);
+							je_free(tok);
 							
 							if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.')
 							 && (newVar->strParts[0][1] == '.')
 							 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 								end = 0;
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 								tok = popFIFO((sArray*)newVar);
 								for (char *numPtr = tok; *numPtr; ++numPtr) {
 									end = end * 10 + *numPtr - '0';
 								}
-								free(tok);
+								je_free(tok);
 							} else {
 								end = start;
 							}
@@ -1184,13 +1186,13 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 							tok = popFIFO((sArray*)newVar);
 							if (tok[0] != ']') {
 								ARBCONV_DBG_RE("Failed to get param: [%s].row[%d..%d(not ])\n", matrixName, start, end)
-								free(tok);
+								je_free(tok);
 								return NULL;
 							}
-							free(tok);
+							je_free(tok);
 						} else {
 							ARBCONV_DBG_RE("Failed to get param: [%s].%s\n", matrixName, tok)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
 					}
@@ -1199,46 +1201,46 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 					mtxNameLen = 37;
 				}
 			} else if (!strcmp(tok, "texture")) {
-				free(tok);
+				je_free(tok);
 				if (newVar->strLen && !IS_NEW_STR_OR_SWIZZLE(newVar->strParts[0], type)) {
 					int mvmtx = 0;
 					int mvmtxsz = 0;
 					if (newVar->strParts[0][0] == '[') {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						tok = popFIFO((sArray*)newVar);
 						for (char *numPtr = tok; *numPtr; ++numPtr) {
 							if ((*numPtr < '0') || (*numPtr > '9')) {
 								ARBCONV_DBG_RE("Failed to get param: state.texture[(NaN)\n")
-								free(tok);
+								je_free(tok);
 								return NULL;
 							}
 							++mvmtxsz;
 							mvmtx = mvmtx * 10 + *numPtr - '0';
 						}
-						free(tok);
+						je_free(tok);
 						
 						tok = popFIFO((sArray*)newVar);
 						if (tok[0] != ']') {
 							ARBCONV_DBG_RE("Failed to get param: state.texture[%d(not ])\n", mvmtx)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
-						free(tok);
+						je_free(tok);
 					}
 					
 					if (!newVar->strLen || IS_NEW_STR_OR_SWIZZLE(newVar->strParts[0], type)) {
 						matrixName = "gl_TextureMatrixTranspose";
 						mtxNameLen = 25;
 					} else if (!strcmp(newVar->strParts[0], "invtrans")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_TextureMatrixInverse";
 						mtxNameLen = 23;
 					} else if (!strcmp(newVar->strParts[0], "inverse")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_TextureMatrixInverseTranspose";
 						mtxNameLen = 32;
 					} else if (!strcmp(newVar->strParts[0], "transpose")) {
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						matrixName = "gl_TextureMatrix";
 						mtxNameLen = 16;
 					} else {
@@ -1250,35 +1252,35 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 						tok = popFIFO((sArray*)newVar);
 						if (!strcmp(tok, "row")
 						 && newVar->strLen && (newVar->strParts[0][0] >= '0') && (newVar->strParts[0][0] <= '9')) {
-							free(tok);
+							je_free(tok);
 							tok = popFIFO((sArray*)newVar);
 							for (char *numPtr = tok; *numPtr; ++numPtr) {
 								start = start * 10 + *numPtr - '0';
 							}
-							free(tok);
+							je_free(tok);
 							
 							if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.')
 							 && (newVar->strParts[0][1] == '.')
 							 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 								end = 0;
-								free(popFIFO((sArray*)newVar));
+								je_free(popFIFO((sArray*)newVar));
 								tok = popFIFO((sArray*)newVar);
 								for (char *numPtr = tok; *numPtr; ++numPtr) {
 									end = end * 10 + *numPtr - '0';
 								}
-								free(tok);
+								je_free(tok);
 							} else {
 								end = start;
 							}
 						} else {
 							ARBCONV_DBG_RE("Failed to get param: [%s].%s\n", matrixName, tok)
-							free(tok);
+							je_free(tok);
 							return NULL;
 						}
 					}
 					
 					mtxNameLen += 2 + (mvmtxsz ? mvmtxsz : 1);
-					matrixNameMallocd = malloc((mtxNameLen + 1) * sizeof(char));
+					matrixNameMallocd = je_malloc((mtxNameLen + 1) * sizeof(char));
 					sprintf(matrixNameMallocd, "%s[%d]", matrixName, mvmtx);
 				} else {
 					matrixName = "gl_TextureMatrixTranspose";
@@ -1286,17 +1288,17 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 				}
 			} else {
 				ARBCONV_DBG_RE("Failed to get param: state.matrix.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return NULL;
 			}
 		} else {
 			ARBCONV_DBG_RE("Failed to get param: state.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return NULL;
 		}
 	} else if (!strcmp(tok, "program")) {
 		refuseEndGE4 = 0;
-		free(tok);
+		je_free(tok);
 		tok = popFIFO((sArray*)newVar);
 		
 		if (!tok) {
@@ -1307,30 +1309,30 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 			mtxNameLen = 13;
 			isMatrix = 1;
 			
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get param: program.env(tok NULL)\n")
 				return NULL;
 			} else if (tok[0] == '[') {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				if ((tok[0] >= '0') && (tok[0] <= '9')) {
 					for (char *numPtr = tok; *numPtr; ++numPtr) {
 						start = start * 10 + *numPtr - '0';
 					}
-					free(tok);
+					je_free(tok);
 					
 					if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.') && (newVar->strParts[0][1] == '.')
 					 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 						end = 0;
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						tok = popFIFO((sArray*)newVar);
 						for (char *numPtr = tok; *numPtr; ++numPtr) {
 							end = end * 10 + *numPtr - '0';
 						}
-						free(tok);
+						je_free(tok);
 					} else {
 						end = start;
 					}
@@ -1338,18 +1340,18 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 					tok = popFIFO((sArray*)newVar);
 					if (tok[0] != ']') {
 						ARBCONV_DBG_RE("Failed to get param: program.env[%d..%d(not ])\n", start, end)
-						free(tok);
+						je_free(tok);
 						return NULL;
 					}
-					free(tok);
+					je_free(tok);
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: program.env[%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return NULL;
 				}
 			} else {
 				ARBCONV_DBG_RE("Failed to get param: program.env.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return NULL;
 			}
 		} else if (!strcmp(tok, "local")) {
@@ -1357,30 +1359,30 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 			mtxNameLen = 15;
 			isMatrix = 1;
 			
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			
 			if (!tok) {
 				ARBCONV_DBG_RE("Failed to get param: program.local(tok NULL)\n")
 				return NULL;
 			} else if (tok[0] == '[') {
-				free(tok);
+				je_free(tok);
 				tok = popFIFO((sArray*)newVar);
 				if ((tok[0] >= '0') && (tok[0] <= '9')) {
 					for (char *numPtr = tok; *numPtr; ++numPtr) {
 						start = start * 10 + *numPtr - '0';
 					}
-					free(tok);
+					je_free(tok);
 					
 					if ((newVar->strLen >= 3) && (newVar->strParts[0][0] == '.') && (newVar->strParts[0][1] == '.')
 					 && (newVar->strParts[1][0] >= '0') && (newVar->strParts[1][0] <= '9')) {
 						end = 0;
-						free(popFIFO((sArray*)newVar));
+						je_free(popFIFO((sArray*)newVar));
 						tok = popFIFO((sArray*)newVar);
 						for (char *numPtr = tok; *numPtr; ++numPtr) {
 							end = end * 10 + *numPtr - '0';
 						}
-						free(tok);
+						je_free(tok);
 					} else {
 						end = start;
 					}
@@ -1388,23 +1390,23 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 					tok = popFIFO((sArray*)newVar);
 					if (tok[0] != ']') {
 						ARBCONV_DBG_RE("Failed to get param: program.local[%d..%d(not ])\n", start, end)
-						free(tok);
+						je_free(tok);
 						return NULL;
 					}
-					free(tok);
+					je_free(tok);
 				} else {
 					ARBCONV_DBG_RE("Failed to get param: program.local[%s\n", tok)
-					free(tok);
+					je_free(tok);
 					return NULL;
 				}
 			} else {
 				ARBCONV_DBG_RE("Failed to get param: program.local.%s\n", tok)
-				free(tok);
+				je_free(tok);
 				return NULL;
 			}
 		} else {
 			ARBCONV_DBG_RE("Failed to get param: program.%s\n", tok)
-			free(tok);
+			je_free(tok);
 			return NULL;
 		}
 	} else if (tok[0] == '{') {
@@ -1413,7 +1415,7 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 		sCurStatus pseudoSt;
 		pseudoSt.curValue.newVar.state = 0;
 		pseudoSt.status = ST_VARIABLE_INIT;
-		pseudoSt.outputString = malloc(DEFAULT_STRING_MALLOC_SIZE);
+		pseudoSt.outputString = je_malloc(DEFAULT_STRING_MALLOC_SIZE);
 		pseudoSt.outputString[0] = 'v';
 		pseudoSt.outputString[1] = 'e';
 		pseudoSt.outputString[2] = 'c';
@@ -1426,7 +1428,7 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 		pseudoSt.outLeft = DEFAULT_STRING_CAP - 6;
 		
 		do {
-			free(tok);
+			je_free(tok);
 			tok = popFIFO((sArray*)newVar);
 			pseudoSt.endOfToken = tok; // Yes, this is weird...
 			readNextToken(&pseudoSt);
@@ -1493,29 +1495,29 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 				continue;
 			}
 		} while (tok && (pseudoSt.status != ST_ERROR) && (pseudoSt.curToken != TOK_RBRACE));
-		free(tok);
+		je_free(tok);
 		if (pseudoSt.status == ST_ERROR) {
 			ARBCONV_DBG_RE("Failed to get param: %s tok (%s))\n", TOKEN2STR(pseudoSt.curToken), pseudoSt.outputString)
-			free(pseudoSt.outputString);
+			je_free(pseudoSt.outputString);
 			return NULL;
 		}
 		
 		if (((((valuesCnt != 1) && (valuesCnt != 4))) || appendString(&pseudoSt, ")", 1))
 		  && ( (valuesCnt != 2)                       || appendString(&pseudoSt, ", 0., 0.)", 9))
 		  && ( (valuesCnt != 3)                       || appendString(&pseudoSt, ", 0.)", 5))) {
-			free(pseudoSt.outputString);
+			je_free(pseudoSt.outputString);
 			ARBCONV_DBG_RE("Failed to get param: not enough memory?\n")
 			return NULL;
 		}
 		
-		char **r = (char**)calloc(2, sizeof(char*));
+		char **r = (char**)je_calloc(2, sizeof(char*));
 		r[0] = pseudoSt.outputString;
 		r[1] = NULL;
 		return r;
 	} else if ((tok[0] >= '0') && (tok[0] <= '9')) {
 		// Scalar
-		char **r = (char**)calloc(2, sizeof(char*));
-		r[0] = (char*)calloc(13 + 4*strlen(tok), sizeof(char));
+		char **r = (char**)je_calloc(2, sizeof(char*));
+		r[0] = (char*)je_calloc(13 + 4*strlen(tok), sizeof(char));
 		r[1] = NULL;
 		
 		sprintf(r[0], "vec4(%s, %s, %s, %s)", tok, tok, tok, tok);
@@ -1523,7 +1525,7 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 		return r;
 	} else {
 		ARBCONV_DBG_RE("Failed to get param: %s\n", tok)
-		free(tok);
+		je_free(tok);
 		return NULL;
 	}
 	/* TODO: (* todo, V done, ! todo but only in vertex/fragment shaders, ? todo?)
@@ -2260,14 +2262,14 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 	if (isMatrix) {
 		if ((start > end) || ((end > 3) && refuseEndGE4)) {
 			ARBCONV_DBG_RE("Failed to get param: [%s] (se)\n", matrixNameMallocd?matrixNameMallocd:matrixName)
-			if (matrixNameMallocd) free(matrixNameMallocd);
+			if (matrixNameMallocd) je_free(matrixNameMallocd);
 			return NULL;
 		}
 		
 		if (((type == 0) || (type == 1)) && (start != end)) {
 			// type = 0 and 1 are paramSingleItem*
 			ARBCONV_DBG_RE("Failed to get param: [%s] (t)\n", matrixNameMallocd?matrixNameMallocd:matrixName)
-			if (matrixNameMallocd) free(matrixNameMallocd);
+			if (matrixNameMallocd) je_free(matrixNameMallocd);
 			return NULL;
 		}
 		
@@ -2275,16 +2277,16 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 			matrixName = matrixNameMallocd;
 		}
 		
-		char **ret = (char**)calloc(end - start + 2, sizeof(char*));
+		char **ret = (char**)je_calloc(end - start + 2, sizeof(char*));
 		for (int i = start; i <= end; ++i) {
-			char *buf = (char*)calloc(mtxNameLen + 13, sizeof(char)); // Assume 32-bit array = 11 digits max
+			char *buf = (char*)je_calloc(mtxNameLen + 13, sizeof(char)); // Assume 32-bit array = 11 digits max
 			sprintf(buf, "%s[%d]", matrixName, i);
 			ret[i - start] = buf;
 		}
 		ret[end - start + 1] = NULL;
 		
 		if (matrixNameMallocd) {
-			free(matrixNameMallocd);
+			je_free(matrixNameMallocd);
 		}
 		
 		return ret;
@@ -2293,7 +2295,7 @@ char **resolveParam(sCurStatus_NewVar *newVar, int vertex, int type) {
 	return (char**)0xFFFFFFFFU; // Unreachable
 }
 
-#define FAIL(str) curStatusPtr->status = ST_ERROR; if (*error_msg) free(*error_msg); \
+#define FAIL(str) curStatusPtr->status = ST_ERROR; if (*error_msg) je_free(*error_msg); \
 		*error_msg = strdup(str); return
 void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct sSpecialCases *specialCases) {
 	if (((curStatusPtr->curToken == TOK_UNKNOWN) && (curStatusPtr->status != ST_LINE_COMMENT))
@@ -2352,10 +2354,10 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				curStatusPtr->valueType = TYPE_OPTION_DECL;
 				curStatusPtr->curValue.newOpt.optName = NULL;
 			} else {
-				free(tok);
+				je_free(tok);
 				FAIL("Unknown operand");
 			}
-			free(tok);
+			je_free(tok);
 			}
 			break;
 			
@@ -2397,7 +2399,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				char *tok = getToken(curStatusPtr);
 				if (kh_str_exist(curStatusPtr->varsMap, tok)) {
 					// Identifier already exists
-					free(tok);
+					je_free(tok);
 					FAIL("Cannot redefine variable");
 				}
 				
@@ -2405,7 +2407,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 					// Special case for the 'half' keyword
 					pushArray((sArray*)curStatusPtr->curValue.newVar.var, strdup("gl4es_half"));
 					
-					// Hopefully this doesn't make a free-after-free in case of error (though it shouldn't)
+					// Hopefully this doesn't make a je_free-after-je_free in case of error (though it shouldn't)
 					int ret;
 					khint_t varIdx = kh_put(variables, curStatusPtr->varsMap, tok, &ret);
 					if (ret < 0) {
@@ -2485,7 +2487,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				char *tok = getToken(curStatusPtr);
 				if (kh_str_exist(curStatusPtr->varsMap, tok)) {
 					// Identifier already exists
-					free(tok);
+					je_free(tok);
 					FAIL("Cannot redefine variable");
 				}
 				
@@ -2493,7 +2495,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 					// Special case for the 'half' keyword
 					pushArray((sArray*)curStatusPtr->curValue.newVar.var, strdup("gl4es_half"));
 					
-					// Hopefully this doesn't make a free-after-free in case of error (though it shouldn't)
+					// Hopefully this doesn't make a je_free-after-je_free in case of error (though it shouldn't)
 					int ret;
 					khint_t varIdx = kh_put(variables, curStatusPtr->varsMap, tok, &ret);
 					if (ret < 0) {
@@ -2646,7 +2648,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				}
 				
 				if ((tok = popFIFO((sArray*)&curStatusPtr->curValue.newVar))) {
-					free(tok);
+					je_free(tok);
 					FAIL("Not a valid attribute");
 				}
 				
@@ -2709,7 +2711,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				}
 				
 				if ((tok = popFIFO((sArray*)&curStatusPtr->curValue.newVar))) {
-					free(tok);
+					je_free(tok);
 					FAIL("Not a valid output");
 				}
 				
@@ -2763,7 +2765,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				
 				if (curStatusPtr->curValue.newVar.state > 2) {
 					size_t tokLen = getTokenLength(curStatusPtr);
-					char *tok = (char*)malloc((tokLen + 2) * sizeof(char));
+					char *tok = (char*)je_malloc((tokLen + 2) * sizeof(char));
 					copyToken(curStatusPtr, tok);
 					tok[tokLen] = '.';
 					tok[tokLen + 1] = '\0';
@@ -2875,14 +2877,14 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				}
 				
 				if (curStatusPtr->curValue.newVar.strLen) {
-					free(param);
+					je_free(param);
 					FAIL("Not a valid single param");
 				}
 				
 				for (char **parm = param; *parm; ++parm) {
 					pushArray((sArray*)&curStatusPtr->curValue.newVar.var->init, *parm);
 				}
-				free(param);
+				je_free(param);
 				
 				curStatusPtr->curValue.newVar.var->init.strings_total_len = -1;
 				
@@ -2934,7 +2936,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 					pushArray((sArray*)&curStatusPtr->curValue.newVar, getToken(curStatusPtr));
 				} else {
 					size_t tokLen = getTokenLength(curStatusPtr);
-					char *tok = (char*)malloc((tokLen + 2) * sizeof(char));
+					char *tok = (char*)je_malloc((tokLen + 2) * sizeof(char));
 					copyToken(curStatusPtr, tok);
 					tok[tokLen] = '.';
 					tok[tokLen + 1] = '\0';
@@ -3049,7 +3051,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				curStatusPtr->curValue.newVar.var->init.strings_total_len = 0;
 				do {
 					// Remove the comma
-					free(popFIFO((sArray*)&curStatusPtr->curValue.newVar));
+					je_free(popFIFO((sArray*)&curStatusPtr->curValue.newVar));
 					
 					char **param = resolveParam(&curStatusPtr->curValue.newVar, vertex, 2);
 					// If param is not resolved, fail
@@ -3062,7 +3064,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 						ARBCONV_DBG_HEAVY(SHUT_LOGD("Resolved param %p: ", *parm);fflush(stdout);printf("%s\n", *parm);)
 						pushArray((sArray*)&curStatusPtr->curValue.newVar.var->init, *parm);
 					}
-					free(param);
+					je_free(param);
 					
 					// Repeat until list empty OR not a comma
 				} while (curStatusPtr->curValue.newVar.strLen
@@ -3129,7 +3131,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 			char *tok = getToken(curStatusPtr);
 			if (kh_str_exist(curStatusPtr->varsMap, tok)) {
 				// Identifier already exists
-				free(tok);
+				je_free(tok);
 				FAIL("Cannot redeclare variable");
 			}
 			curStatusPtr->curValue.string = tok;
@@ -3158,7 +3160,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 			
 			char *tok = getToken(curStatusPtr);
 			khint_t varIdx = kh_get(variables, curStatusPtr->varsMap, tok);
-			free(tok);
+			je_free(tok);
 			if (!kh_truly_exist(curStatusPtr->varsMap, varIdx)) {
 				// Aliasing to empty space
 				FAIL("Cannot alias to inexistant variable");
@@ -3237,12 +3239,12 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 			case STATE_AFTER_VALID_LSQBR_ADOT:
 			case STATE_AFTER_VALID_LSQBR_ADOK:
 			case STATE_AFTER_VALID_LSQBR_SIGN: {
-				char *faa = (char*)realloc(
+				char *faa = (char*)je_realloc(
 					curVarPtr->floatArrAddr,
 					(strlen(curVarPtr->floatArrAddr) + getTokenLength(curStatusPtr) + 1) * sizeof(char)
 				);
 				if (!faa) {
-					FAIL("Failed to realloc (out of memory?)");
+					FAIL("Failed to je_realloc (out of memory?)");
 				}
 				copyToken(curStatusPtr, faa + strlen(faa));
 				curVarPtr->floatArrAddr = faa;
@@ -3262,12 +3264,12 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				break;
 				
 			case STATE_AFTER_VALID_LSQBR_ADOK: {
-				char *faa = (char*)realloc(
+				char *faa = (char*)je_realloc(
 					curVarPtr->floatArrAddr,
 					(strlen(curVarPtr->floatArrAddr) + getTokenLength(curStatusPtr) + 1) * sizeof(char)
 				);
 				if (!faa) {
-					FAIL("Failed to realloc (out of memory?)");
+					FAIL("Failed to je_realloc (out of memory?)");
 				}
 				copyToken(curStatusPtr, faa + strlen(faa));
 				curVarPtr->floatArrAddr = faa;
@@ -3308,12 +3310,12 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				break;
 				
 			case STATE_AFTER_VALID_LSQBR_SIGN: {
-				char *faa = (char*)realloc(
+				char *faa = (char*)je_realloc(
 					curVarPtr->floatArrAddr,
 					(strlen(curVarPtr->floatArrAddr) + getTokenLength(curStatusPtr) + 1) * sizeof(char)
 				);
 				if (!faa) {
-					FAIL("Failed to realloc (out of memory?)");
+					FAIL("Failed to je_realloc (out of memory?)");
 				}
 				copyToken(curStatusPtr, faa + strlen(faa));
 				curVarPtr->floatArrAddr = faa;
@@ -3418,7 +3420,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 					}
 				}
 				if (e) {
-					free(tok);
+					je_free(tok);
 					FAIL("Invalid swizzle value");
 				}
 				
@@ -3429,12 +3431,12 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 			case STATE_AFTER_VALID_LSQBR_START: {
 				khint_t idx = kh_get(variables, curStatusPtr->varsMap, tok);
 				if (!kh_truly_exist(curStatusPtr->varsMap, idx)) {
-					free(tok);
+					je_free(tok);
 					FAIL("Invalid relative addressing (not a declared address)");
 				}
 				sVariable *var = kh_val(curStatusPtr->varsMap, idx);
 				if (var->type != VARTYPE_ADDRESS) {
-					free(tok);
+					je_free(tok);
 					FAIL("Invalid relative addressing (not an address)");
 				}
 				
@@ -3445,16 +3447,16 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				
 			case STATE_AFTER_VALID_LSQBR_ADOT: {
 				if ((getTokenLength(curStatusPtr) != 1) || (tok[0] != 'x')) {
-					free(tok);
+					je_free(tok);
 					FAIL("Invalid address mask");
 				}
 				
-				char *faa = (char*)realloc(
+				char *faa = (char*)je_realloc(
 					curVarPtr->floatArrAddr,
 					(strlen(curVarPtr->floatArrAddr) + getTokenLength(curStatusPtr) + 1) * sizeof(char)
 				);
 				if (!faa) {
-					FAIL("Failed to realloc (out of memory?)");
+					FAIL("Failed to je_realloc (out of memory?)");
 				}
 				copyToken(curStatusPtr, faa + strlen(faa));
 				curVarPtr->floatArrAddr = faa;
@@ -3490,11 +3492,11 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				
 				/* FALLTHROUGH */
 			default:
-				free(tok);
+				je_free(tok);
 				FAIL("Invalid state");
 			}
 			
-			free(tok);
+			je_free(tok);
 			break;
 		}
 			
@@ -3506,12 +3508,12 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				break;
 				
 			case STATE_AFTER_VALID_LSQBR_ADDR: {
-				char *faa = (char*)realloc(
+				char *faa = (char*)je_realloc(
 					curVarPtr->floatArrAddr,
 					(strlen(curVarPtr->floatArrAddr) + getTokenLength(curStatusPtr) + 1) * sizeof(char)
 				);
 				if (!faa) {
-					FAIL("Failed to realloc (out of memory?)");
+					FAIL("Failed to je_realloc (out of memory?)");
 				}
 				copyToken(curStatusPtr, faa + strlen(faa));
 				curVarPtr->floatArrAddr = faa;
@@ -3681,7 +3683,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 						for (char **resvd = resolved; *resvd; ++resvd) {
 							pushArray((sArray*)&curStatusPtr->_fixedNewVar.var->init, *resvd);
 						}
-						free(resolved);
+						je_free(resolved);
 					}
 					
 					if (failure) {
@@ -3722,7 +3724,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 								e = 1; continue;
 							}
 						}
-						free(swiz);
+						je_free(swiz);
 						if (e) {
 							deleteVariable(&curStatusPtr->_fixedNewVar.var);
 							FAIL("Invalid swizzle");
@@ -3829,7 +3831,7 @@ void parseToken(sCurStatus* curStatusPtr, int vertex, char **error_msg, struct s
 				FAIL("Unknown option");
 			}
 			
-			free(curStatusPtr->curValue.newOpt.optName);
+			je_free(curStatusPtr->curValue.newOpt.optName);
 			
 			curStatusPtr->valueType = TYPE_NONE;
 			curStatusPtr->status = ST_LINE_START;

@@ -7,6 +7,7 @@
 #include "init.h"
 #include "loader.h"
 #include "buffers.h"
+#include <jemalloc/jemalloc.h>
 
 // KH Map implementation
 KHASH_MAP_IMPL_INT(material, rendermaterial_t *);
@@ -17,7 +18,7 @@ KHASH_MAP_IMPL_INT(gllisthead, renderlist_t*);
 
 renderlist_t *alloc_renderlist() {
 
-    renderlist_t *list = (renderlist_t *)malloc(sizeof(renderlist_t));
+    renderlist_t *list = (renderlist_t *)je_malloc(sizeof(renderlist_t));
     memset(list, 0, sizeof(renderlist_t));
     list->cap = DEFAULT_RENDER_LIST_CAPACITY;
     list->matrix_val[0] = list->matrix_val[5] = list->matrix_val[10] = 
@@ -246,14 +247,14 @@ void renderlist_quads2triangles(renderlist_t *a) {
     int ilen = len*3/2;
     if(a->use_glstate) {
         if(ind) {//need to copy first...
-            ind = (GLushort*)malloc(len*sizeof(GLushort));
+            ind = (GLushort*)je_malloc(len*sizeof(GLushort));
             memcpy(ind, glstate->merger_indices, len*sizeof(GLushort));
             a->shared_indices = NULL;   // should not be needed
         }
         resize_merger_indices(ilen);
         a->indices = glstate->merger_indices;
     } else
-        a->indices = (GLushort*)malloc(ilen*sizeof(GLushort));
+        a->indices = (GLushort*)je_malloc(ilen*sizeof(GLushort));
 
     for (int i=0, j=0; i+3<len; i+=4, j+=6) {
         a->indices[j+0] = vind(i+0);
@@ -267,8 +268,8 @@ void renderlist_quads2triangles(renderlist_t *a) {
     a->ilen = ilen;
     if (ind) {
         if (!a->shared_indices || ((*a->shared_indices)--)==0)  {
-            free(ind); 
-            free(a->shared_indices);
+            je_free(ind); 
+            je_free(a->shared_indices);
         }
         a->shared_indices = NULL; // unshared list
     }
@@ -325,7 +326,7 @@ int mode_needindices(GLenum m) {
 void list_add_modeinit(renderlist_t* list, GLenum mode) {
     if (list->mode_init_len+1 >= list->mode_init_cap) {
         list->mode_init_cap+=128;
-        list->mode_inits = (modeinit_t*)realloc(list->mode_inits, list->mode_init_cap*sizeof(modeinit_t));
+        list->mode_inits = (modeinit_t*)je_realloc(list->mode_inits, list->mode_init_cap*sizeof(modeinit_t));
     }
     list->mode_inits[list->mode_init_len].mode_init = mode;
     list->mode_inits[list->mode_init_len++].ilen = list->indices?list->ilen:(list->cur_istart?list->cur_istart:list->len);
@@ -369,7 +370,7 @@ void unshared_renderlist(renderlist_t *a, int cap) {
         }
     }
     if(a->shared_arrays && (*a->shared_arrays)==0) {
-        free(a->shared_arrays); 
+        je_free(a->shared_arrays); 
         a->shared_arrays=NULL;
     }
 }
@@ -381,12 +382,12 @@ void unsharedindices_renderlist(renderlist_t* a, int cap)
             GLushort* tmpi = a->indices;
             a->indice_cap = cap;
             if (a->indice_cap > 48) a->indice_cap = ((a->indice_cap+512)>>9)<<9;
-            a->indices = (GLushort*)malloc(a->indice_cap*sizeof(GLushort));
+            a->indices = (GLushort*)je_malloc(a->indice_cap*sizeof(GLushort));
             memcpy(a->indices, tmpi, a->ilen*sizeof(GLushort));
         }
     } 
     if(a->shared_indices && (*a->shared_indices)==0) {
-        free(a->shared_indices); 
+        je_free(a->shared_indices); 
         a->shared_indices=0;
     }
 }
@@ -406,13 +407,13 @@ void redim_renderlist(renderlist_t *a, int cap) {
 
 void prepareadd_renderlist(renderlist_t* a, int size_to_add)
 {
-    // alloc or realloc a->indices first...
+    // alloc or je_realloc a->indices first...
     int capindices = renderlist_getindicesize(a)+size_to_add;
     if (capindices > 48) capindices = ((capindices+512)>>9)<<9;
     #define alloc_a_indices                                      \
-    newind=(GLushort*)malloc(capindices*sizeof(GLushort))
+    newind=(GLushort*)je_malloc(capindices*sizeof(GLushort))
     #define copy_a_indices                                       \
-    if (a->indices) free(a->indices);                            \
+    if (a->indices) je_free(a->indices);                            \
     a->indices = newind;                                         \
     a->indice_cap = capindices
     // check if "a" needs to be converted
@@ -460,7 +461,7 @@ void prepareadd_renderlist(renderlist_t* a, int size_to_add)
             } else {
                 // a->indices already exist, just check if need to adjust its size
                 if (a->indice_cap < capindices) {
-                    a->indices = (GLushort*)realloc(a->indices, capindices*sizeof(GLushort));
+                    a->indices = (GLushort*)je_realloc(a->indices, capindices*sizeof(GLushort));
                     a->indice_cap = capindices;
                 }
             }
@@ -534,7 +535,7 @@ void append_renderlist(renderlist_t *a, renderlist_t *b) {
     if (ilen_a || ilen_b || mode_needindices(a->mode) || mode_needindices(b->mode) 
         || (a->mode!=b->mode && (a->mode==GL_QUADS || b->mode==GL_QUADS)) )
     {
-        // alloc or realloc a->indices first...
+        // alloc or je_realloc a->indices first...
         ilen_b = renderlist_getindicesize(b);
         prepareadd_renderlist(a, ilen_b);
         // then append b
@@ -576,7 +577,7 @@ renderlist_t *extend_renderlist(renderlist_t *list) {
         new->lastColorsSet = list->lastColorsSet;
         // detach
         list->prev = NULL;
-        // free list now
+        // je_free list now
         free_renderlist(list);
         return new;
     } else {
@@ -606,15 +607,15 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
             renderlist_t *new = alloc_renderlist();
             // prepared shared stuff...
             if(a->len && !a->shared_arrays) {
-                a->shared_arrays = (int*)malloc(sizeof(int));
+                a->shared_arrays = (int*)je_malloc(sizeof(int));
                 *a->shared_arrays = 0;
             }
             if(a->ilen && !a->shared_indices) {
-                a->shared_indices = (int*)malloc(sizeof(int));
+                a->shared_indices = (int*)je_malloc(sizeof(int));
                 *a->shared_indices = 0;
             }
             if(a->calls.len && !a->shared_calls) {
-                a->shared_calls = (int*)malloc(sizeof(int));
+                a->shared_calls = (int*)je_malloc(sizeof(int));
                 *a->shared_calls = 0;
             }
             // batch copy first
@@ -627,7 +628,7 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
             if (list->calls.len > 0) {
                 ++(*list->shared_calls);
                 /*
-                list->calls.calls = (packed_call_t**)malloc(sizeof(packed_call_t*)*a->calls.cap);
+                list->calls.calls = (packed_call_t**)je_malloc(sizeof(packed_call_t*)*a->calls.cap);
                 for (int i = 0; i < list->calls.len; i++) {
                     list->calls.calls[i] = glCopyPackedCall(a->calls.calls[i]);
                 }*/
@@ -645,7 +646,7 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
                     int ret;        \
                     kh_foreach_value(a->W, m,   \
                         k = kh_put(W, list->W, C, &ret);    \
-                        m2= kh_value(list->W, k) = malloc(sizeof(T));   \
+                        m2= kh_value(list->W, k) = je_malloc(sizeof(T));   \
                         memcpy(m2, m, sizeof(T));           \
                     );       \
                 }
@@ -655,7 +656,7 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
             PROCESS(texenv, rendertexenv_t, m->pname | ((m->target)<<16));
             #undef PROCESS
             if (list->lightmodel) {
-                list->lightmodel = (GLfloat*)malloc(4*sizeof(GLfloat));
+                list->lightmodel = (GLfloat*)je_malloc(4*sizeof(GLfloat));
                 memcpy(list->lightmodel, a->lightmodel, 4*sizeof(GLfloat));
             }
             if (list->raster) {
@@ -681,30 +682,30 @@ void free_renderlist(renderlist_t *list) {
     renderlist_t *next;
     do {
         if(list->mode_inits)
-            free(list->mode_inits);
+            je_free(list->mode_inits);
         if ((list->calls.len > 0) && (!list->shared_calls || ((*list->shared_calls)--)==0)) {
-            if(list->shared_calls) free(list->shared_calls);
+            if(list->shared_calls) je_free(list->shared_calls);
             for (int i = 0; i < list->calls.len; i++) {
-                free(list->calls.calls[i]);
+                je_free(list->calls.calls[i]);
             }
-            free(list->calls.calls);
+            je_free(list->calls.calls);
         }
         int a;
         if(!list->use_glstate) {
             if (!list->shared_arrays || ((*list->shared_arrays)--)==0) {
-                if (list->shared_arrays) free(list->shared_arrays);
-                if (list->vert) free(list->vert);
-                if (list->normal) free(list->normal);
-                if (list->color) free(list->color);
-                if (list->secondary) free(list->secondary);
-                if (list->fogcoord) free(list->fogcoord);
+                if (list->shared_arrays) je_free(list->shared_arrays);
+                if (list->vert) je_free(list->vert);
+                if (list->normal) je_free(list->normal);
+                if (list->color) je_free(list->color);
+                if (list->secondary) je_free(list->secondary);
+                if (list->fogcoord) je_free(list->fogcoord);
                 for (a=0; a<list->maxtex; a++)
-                    if (list->tex[a]) free(list->tex[a]);
+                    if (list->tex[a]) je_free(list->tex[a]);
             }
             if (!list->shared_indices || ((*list->shared_indices)--)==0) {
-                if (list->shared_indices) free(list->shared_indices);
+                if (list->shared_indices) je_free(list->shared_indices);
                 if (list->indices)
-                    free(list->indices);
+                    je_free(list->indices);
             }
         } else
             glstate->merger_used = 0;
@@ -712,61 +713,61 @@ void free_renderlist(renderlist_t *list) {
         if (list->material) {
             rendermaterial_t *m;
             kh_foreach_value(list->material, m,
-                free(m);
+                je_free(m);
             )
             kh_destroy(material, list->material);
         }
         if (list->light) {
             renderlight_t *m;
             kh_foreach_value(list->light, m,
-                free(m);
+                je_free(m);
             )
             kh_destroy(light, list->light);
         }
         if (list->texgen) {
             rendertexgen_t *m;
             kh_foreach_value(list->texgen, m,
-                free(m);
+                je_free(m);
             )
             kh_destroy(texgen, list->texgen);
         }
         if (list->texenv) {
             rendertexenv_t *m;
             kh_foreach_value(list->texenv, m,
-                free(m);
+                je_free(m);
             )
             kh_destroy(texenv, list->texenv);
         }
         if (list->lightmodel)
-			free(list->lightmodel);
+			je_free(list->lightmodel);
 			
         if (list->raster && !((*list->raster->shared)--)) {
 			if (list->raster->texture)
 				gl4es_glDeleteTextures(1, &list->raster->texture);
-            free(list->raster->shared);
-			free(list->raster);
+            je_free(list->raster->shared);
+			je_free(list->raster);
 		}
 
         if(list->bitmaps && !((*list->bitmaps->shared)--)) {
             for(int i=0; i<list->bitmaps->count; i++)
                 if(list->bitmaps->list[i].bitmap)
-                    free(list->bitmaps->list[i].bitmap);
-            free(list->bitmaps->list);
-            free(list->bitmaps->shared);
-            free(list->bitmaps);
+                    je_free(list->bitmaps->list[i].bitmap);
+            je_free(list->bitmaps->list);
+            je_free(list->bitmaps->shared);
+            je_free(list->bitmaps);
         }
         
         if(list->ind_lines)
-            free(list->ind_lines);
+            je_free(list->ind_lines);
         if(list->final_colors)
-            free(list->final_colors);
+            je_free(list->final_colors);
         if(list->vbo_array)
             deleteSingleBuffer(list->vbo_array);
         if(list->vbo_indices)
             deleteSingleBuffer(list->vbo_indices);
 
         next = list->next;
-        free(list);
+        je_free(list);
     } while ((list = next));
 }
 
@@ -806,7 +807,7 @@ void resize_merger_indices(int cap) {
     if(cap<glstate->merger_indice_cap)
         return;
     glstate->merger_indice_cap = ((glstate->merger_indice_cap+cap+512)>>9)<<9;
-    glstate->merger_indices = (GLushort*)realloc(glstate->merger_indices, glstate->merger_indice_cap*sizeof(GLushort));
+    glstate->merger_indices = (GLushort*)je_realloc(glstate->merger_indices, glstate->merger_indice_cap*sizeof(GLushort));
 }
 
 void resize_indices_renderlist(renderlist_t *list, int n) {
@@ -819,7 +820,7 @@ void resize_indices_renderlist(renderlist_t *list, int n) {
         if(list->ilen+n<list->indice_cap)
             return;
         list->indice_cap = ((list->indice_cap+n+511)>>9)<<9;
-        list->indices = (GLushort*)realloc(list->indices, list->indice_cap*sizeof(GLushort));
+        list->indices = (GLushort*)je_realloc(list->indices, list->indice_cap*sizeof(GLushort));
     }
 }
 
@@ -906,7 +907,7 @@ renderlist_t* recycle_renderlist(renderlist_t *list, GLenum mode) {
                 resize_merger_indices(renderlist_getindicesize(list)); indices = glstate->merger_indices;\
             } else {\
                 list->indice_cap = renderlist_getindicesize(list);\
-                indices = (GLushort*)malloc(sizeof(GLushort)*list->indice_cap);\
+                indices = (GLushort*)je_malloc(sizeof(GLushort)*list->indice_cap);\
             }
 #define post_expand  \
             list->ilen = renderlist_getindicesize(list);\

@@ -8,6 +8,7 @@
 #include "array.h"
 #include "logs.h"
 #include "matvec.h"
+#include <jemalloc/jemalloc.h>
 
 static inline map_state_t **get_map_pointer(GLenum target) {
     switch (target) {
@@ -44,8 +45,8 @@ static inline map_state_t **get_map_pointer(GLenum target) {
         map->width = get_map_width(magic);                      \
         map_statef_t *m = (map_statef_t *)glstate->map##dims.name; \
         if (m) {                                                \
-            free((void *)m->points);                            \
-            free(m);                                            \
+            je_free((void *)m->points);                            \
+            je_free(m);                                            \
         }                                                       \
         glstate->map##dims.name = (map_state_t *)map;           \
         break;                                                  \
@@ -67,7 +68,7 @@ static inline map_state_t **get_map_pointer(GLenum target) {
 void APIENTRY_GL4ES gl4es_glMap1d(GLenum target, GLdouble u1, GLdouble u2,
              GLint ustride, GLint uorder, const GLdouble *points) {
     noerrorShim();
-    map_statef_t *map = malloc(sizeof(map_statef_t));
+    map_statef_t *map = je_malloc(sizeof(map_statef_t));
     map->type = GL_FLOAT; map->dims = 1;
     set_map_coords(u);
     map_switch(1);
@@ -77,7 +78,7 @@ void APIENTRY_GL4ES gl4es_glMap1d(GLenum target, GLdouble u1, GLdouble u2,
 void APIENTRY_GL4ES gl4es_glMap1f(GLenum target, GLfloat u1, GLfloat u2,
              GLint ustride, GLint uorder, const GLfloat *points) {
     noerrorShim();
-    map_statef_t *map = malloc(sizeof(map_statef_t));
+    map_statef_t *map = je_malloc(sizeof(map_statef_t));
     map->type = GL_FLOAT; map->dims = 1;
     set_map_coords(u);
     map_switch(1);
@@ -88,7 +89,7 @@ void APIENTRY_GL4ES gl4es_glMap2d(GLenum target, GLdouble u1, GLdouble u2,
              GLint ustride, GLint uorder, GLdouble v1, GLdouble v2,
              GLint vstride, GLint vorder, const GLdouble *points) {
     noerrorShim();
-    map_statef_t *map = malloc(sizeof(map_statef_t));
+    map_statef_t *map = je_malloc(sizeof(map_statef_t));
     map->type = GL_FLOAT; map->dims = 2;
     set_map_coords(u);
     set_map_coords(v);
@@ -100,7 +101,7 @@ void APIENTRY_GL4ES gl4es_glMap2f(GLenum target, GLfloat u1, GLfloat u2,
              GLint ustride, GLint uorder, GLfloat v1, GLfloat v2,
              GLint vstride, GLint vorder, const GLfloat *points) {
     noerrorShim();
-    map_statef_t *map = malloc(sizeof(map_statef_t));
+    map_statef_t *map = je_malloc(sizeof(map_statef_t));
     map->type = GL_FLOAT; map->dims = 2;
     set_map_coords(u);
     set_map_coords(v);

@@ -7,6 +7,7 @@
 #include "loader.h"
 #include "matrix.h"
 #include "matvec.h"
+#include <jemalloc/jemalloc.h>
 
 //extern void* eglGetProcAddress(const char*);
 
@@ -287,7 +288,7 @@ void gen_tex_coords(GLfloat *verts, GLfloat *norm, GLfloat **coords, GLint count
     // special case : no texgen but texture activated, create a simple 1 repeated element
     if (!glstate->enable.texgen_s[texture] && !glstate->enable.texgen_t[texture] && !glstate->enable.texgen_r[texture] && !glstate->enable.texgen_q[texture]) {
         if ((*coords)==NULL) 
-            *coords = (GLfloat *)malloc(count * 4 * sizeof(GLfloat));
+            *coords = (GLfloat *)je_malloc(count * 4 * sizeof(GLfloat));
         if (indices)
             for (int i=0; i<ilen; i++) {
                 memcpy((*coords)+indices[i]*4, glstate->texcoord[texture], sizeof(GLfloat)*4);
@@ -304,7 +305,7 @@ void gen_tex_coords(GLfloat *verts, GLfloat *norm, GLfloat **coords, GLint count
         if (!IS_TEX2D(glstate->enable.texture[texture]))
             return;
         if ((*coords)==NULL) 
-            *coords = (GLfloat *)malloc(count * 4 * sizeof(GLfloat));
+            *coords = (GLfloat *)je_malloc(count * 4 * sizeof(GLfloat));
         sphere_loop(verts, norm, *coords, (indices)?ilen:count, indices);
         return;
     }
@@ -340,7 +341,7 @@ void gen_tex_coords(GLfloat *verts, GLfloat *norm, GLfloat **coords, GLint count
             if (!IS_TEX2D(glstate->enable.texture[texture]))
                 return;
             if ((*coords)==NULL) 
-                *coords = (GLfloat *)malloc(count * 4 * sizeof(GLfloat));
+                *coords = (GLfloat *)je_malloc(count * 4 * sizeof(GLfloat));
             reflection_loop(verts, norm, *coords, (indices)?ilen:count, indices);
         }
         return;
@@ -378,7 +379,7 @@ void gen_tex_coords(GLfloat *verts, GLfloat *norm, GLfloat **coords, GLint count
     if (!IS_ANYTEX(glstate->enable.texture[texture]))
 	return;
     if ((*coords)==NULL) 
-        *coords = (GLfloat *)malloc(count * 4 * sizeof(GLfloat));
+        *coords = (GLfloat *)je_malloc(count * 4 * sizeof(GLfloat));
     if (    (glstate->enable.texgen_s[texture] && glstate->texgen[texture].S==GL_EYE_LINEAR) 
         &&  (glstate->enable.texgen_t[texture] && glstate->texgen[texture].T==GL_EYE_LINEAR) )
     {

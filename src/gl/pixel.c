@@ -7,6 +7,8 @@
 #include "glstate.h"
 #include "debug.h"
 
+#include <jemalloc/jemalloc.h>
+
 #ifdef __BIG_ENDIAN__
 #define GL_INT8_REV     GL_UNSIGNED_INT_8_8_8_8
 #define GL_INT8         GL_UNSIGNED_INT_8_8_8_8_REV
@@ -801,7 +803,7 @@ bool pixel_convert(const GLvoid *src, GLvoid **dst,
 
         // Allocate memory if not already allocated
         if (*dst == NULL) {
-            *dst = malloc(dst_size);
+            *dst = je_malloc(dst_size);
             if (*dst == NULL) {
                 LOGE("Memory allocation failed for destination buffer\n");
                 return false;
@@ -852,7 +854,7 @@ bool pixel_convert(const GLvoid *src, GLvoid **dst,
     GLsizei dst_stride = pixel_sizeof(dst_format, dst_type);
 
     if (*dst == src || *dst == NULL) {
-        *dst = malloc(dst_size);
+        *dst = je_malloc(dst_size);
         if (*dst == NULL) {
             LOGE("Memory allocation failed for destination buffer\n");
             return false;
@@ -1258,7 +1260,7 @@ bool pixel_transform(const GLvoid *src, GLvoid **dst,
     src_color = get_color_map(src_format);
     GLsizei src_stride = pixel_sizeof(src_format, src_type);
     if (*dst == src || *dst == NULL)
-        *dst = malloc(dst_size);
+        *dst = je_malloc(dst_size);
     uintptr_t src_pos = (uintptr_t)src;
     uintptr_t dst_pos = (uintptr_t)*dst;
 	if (! transform_pixel((const GLvoid *)src_pos, (GLvoid *)dst_pos,
@@ -1291,7 +1293,7 @@ bool pixel_scale(const GLvoid *old, GLvoid **new,
     uintptr_t src, pos, pixel;
 
     pixel_size = pixel_sizeof(format, type);
-    dst = malloc(pixel_size * new_width * new_height);
+    dst = je_malloc(pixel_size * new_width * new_height);
     src = (uintptr_t)old;
     pos = (uintptr_t)dst;
     for (int y = 0; y < new_height; y++) {
@@ -1324,7 +1326,7 @@ bool pixel_halfscale(const GLvoid *old, GLvoid **new,
     pixel_size = pixel_sizeof(format, type);
 
     size_t dst_size = pixel_size * new_width * new_height;
-    GLvoid *dst = malloc(dst_size);
+    GLvoid *dst = je_malloc(dst_size);
     if (dst == NULL) {
         return false;
     }
@@ -1338,14 +1340,14 @@ bool pixel_halfscale(const GLvoid *old, GLvoid **new,
 
     if (!src_color->type) {
         if (!pixel_size) {
-            free(dst);
+            je_free(dst);
             return false;
         }
         for (int y = 0; y < new_height; y++) {
             for (int x = 0; x < new_width; x++) {
                 uintptr_t pix0 = src + ((x * mx) + (y * my) * width) * pixel_size;
                 if (pix0 + pixel_size > (uintptr_t)old + width * height * pixel_size) {
-                    free(dst);
+                    je_free(dst);
                     return false;
                 }
                 memcpy((void*)pos, (void*)pix0, pixel_size);
@@ -1367,12 +1369,12 @@ bool pixel_halfscale(const GLvoid *old, GLvoid **new,
                 pix1 + pixel_size > (uintptr_t)old + width * height * pixel_size ||
                 pix2 + pixel_size > (uintptr_t)old + width * height * pixel_size ||
                 pix3 + pixel_size > (uintptr_t)old + width * height * pixel_size) {
-                free(dst);
+                je_free(dst);
                 return false;
             }
 
             if (pos + pixel_size > (uintptr_t)dst + dst_size) {
-                free(dst);
+                je_free(dst);
                 return false;
             }
 
@@ -1403,7 +1405,7 @@ bool pixel_thirdscale(const GLvoid *old, GLvoid **new,
 
     pixel_size = pixel_sizeof(format, type);
     dest_size = pixel_sizeof(format, GL_UNSIGNED_SHORT_4_4_4_4);
-    dst = malloc(dest_size * new_width * new_height);
+    dst = je_malloc(dest_size * new_width * new_height);
     src = (uintptr_t)old;
     pos = (uintptr_t)dst;
     const int dx = (width>1)?1:0;
@@ -1447,7 +1449,7 @@ bool pixel_quarterscale(const GLvoid *old, GLvoid **new,
     uintptr_t src, pos, pix[16];
 
     pixel_size = pixel_sizeof(format, type);
-    dst = malloc(pixel_size * new_width * new_height);
+    dst = je_malloc(pixel_size * new_width * new_height);
     src = (uintptr_t)old;
     pos = (uintptr_t)dst;
     const int dxs[4] = {0, width>1?1:0, width>2?2:0, width>3?3:width>1?1:0};
@@ -1455,7 +1457,7 @@ bool pixel_quarterscale(const GLvoid *old, GLvoid **new,
     if(!src_color->type) {
         if(!pixel_size) {
             SHUT_LOGD("LIBGL: Cannot quarterscale unknown format/type %s/%s\n", PrintEnum(format), PrintEnum(type));
-            free(dst);
+            je_free(dst);
             return 0;
         }
         for (int y = 0; y < new_height; y++) {
@@ -1503,7 +1505,7 @@ bool pixel_doublescale(const GLvoid *old, GLvoid **new,
 
     size_t dst_size = pixel_size * new_width * new_height;
 
-    GLvoid *dst = malloc(dst_size);
+    GLvoid *dst = je_malloc(dst_size);
     if (dst == NULL) {
         LOGE("Memory allocation failed for destination buffer\n");
         return false;
@@ -1520,13 +1522,13 @@ bool pixel_doublescale(const GLvoid *old, GLvoid **new,
 
             if (pix0 + pixel_size > (uintptr_t)old + width * height * pixel_size) {
                 LOGE("Source memory access out of bounds\n");
-                free(dst);
+                je_free(dst);
                 return false;
             }
 
             if (pos + pixel_size > (uintptr_t)dst + dst_size) {
                 LOGE("Destination memory access out of bounds\n");
-                free(dst);
+                je_free(dst);
                 return false;
             }
 

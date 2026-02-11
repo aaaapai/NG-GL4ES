@@ -11,6 +11,8 @@
 #include "matvec.h"
 #include "pixel.h"
 
+#include <jemalloc/jemalloc.h>
+
 #undef min
 #undef max
 #define min(a, b)	((a)<b)?(a):(b)
@@ -205,12 +207,12 @@ void init_raster(int width, int height) {
 	h=(hardext.npot>0)?height:npot(height);
 	if (glstate->raster.data) {
 		if ((glstate->raster.raster_nwidth<width) || (glstate->raster.raster_nheight<height)) {
-			free(glstate->raster.data);
+			je_free(glstate->raster.data);
 			glstate->raster.data = NULL;
 		}
 	}
     if (!glstate->raster.data) {
-        glstate->raster.data = (GLubyte *)malloc(4 * w * h * sizeof(GLubyte)); // no need to memset to 0
+        glstate->raster.data = (GLubyte *)je_malloc(4 * w * h * sizeof(GLubyte)); // no need to memset to 0
 		glstate->raster.raster_nwidth = w; glstate->raster.raster_nheight = h;
 	}
 	glstate->raster.raster_x1 = 0; glstate->raster.raster_y1 = 0;
@@ -375,14 +377,14 @@ void APIENTRY_GL4ES gl4es_glBitmap(GLsizei width, GLsizei height, GLfloat xorig,
 	if(glstate->list.active) {
 		renderlist_t* list = glstate->list.active;
 		if (!list->bitmaps) {
-			list->bitmaps = (bitmaps_t*)malloc(sizeof(bitmaps_t));
+			list->bitmaps = (bitmaps_t*)je_malloc(sizeof(bitmaps_t));
 			memset(list->bitmaps, 0, sizeof(bitmaps_t));
-			list->bitmaps->shared = (int*)malloc(sizeof(int)); 
+			list->bitmaps->shared = (int*)je_malloc(sizeof(int)); 
             *list->bitmaps->shared = 0;
 		}
 		if(list->bitmaps->count == list->bitmaps->cap) {
 			list->bitmaps->cap += 8;
-			list->bitmaps->list = (bitmap_list_t*)realloc(list->bitmaps->list, list->bitmaps->cap*sizeof(bitmap_list_t));
+			list->bitmaps->list = (bitmap_list_t*)je_realloc(list->bitmaps->list, list->bitmaps->cap*sizeof(bitmap_list_t));
 		}
 		bitmap_list_t *l = &list->bitmaps->list[list->bitmaps->count++];
 		l->width = width;
@@ -392,7 +394,7 @@ void APIENTRY_GL4ES gl4es_glBitmap(GLsizei width, GLsizei height, GLfloat xorig,
 		l->xmove = xmove;
 		l->ymove = ymove;
 		int sz = ((width+7)/8)*height;
-		l->bitmap = (GLubyte*)malloc(sz);
+		l->bitmap = (GLubyte*)je_malloc(sz);
 		memcpy(l->bitmap, bitmap, sz);
 		return;
 	}
@@ -430,12 +432,12 @@ void APIENTRY_GL4ES gl4es_glBitmap(GLsizei width, GLsizei height, GLfloat xorig,
 	}
 	if (ex<0 || ey<0 || sx<0 || sy<0 || sx==ex || sy==ey)	// nothing to draw, no changes
 		return;
-	// create/realloc buffer if needed
+	// create/je_realloc buffer if needed
 	if(glstate->raster.bm_alloc < glstate->raster.viewport.width*glstate->raster.viewport.height*4) {
 		if(glstate->raster.bitmap)
-			free(glstate->raster.bitmap);
+			je_free(glstate->raster.bitmap);
 		glstate->raster.bm_alloc = glstate->raster.viewport.width*glstate->raster.viewport.height*4;
-		glstate->raster.bitmap = (GLubyte*)malloc(glstate->raster.bm_alloc);
+		glstate->raster.bitmap = (GLubyte*)je_malloc(glstate->raster.bm_alloc);
 	}
 	// clear buffer if needed
 	if(!glstate->raster.bm_drawing) {
@@ -558,14 +560,14 @@ void APIENTRY_GL4ES gl4es_glDrawPixels(GLsizei width, GLsizei height, GLenum for
 		}
 	}
 	if (pixels != data)
-        free(pixels);
+        je_free(pixels);
 	
     rasterlist_t *r;
 	if (glstate->list.active) {
 		NewStage(glstate->list.active, STAGE_RASTER);
-		r = glstate->list.active->raster = (rasterlist_t*)malloc(sizeof(rasterlist_t));
+		r = glstate->list.active->raster = (rasterlist_t*)je_malloc(sizeof(rasterlist_t));
 		memset(r, 0, sizeof(rasterlist_t));
-        r->shared = (int*)malloc(sizeof(int));
+        r->shared = (int*)je_malloc(sizeof(int));
         *r->shared = 0;
 	} else {
 		r = &glstate->raster.immediate;

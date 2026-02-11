@@ -1,4 +1,5 @@
 #include "arbhelper.h"
+#include <jemalloc/jemalloc.h>
 
 #include "../config.h"
 
@@ -11,7 +12,7 @@ void *resize(void** obj, size_t* cap, size_t esize) {
 	} else {
 		newSize = oldSize * 2;
 	}
-	void *reloc = realloc(*obj, newSize);
+	void *reloc = je_realloc(*obj, newSize);
 	if (reloc) {
 		*obj = reloc;
 		*cap = newSize;
@@ -20,7 +21,7 @@ void *resize(void** obj, size_t* cap, size_t esize) {
 }
 
 void initArray(sArray* arr) {
-	arr->objs = calloc(DEFAULT_MALLOC_COUNT, sizeof(void*));
+	arr->objs = je_calloc(DEFAULT_MALLOC_COUNT, sizeof(void*));
 	arr->size = 0;
 	arr->cap = DEFAULT_MALLOC_COUNT;
 }
@@ -59,9 +60,9 @@ void* popFIFO(sArray* arr) {
 void freeArray(sArray* arr) {
 	while (arr->size) {
 		--arr->size;
-		free(arr->objs[arr->size]);
+		je_free(arr->objs[arr->size]);
 	}
-	free(arr->objs);
+	je_free(arr->objs);
 	arr->objs = NULL;
 }
 
@@ -216,7 +217,7 @@ eInstruction STR2INST(char *str, int *sat) {
 KHASH_MAP_IMPL_STR(variables, sVariable*)
 
 sVariable *createVariable(eVariableType type) {
-	sVariable *var = (sVariable*)calloc(1, sizeof(sVariable)); // malloc *should* be fine here
+	sVariable *var = (sVariable*)je_calloc(1, sizeof(sVariable)); // je_malloc *should* be fine here
 	initArray((sArray*)var);
 	initArray((sArray*)&var->init);
 	var->type = type;
@@ -229,15 +230,15 @@ void deleteVariable(sVariable **var) {
 	
 	char *stringPtr;
 	while ((stringPtr = popArray((sArray*)&(*var)->init))) {
-		free(stringPtr);
+		je_free(stringPtr);
 	}
 	freeArray((sArray*)&(*var)->init);
-	free(*var);
+	je_free(*var);
 	*var = NULL;
 }
 
 sInstruction *copyInstruction(const sInstruction *orig) {
-	sInstruction *dup = (sInstruction*)malloc(sizeof(sInstruction));
+	sInstruction *dup = (sInstruction*)je_malloc(sizeof(sInstruction));
 	memcpy(dup, orig, sizeof(sInstruction));
 	return dup;
 }
@@ -248,7 +249,7 @@ void initStatus(sCurStatus* curStatus, const char* code) {
 	curStatus->codePtr = code;
 	curStatus->endOfToken = code;
 	
-	curStatus->outputString = malloc(DEFAULT_STRING_MALLOC_SIZE);
+	curStatus->outputString = je_malloc(DEFAULT_STRING_MALLOC_SIZE);
 	curStatus->outputString[0] = '\0';
 	curStatus->outputEnd = curStatus->outputString;
 	curStatus->outLen = 0;
@@ -257,19 +258,19 @@ void initStatus(sCurStatus* curStatus, const char* code) {
 	
 	curStatus->valueType = TYPE_NONE;
 	
-	curStatus->texVars = (sVariable**)malloc(MAX_TEX * sizeof(sVariable*));
+	curStatus->texVars = (sVariable**)je_malloc(MAX_TEX * sizeof(sVariable*));
 	for (size_t i = 0; i < MAX_TEX; ++i) {
 		curStatus->texVars[i] = createVariable(VARTYPE_TEXTURE);
 	}
-	curStatus->tex1D = (sVariable*)malloc(sizeof(sVariable));
+	curStatus->tex1D = (sVariable*)je_malloc(sizeof(sVariable));
 	curStatus->tex1D->type = VARTYPE_TEXTARGET;
-	curStatus->tex2D = (sVariable*)malloc(sizeof(sVariable));
+	curStatus->tex2D = (sVariable*)je_malloc(sizeof(sVariable));
 	curStatus->tex2D->type = VARTYPE_TEXTARGET;
-	curStatus->tex3D = (sVariable*)malloc(sizeof(sVariable));
+	curStatus->tex3D = (sVariable*)je_malloc(sizeof(sVariable));
 	curStatus->tex3D->type = VARTYPE_TEXTARGET;
-	curStatus->texCUBE = (sVariable*)malloc(sizeof(sVariable));
+	curStatus->texCUBE = (sVariable*)je_malloc(sizeof(sVariable));
 	curStatus->texCUBE->type = VARTYPE_TEXTARGET;
-	curStatus->texRECT = (sVariable*)malloc(sizeof(sVariable));
+	curStatus->texRECT = (sVariable*)je_malloc(sizeof(sVariable));
 	curStatus->texRECT->type = VARTYPE_TEXTARGET;
 	
 	curStatus->varsMap = kh_init(variables);
@@ -285,24 +286,24 @@ void freeStatus(sCurStatus* curStatus) {
 	if (curStatus->valueType == TYPE_INST_DECL) {
 		for (int i = 0; i < MAX_OPERANDS; ++i) {
 			if (curStatus->curValue.newInst.inst.vars[i].floatArrAddr) {
-				free(curStatus->curValue.newInst.inst.vars[i].floatArrAddr);
+				je_free(curStatus->curValue.newInst.inst.vars[i].floatArrAddr);
 			}
 		}
 	} else if (curStatus->valueType == TYPE_VARIABLE_DECL) {
 		char *strPtr;
 		while ((strPtr = (char*)popArray((sArray*)&curStatus->curValue.newVar))) {
-			free(strPtr);
+			je_free(strPtr);
 		}
 		freeArray((sArray*)&curStatus->curValue.newVar);
 		
 		deleteVariable(&curStatus->curValue.newVar.var);
 	} else if (curStatus->valueType == TYPE_ALIAS_DECL) {
 		if (curStatus->curValue.string) {
-			free(curStatus->curValue.string);
+			je_free(curStatus->curValue.string);
 		}
 	} else if (curStatus->valueType == TYPE_OPTION_DECL) {
 		if (curStatus->curValue.newOpt.optName) {
-			free(curStatus->curValue.newOpt.optName);
+			je_free(curStatus->curValue.newOpt.optName);
 		}
 	}
 	curStatus->valueType = TYPE_NONE;
@@ -310,12 +311,12 @@ void freeStatus(sCurStatus* curStatus) {
 	for (size_t i = 0; i < MAX_TEX; ++i) {
 		deleteVariable(&curStatus->texVars[i]);
 	}
-	free(curStatus->texVars);
-	free(curStatus->tex1D);
-	free(curStatus->tex2D);
-	free(curStatus->tex3D);
-	free(curStatus->texCUBE);
-	free(curStatus->texRECT);
+	je_free(curStatus->texVars);
+	je_free(curStatus->tex1D);
+	je_free(curStatus->tex2D);
+	je_free(curStatus->tex3D);
+	je_free(curStatus->texCUBE);
+	je_free(curStatus->texRECT);
 	
 	kh_destroy(variables, curStatus->varsMap);
 	
@@ -327,10 +328,10 @@ void freeStatus(sCurStatus* curStatus) {
 	while ((instPtr = (sInstruction*)popArray((sArray*)&curStatus->instructions))) {
 		for (int i = 0; i < MAX_OPERANDS; ++i) {
 			if (instPtr->vars[i].floatArrAddr) {
-				free(instPtr->vars[i].floatArrAddr);
+				je_free(instPtr->vars[i].floatArrAddr);
 			}
 		}
-		free(instPtr);
+		je_free(instPtr);
 	}
 	
 	freeArray((sArray*)&curStatus->variables);
@@ -360,14 +361,14 @@ int appendString(sCurStatus *curStatusPtr, const char *str, size_t strLen) {
 	}
 	
 	ARBCONV_DBG_HEAVY(ARBCONV_DBG(
-	char *dup = malloc((strLen + 1) * sizeof(char)); memcpy(dup, str, strLen); dup[strLen] = '\0'; SHUT_LOGD(
+	char *dup = je_malloc((strLen + 1) * sizeof(char)); memcpy(dup, str, strLen); dup[strLen] = '\0'; SHUT_LOGD(
 		"Appending '%s' to %p (%p + %ld = %p)\n",
 		dup,
 		curStatusPtr->outputEnd,
 		curStatusPtr->outputString,
 		curStatusPtr->outLen,
 		curStatusPtr->outputString + curStatusPtr->outLen
-	); free(dup); fflush(stdout);)
+	); je_free(dup); fflush(stdout);)
 	if (curStatusPtr->outputEnd != curStatusPtr->outputString + curStatusPtr->outLen) {
 		printf("\033[01;31mERROR!!!\033[m\n%s\n", str);
 		curStatusPtr->status = ST_ERROR;

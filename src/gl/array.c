@@ -5,6 +5,7 @@
 #include "glcase.h"
 #include "light.h"
 #include "state.h"
+#include <jemalloc/jemalloc.h>
 
 GLvoid *copy_gl_array(const GLvoid *src,
                       GLenum from, GLsizei width, GLsizei stride,
@@ -17,7 +18,7 @@ GLvoid *copy_gl_array(const GLvoid *src,
 
     const char *unknown_str = "LIBGL: copy_gl_array -> unknown type: %x\n";
     if(!dst) {
-        dst = malloc((count-skip) * to_width * gl_sizeof(to));
+        dst = je_malloc((count-skip) * to_width * gl_sizeof(to));
     }
     GLsizei from_size = gl_sizeof(from) * width;
     if (to_width < width) {
@@ -87,7 +88,7 @@ GLvoid *copy_gl_array_texcoord(const GLvoid *src,
 
     static const char *unknown_str = "LIBGL: copy_gl_array -> unknown type: %x\n";
     if(!dst)
-        dst = malloc((count-skip) * to_width * gl_sizeof(GL_FLOAT));
+        dst = je_malloc((count-skip) * to_width * gl_sizeof(GL_FLOAT));
     GLsizei from_size = gl_sizeof(from) * width;
     GLsizei to_elem = gl_sizeof(GL_FLOAT);
     uintptr_t in = (uintptr_t)src;
@@ -141,7 +142,7 @@ GLvoid *copy_gl_array_quickconvert(const GLvoid *src,
     if (! stride)
         stride = 4 * gl_sizeof(from);
     const char *unknown_str = "LIBGL: copy_gl_array_quickconvert -> unknown type: %x\n";
-    GLvoid *dst = (dest)?dest:malloc((count-skip) * 4 * gl_sizeof(GL_FLOAT));
+    GLvoid *dst = (dest)?dest:je_malloc((count-skip) * 4 * gl_sizeof(GL_FLOAT));
 
     uintptr_t in = (uintptr_t)src;
     in += stride*skip;
@@ -176,7 +177,7 @@ GLvoid *copy_gl_array_convert(const GLvoid *src,
     GLsizei from_size = gl_sizeof(from) * width;
 
     if(to==from && width==to_width && stride==(to_width * gl_sizeof(to))) {
-        if(!dst) dst = malloc((count-skip) * stride);
+        if(!dst) dst = je_malloc((count-skip) * stride);
         memcpy(dst, (char*)src+stride*skip, (count-skip)*stride);
         return dst;
     }
@@ -190,7 +191,7 @@ GLvoid *copy_gl_array_convert(const GLvoid *src,
             return copy_gl_array(src, from, width, stride, to, to_width, skip, count, dst);
 
     const char *unknown_str = "LIBGL: copy_gl_array_convert -> unknown type: %x\n";
-    if(!dst) dst = malloc((count-skip) * to_width * gl_sizeof(to));
+    if(!dst) dst = je_malloc((count-skip) * to_width * gl_sizeof(to));
     if (to_width < width) {
         /*printf("Warning: copy_gl_array: %i < %i\n", to_width, width);
         return NULL;*/
@@ -332,7 +333,7 @@ GLfloat *copy_eval_double1(GLenum target, GLint ustride, GLint uorder,
     if(!src || !width)
         return NULL;
 
-    out = malloc(uorder*width*sizeof(GLfloat));
+    out = je_malloc(uorder*width*sizeof(GLfloat));
 
     GLfloat *p = out;
 
@@ -352,7 +353,7 @@ GLfloat *copy_eval_float1(GLenum target, GLint ustride, GLint uorder,
     if(!src || !width)
         return NULL;
 
-    out = malloc(uorder*width*sizeof(GLfloat));
+    out = je_malloc(uorder*width*sizeof(GLfloat));
 
     GLfloat *p = out;
 
@@ -378,9 +379,9 @@ GLfloat *copy_eval_double2(GLenum target, GLint ustride, GLint uorder,
     int hsize = (uorder > vorder ? uorder : vorder)*width;
  
     if(hsize>dsize)
-      out = malloc((uorder*vorder*width+hsize)*sizeof(GLfloat));
+      out = je_malloc((uorder*vorder*width+hsize)*sizeof(GLfloat));
     else
-      out = malloc((uorder*vorder*width+dsize)*sizeof(GLfloat));
+      out = je_malloc((uorder*vorder*width+dsize)*sizeof(GLfloat));
  
     int uinc = ustride - vorder*vstride;
     GLfloat* p = out;
@@ -407,9 +408,9 @@ GLfloat *copy_eval_float2(GLenum target, GLint ustride, GLint uorder,
     int hsize = (uorder > vorder ? uorder : vorder)*width;
 
     if(hsize>dsize)
-        out = malloc((uorder*vorder*width+hsize)*sizeof(GLfloat));
+        out = je_malloc((uorder*vorder*width+hsize)*sizeof(GLfloat));
     else
-        out = malloc((uorder*vorder*width+dsize)*sizeof(GLfloat));
+        out = je_malloc((uorder*vorder*width+dsize)*sizeof(GLfloat));
 
     int uinc = ustride - vorder*vstride;
     GLfloat* p = out;
@@ -467,7 +468,7 @@ void *copy_gl_array_bgra(void* dest, const void *ptr, GLint stride, GLsizei widt
         stride = 4;
 
     if(!dest)
-        dest = malloc(4*sizeof(GLfloat)*(count-skip));
+        dest = je_malloc(4*sizeof(GLfloat)*(count-skip));
     GLfloat* dst = dest;
     src += skip*(stride);
 

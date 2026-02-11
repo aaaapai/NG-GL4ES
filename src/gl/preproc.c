@@ -8,6 +8,8 @@
 #include "preproc.h"
 #include "string_utils.h"
 
+#include <jemalloc/jemalloc.h>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -317,7 +319,7 @@ typedef struct {
 static void push_if(stackif_t *st, int v) {
     if(st->sz == st->cap) {
         st->cap += 16;
-        st->ifs = (int*)realloc(st->ifs, sizeof(int)*st->cap);
+        st->ifs = (int*)je_realloc(st->ifs, sizeof(int)*st->cap);
     }
     st->ifs[st->sz++] = v;
 }
@@ -356,7 +358,7 @@ char* preproc(const char* code, int keepcomments, int gl_es, extensions_t* exts,
     char* p = (char*)code;
     char* oldp = NULL;
     int cap=1000;
-    char* ncode = (char*)malloc(1000);
+    char* ncode = (char*)je_malloc(1000);
     ncode[0]=0;
     int sz=1;
     int status=0;
@@ -510,7 +512,7 @@ char* preproc(const char* code, int keepcomments, int gl_es, extensions_t* exts,
                         } else if(!strcmp(tok.str, "version")) {
                             status = 810;
                             if(!*versionString)
-                                *versionString = (char*)calloc(1, 51);
+                                *versionString = (char*)je_calloc(1, 51);
                         } else status=399;
                     } else status = 399;  // meh?
                     break;
@@ -624,7 +626,7 @@ char* preproc(const char* code, int keepcomments, int gl_es, extensions_t* exts,
                         if(state!=-1) {
                             if(exts->size==exts->cap) {
                                 exts->cap += 4;
-                                exts->ext = (extension_t*)realloc(exts->ext, sizeof(extension_t)*exts->cap);
+                                exts->ext = (extension_t*)je_realloc(exts->ext, sizeof(extension_t)*exts->cap);
                             }
                             strcpy(exts->ext[exts->size].name, extname);
                             exts->ext[exts->size].state = state;
@@ -803,7 +805,7 @@ char* preproc(const char* code, int keepcomments, int gl_es, extensions_t* exts,
                     int l = strlen(tok.str);
                     if(sz+l>=cap) {
                         cap+=2000;
-                        ncode = (char*)realloc(ncode, cap);
+                        ncode = (char*)je_realloc(ncode, cap);
                     }
                     strcat(ncode, tok.str);
                     sz+=l;
@@ -814,11 +816,11 @@ char* preproc(const char* code, int keepcomments, int gl_es, extensions_t* exts,
     DBG(SHUT_LOGD("New code is: ------------\n%s\n------------------\n", ncode);)
     kh_destroy(define, defines);
     kh_foreach_value(alldefines, defname,
-            free(defname);
+            je_free(defname);
         )
     kh_destroy(alldefine, alldefines);
     if(stackif.ifs)
-        free(stackif.ifs);
+        je_free(stackif.ifs);
 
     setlocale(LC_ALL, old_locale);
     return ncode;

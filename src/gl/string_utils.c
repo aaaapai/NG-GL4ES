@@ -4,6 +4,8 @@
 
 #include "string_utils.h"
 
+#include <jemalloc/jemalloc.h>
+
 const char* AllSeparators = " \t\n\r.,;()[]{}-<>+*/%&\\\"'^$=!:?";
 
 char* gl4es_resize_if_needed(char* pBuffer, int *size, int addsize);
@@ -11,22 +13,22 @@ char* gl4es_resize_if_needed(char* pBuffer, int *size, int addsize);
 void AppendToEnd(char **str, const char *suffix) {
     size_t len = strlen(*str);
     size_t suffixLen = strlen(suffix);
-    char *newStr = (char *)malloc(len + suffixLen + 1);
+    char *newStr = (char *)je_malloc(len + suffixLen + 1);
     if (newStr == NULL) {
         return;
     }
     strcpy(newStr, *str);
     strcpy(newStr + len, suffix);
-    free(*str);
+    je_free(*str);
     *str = newStr;
 }
 void InsertAtBeginning(char **str, const char *prefix) {
     size_t len = strlen(*str);
     size_t prefixLen = strlen(prefix);
-    char *newStr = (char *)malloc(len + prefixLen + 1);
+    char *newStr = (char *)je_malloc(len + prefixLen + 1);
     strcpy(newStr, prefix);
     strcpy(newStr + prefixLen, *str);
-    free(*str);
+    je_free(*str);
     *str = newStr;
 }
 
@@ -191,7 +193,7 @@ char* gl4es_resize_if_needed(char* pBuffer, int *size, int addsize) {
     int newsize = strlen(pBuffer)+addsize+1;
     if (newsize>*size) {
         //newsize += 100;
-        p = (char*)realloc(pBuffer, newsize);
+        p = (char*)je_realloc(pBuffer, newsize);
         *size=newsize;
     }
     return p;

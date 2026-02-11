@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "debug.h"
 #include "logs.h"
+#include <jemalloc/jemalloc.h>
 
 //#define DEBUG
 #ifdef DEBUG
@@ -27,12 +28,12 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
         } else gl4es_flush();
 
     if (glstate->stack == NULL) {
-        glstate->stack = (glstack_t *)malloc(STACK_SIZE * sizeof(glstack_t));
+        glstate->stack = (glstack_t *)je_malloc(STACK_SIZE * sizeof(glstack_t));
         glstate->stack->len = 0;
         glstate->stack->cap = STACK_SIZE;
     } else if (glstate->stack->len == glstate->stack->cap) {
         glstate->stack->cap += STACK_SIZE;
-        glstate->stack = (glstack_t *)realloc(glstate->stack, glstate->stack->cap * sizeof(glstack_t));
+        glstate->stack = (glstack_t *)je_realloc(glstate->stack, glstate->stack->cap * sizeof(glstack_t));
     }
 
     glstack_t *cur = glstate->stack + glstate->stack->len;
@@ -83,7 +84,7 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
         cur->autonormal = gl4es_glIsEnabled(GL_AUTO_NORMAL);
         cur->blend = gl4es_glIsEnabled(GL_BLEND);
         
-        cur->clip_planes_enabled = (GLboolean *)malloc(hardext.maxplanes * sizeof(GLboolean));
+        cur->clip_planes_enabled = (GLboolean *)je_malloc(hardext.maxplanes * sizeof(GLboolean));
         for (i = 0; i < hardext.maxplanes; i++) {
             *(cur->clip_planes_enabled + i) = gl4es_glIsEnabled(GL_CLIP_PLANE0 + i);
         }
@@ -94,7 +95,7 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
         cur->dither = gl4es_glIsEnabled(GL_DITHER);
         cur->fog = gl4es_glIsEnabled(GL_FOG);
 
-        cur->lights_enabled = (GLboolean *)malloc(hardext.maxlights * sizeof(GLboolean));
+        cur->lights_enabled = (GLboolean *)je_malloc(hardext.maxlights * sizeof(GLboolean));
         for (i = 0; i < hardext.maxlights; i++) {
             *(cur->lights_enabled + i) = gl4es_glIsEnabled(GL_LIGHT0 + i);
         }
@@ -158,8 +159,8 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
 
         int i;
         int j=0;
-        cur->lights_enabled = (GLboolean *)malloc(hardext.maxlights * sizeof(GLboolean));
-        cur->lights = (GLfloat *)malloc(hardext.maxlights * sizeof(GLfloat)*(10*4));
+        cur->lights_enabled = (GLboolean *)je_malloc(hardext.maxlights * sizeof(GLboolean));
+        cur->lights = (GLfloat *)je_malloc(hardext.maxlights * sizeof(GLfloat)*(10*4));
         for (i = 0; i < hardext.maxlights; i++) {
             *(cur->lights_enabled + i) = gl4es_glIsEnabled(GL_LIGHT0 + i);
             #define L(A) gl4es_glGetLightfv(GL_LIGHT0 + i, A, cur->lights+j); j+=4
@@ -176,7 +177,7 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
             #undef L
         }
         j=0;
-        cur->materials = (GLfloat *)malloc(2 * sizeof(GLfloat)*(5*4));
+        cur->materials = (GLfloat *)je_malloc(2 * sizeof(GLfloat)*(5*4));
         memset(cur->materials, 0, 2 * sizeof(GLfloat)*(5*4));
         #define M(A) gl4es_glGetMaterialfv(GL_BACK, A, cur->materials+j); j+=4; gl4es_glGetMaterialfv(GL_FRONT, A, cur->materials+j); j+=4
         M(GL_AMBIENT); M(GL_DIFFUSE); M(GL_SPECULAR); M(GL_EMISSION); M(GL_SHININESS);  // handle both face at some point?
@@ -272,7 +273,7 @@ void APIENTRY_GL4ES gl4es_glPushAttrib(GLbitfield mask) {
     if (mask & GL_TRANSFORM_BIT) {
 		if (!(mask & GL_ENABLE_BIT)) {
 			int i;
-			cur->clip_planes_enabled = (GLboolean *)malloc(hardext.maxplanes * sizeof(GLboolean));
+			cur->clip_planes_enabled = (GLboolean *)je_malloc(hardext.maxplanes * sizeof(GLboolean));
 			for (i = 0; i < hardext.maxplanes; i++) {
 				*(cur->clip_planes_enabled + i) = gl4es_glIsEnabled(GL_CLIP_PLANE0 + i);
 			}
@@ -294,12 +295,12 @@ void APIENTRY_GL4ES gl4es_glPushClientAttrib(GLbitfield mask) {
     DBG(SHUT_LOGD("glPushClientAttrib(0x%04X)\n", mask);)
     noerrorShim();
     if (glstate->clientStack == NULL) {
-        glstate->clientStack = (glclientstack_t *)malloc(STACK_SIZE * sizeof(glclientstack_t));
+        glstate->clientStack = (glclientstack_t *)je_malloc(STACK_SIZE * sizeof(glclientstack_t));
         glstate->clientStack->len = 0;
         glstate->clientStack->cap = STACK_SIZE;
     } else if (glstate->clientStack->len == glstate->clientStack->cap) {
         glstate->clientStack->cap += STACK_SIZE;
-        glstate->clientStack = (glclientstack_t *)realloc(glstate->clientStack, glstate->clientStack->cap * sizeof(glclientstack_t));
+        glstate->clientStack = (glclientstack_t *)je_realloc(glstate->clientStack, glstate->clientStack->cap * sizeof(glclientstack_t));
     }
 
     glclientstack_t *cur = glstate->clientStack + glstate->clientStack->len;
@@ -325,7 +326,7 @@ void APIENTRY_GL4ES gl4es_glPushClientAttrib(GLbitfield mask) {
 }
 
 #define maybe_free(x) \
-    if (x) free(x)
+    if (x) je_free(x)
 
 #define enable_disable(pname, enabled) \
     if (enabled) gl4es_glEnable(pname);      \

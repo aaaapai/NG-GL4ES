@@ -13,6 +13,8 @@
 #include "init.h"
 #include "loader.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -109,7 +111,7 @@ void APIENTRY_GL4ES gl4es_glGenFramebuffers(GLsizei n, GLuint* ids) {
     khash_t(framebufferlist_t)* list = glstate->fbo.framebufferlist;
     for (int i = 0; i < n; ++i) {
         k = kh_put(framebufferlist_t, list, ids[i], &ret);
-        glframebuffer_t* fb = kh_value(list, k) = malloc(sizeof(glframebuffer_t));
+        glframebuffer_t* fb = kh_value(list, k) = je_malloc(sizeof(glframebuffer_t));
         memset(fb, 0, sizeof(glframebuffer_t));
         fb->id = ids[i];
         fb->n_draw = 0; // correct?
@@ -164,7 +166,7 @@ void APIENTRY_GL4ES gl4es_glDeleteFramebuffers(GLsizei n, GLuint* framebuffers) 
                         if (glstate->fbo.fbo_draw == fb) {
                             glstate->fbo.fbo_draw = 0;
                         }
-                        free(fb);
+                        je_free(fb);
                         kh_del(framebufferlist_t, glstate->fbo.framebufferlist, k);
                     }
                 }
@@ -176,11 +178,11 @@ void APIENTRY_GL4ES gl4es_glDeleteFramebuffers(GLsizei n, GLuint* framebuffers) 
         noerrorShim();
         if (glstate->fbo.old->cap == 0) {
             glstate->fbo.old->cap = 16;
-            glstate->fbo.old->fbos = (GLuint*)malloc(glstate->fbo.old->cap * sizeof(GLuint));
+            glstate->fbo.old->fbos = (GLuint*)je_malloc(glstate->fbo.old->cap * sizeof(GLuint));
         }
         if (glstate->fbo.old->nbr + n > glstate->fbo.old->cap) {
             glstate->fbo.old->cap += n;
-            glstate->fbo.old->fbos = (GLuint*)realloc(glstate->fbo.old->fbos, glstate->fbo.old->cap * sizeof(GLuint));
+            glstate->fbo.old->fbos = (GLuint*)je_realloc(glstate->fbo.old->fbos, glstate->fbo.old->cap * sizeof(GLuint));
         }
         memcpy(glstate->fbo.old->fbos + glstate->fbo.old->nbr, framebuffers, n * sizeof(GLuint));
         glstate->fbo.old->nbr += n;
@@ -879,7 +881,7 @@ void APIENTRY_GL4ES gl4es_glGenRenderbuffers(GLsizei n, GLuint* renderbuffers) {
     khash_t(renderbufferlist_t)* list = glstate->fbo.renderbufferlist;
     for (int i = 0; i < n; ++i) {
         k = kh_put(renderbufferlist_t, list, renderbuffers[i], &ret);
-        glrenderbuffer_t* rend = kh_value(list, k) = malloc(sizeof(glrenderbuffer_t));
+        glrenderbuffer_t* rend = kh_value(list, k) = je_malloc(sizeof(glrenderbuffer_t));
         memset(rend, 0, sizeof(glrenderbuffer_t));
         rend->renderbuffer = renderbuffers[i];
     }
@@ -1003,7 +1005,7 @@ void APIENTRY_GL4ES gl4es_glDeleteRenderbuffers(GLsizei n, GLuint* renderbuffers
                         if (glstate->fbo.current_rb == rend) glstate->fbo.current_rb = glstate->fbo.default_rb;
                         if (rend->secondarybuffer) gles_glDeleteRenderbuffers(1, &rend->secondarybuffer);
                         if (rend->secondarytexture) gl4es_glDeleteTextures(1, &rend->secondarytexture);
-                        free(rend);
+                        je_free(rend);
                         kh_del(renderbufferlist_t, glstate->fbo.renderbufferlist, k);
                     }
                 }

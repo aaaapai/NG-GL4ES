@@ -7,6 +7,7 @@
 #include "glstate.h"
 #include "init.h"
 #include "loader.h"
+#include <jemalloc/jemalloc.h>
 
 //#define DEBUG
 #ifdef DEBUG
@@ -16,10 +17,10 @@
 #endif
 
 void alloc_matrix(matrixstack_t **matrixstack, int depth) {
-	*matrixstack = (matrixstack_t*)malloc(sizeof(matrixstack_t));
+	*matrixstack = (matrixstack_t*)je_malloc(sizeof(matrixstack_t));
 	(*matrixstack)->top = 0;
 	(*matrixstack)->identity = 0;
-	(*matrixstack)->stack = (GLfloat*)malloc(sizeof(GLfloat)*depth*16);
+	(*matrixstack)->stack = (GLfloat*)je_malloc(sizeof(GLfloat)*depth*16);
 }
 
 #define TOP(A) (glstate->A->stack+(glstate->A->top*16))
@@ -79,8 +80,8 @@ DBG(SHUT_LOGD("init_matrix(%p)\n", glstate);)
     alloc_matrix(&glstate->modelview_matrix, MAX_STACK_MODELVIEW);
     set_identity(TOP(modelview_matrix));
 	glstate->modelview_matrix->identity = 1;
-	glstate->texture_matrix = (matrixstack_t**)malloc(sizeof(matrixstack_t*)*MAX_TEX);
-	glstate->arb_matrix = (matrixstack_t**)malloc(sizeof(matrixstack_t*)*MAX_ARB_MATRIX);
+	glstate->texture_matrix = (matrixstack_t**)je_malloc(sizeof(matrixstack_t*)*MAX_TEX);
+	glstate->arb_matrix = (matrixstack_t**)je_malloc(sizeof(matrixstack_t*)*MAX_ARB_MATRIX);
 	set_identity(glstate->mvp_matrix);
 	glstate->mvp_matrix_dirty = 0;
 	set_identity(glstate->inv_mv_matrix);

@@ -13,6 +13,8 @@
 #include "init.h"
 #include "loader.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -136,7 +138,7 @@ void APIENTRY_GL4ES gl4es_glGenBuffers(GLsizei n, GLuint* buffers) {
         khint_t k;
         int ret;
         k = kh_put(buff, list, b, &ret);
-        glbuffer_t* buff = kh_value(list, k) = malloc(sizeof(glbuffer_t));
+        glbuffer_t* buff = kh_value(list, k) = je_malloc(sizeof(glbuffer_t));
         buff->buffer = b;
         buff->type = 0; // no target for now
         buff->data = NULL;
@@ -171,7 +173,7 @@ void APIENTRY_GL4ES gl4es_glBindBuffer(GLenum target, GLuint buffer) {
         glbuffer_t* buff = NULL;
         if (k == kh_end(list)) {
             k = kh_put(buff, list, buffer, &ret);
-            buff = kh_value(list, k) = malloc(sizeof(glbuffer_t));
+            buff = kh_value(list, k) = je_malloc(sizeof(glbuffer_t));
             buff->buffer = buffer;
             buff->type = target;
             buff->data = NULL;
@@ -232,10 +234,10 @@ void APIENTRY_GL4ES gl4es_glBufferData(GLenum target, GLsizeiptr size, const GLv
     }
 
     if (buff->data && buff->size < size) {
-        free(buff->data);
+        je_free(buff->data);
         buff->data = NULL;
     }
-    if (!buff->data) buff->data = malloc(size);
+    if (!buff->data) buff->data = je_malloc(size);
     buff->size = size;
     buff->usage = usage;
     DBG(SHUT_LOGD("\t buff->data = %p (size=%zd)\n", buff->data, size);)
@@ -261,7 +263,7 @@ void APIENTRY_GL4ES gl4es_glNamedBufferData(GLuint buffer, GLsizeiptr size, cons
         return;
     }
     if (buff->data) {
-        free(buff->data);
+        je_free(buff->data);
     }
     int go_real = 0;
     if ((buff->type == GL_ARRAY_BUFFER || buff->type == GL_ELEMENT_ARRAY_BUFFER) &&
@@ -290,7 +292,7 @@ void APIENTRY_GL4ES gl4es_glNamedBufferData(GLuint buffer, GLsizeiptr size, cons
 
     buff->size = size;
     buff->usage = usage;
-    buff->data = malloc(size);
+    buff->data = je_malloc(size);
     buff->access = GL_READ_WRITE;
     if (data) memcpy(buff->data, data, size);
     // update binded VA
@@ -399,9 +401,9 @@ void APIENTRY_GL4ES gl4es_glDeleteBuffers(GLsizei n, const GLuint* buffers) {
                             glstate->vao->vertexattrib[j].real_pointer = 0;
                         }
                     DBG(SHUT_LOGD("\t buff->data = %p\n", buff->data);)
-                    if (buff->data) free(buff->data);
+                    if (buff->data) je_free(buff->data);
                     kh_del(buff, list, k);
-                    free(buff);
+                    je_free(buff);
                 }
             }
         }
@@ -1087,7 +1089,7 @@ void APIENTRY_GL4ES gl4es_glBindVertexArray(GLuint array) {
         glvao_t* glvao = NULL;
         if (k == kh_end(list)) {
             k = kh_put(glvao, list, array, &ret);
-            glvao = kh_value(list, k) = malloc(sizeof(glvao_t));
+            glvao = kh_value(list, k) = je_malloc(sizeof(glvao_t));
             // new vao is binded to nothing
             VaoInit(glvao);
             // Copy current status to new VAO
@@ -1129,7 +1131,7 @@ void APIENTRY_GL4ES gl4es_glDeleteVertexArrays(GLsizei n, const GLuint* arrays) 
                     glvao = kh_value(list, k);
                     VaoSharedClear(glvao);
                     kh_del(glvao, list, k);
-                    // free(glvao);  //let the use delete those
+                    // je_free(glvao);  //let the use delete those
                 }
             }
         }
@@ -1155,13 +1157,13 @@ GLboolean APIENTRY_GL4ES gl4es_glIsVertexArray(GLuint array) {
 void VaoSharedClear(glvao_t* vao) {
     if (vao == NULL || vao->shared_arrays == NULL) return;
     if (!(--(*vao->shared_arrays))) {
-        free(vao->vert.ptr);
-        free(vao->color.ptr);
-        free(vao->secondary.ptr);
-        free(vao->normal.ptr);
+        je_free(vao->vert.ptr);
+        je_free(vao->color.ptr);
+        je_free(vao->secondary.ptr);
+        je_free(vao->normal.ptr);
         for (int i = 0; i < hardext.maxtex; i++)
-            free(vao->tex[i].ptr);
-        free(vao->shared_arrays);
+            je_free(vao->tex[i].ptr);
+        je_free(vao->shared_arrays);
     }
     vao->vert.ptr = NULL;
     vao->color.ptr = NULL;

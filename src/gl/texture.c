@@ -18,6 +18,8 @@
 #include "pixel.h"
 #include "raster.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -909,7 +911,7 @@ static void* swizzle_texture(GLsizei width, GLsizei height, GLenum* format, GLen
                     return NULL;
                 }
                 if (pix2 != pixels) {
-                    if (pixels != data) free(pixels);
+                    if (pixels != data) je_free(pixels);
                     pixels = pix2;
                 }
                 *type = dest_type;
@@ -923,7 +925,7 @@ static void* swizzle_texture(GLsizei width, GLsizei height, GLenum* format, GLen
                               PrintEnum(*type), PrintEnum(dest_format), PrintEnum(dest_type));
                     pix2 = pixels;
                 }
-            if (pix2 != pixels && pixels != data) free(pixels);
+            if (pix2 != pixels && pixels != data) je_free(pixels);
             return pix2;
         } else {
             bound->inter_format = dest_format;
@@ -1603,7 +1605,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
             int imgWidth, pixelSize, dstWidth;
             pixelSize = pixel_sizeof(format, type);
             imgWidth = ((glstate->texture.unpack_row_length) ? glstate->texture.unpack_row_length : width) * pixelSize;
-            GLubyte* dst = (GLubyte*)malloc(width * height * pixelSize);
+            GLubyte* dst = (GLubyte*)je_malloc(width * height * pixelSize);
             pixels = (GLvoid*)dst;
             dstWidth = width * pixelSize;
             const GLubyte* src = (GLubyte*)datab;
@@ -1645,7 +1647,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
         GLvoid* old = pixels;
         pixels = (GLvoid*)swizzle_texture(width, height, &format, &type, internalformat, new_format, old, bound);
         if (old != pixels && old != datab) {
-            free(old);
+            je_free(old);
         }
 
         if (bound->shrink != 0) {
@@ -1687,7 +1689,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                         bound->useratio = 1;
                         pixel_scale(pixels, &out, width, height, newwidth, newheight, format, type);
                     }
-                    if (out != pixels && pixels != datab) free(pixels);
+                    if (out != pixels && pixels != datab) je_free(pixels);
                     pixels = out;
                     width = newwidth;
                     height = newheight;
@@ -1712,7 +1714,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                             bound->ratioy *= 0.25f;
                         }
                     }
-                    if (out != pixels && pixels != datab) free(pixels);
+                    if (out != pixels && pixels != datab) je_free(pixels);
                     pixels = out;
                     width = nlevel(width, toshrink);
                     height = nlevel(height, toshrink);
@@ -1893,7 +1895,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
 
                 GLvoid* out = pixels;
                 if (pixels) pixel_scale(pixels, &out, width, height, nwidth, nheight, format, type);
-                if (out != pixels && pixels != datab) free(pixels);
+                if (out != pixels && pixels != datab) je_free(pixels);
                 pixels = out;
                 width = nwidth;
                 height = nheight;
@@ -1993,7 +1995,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     if (pixels) {
                         GLvoid* out = ndata;
                         pixel_doublescale(ndata, &out, nw, nh, format, type);
-                        if (out != ndata && ndata != pixels) free(ndata);
+                        if (out != ndata && ndata != pixels) je_free(ndata);
                         ndata = out;
                     }
                     nw <<= 1;
@@ -2004,7 +2006,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     gles_glTexImage2D(rtarget, leveln, format, nww, nhh, border, format, type, (pot) ? ndata : NULL);
                     if (!pot && pixels) gles_glTexSubImage2D(rtarget, leveln, 0, 0, nw, nh, format, type, ndata);
                 }
-                if (ndata != pixels) free(ndata);
+                if (ndata != pixels) je_free(ndata);
             }
             if (globals4es.automipmap == 5 && !level) bound->mipmap_done = 0;
             // check if max_level is set... and calculate higher level mipmap
@@ -2019,7 +2021,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     if (pixels) {
                         GLvoid* out = ndata;
                         pixel_halfscale(ndata, &out, nww, nhh, format, type);
-                        if (out != ndata && ndata != pixels) free(ndata);
+                        if (out != ndata && ndata != pixels) je_free(ndata);
                         ndata = out;
                     }
                     nw = nlevel(nw, 1);
@@ -2030,7 +2032,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     gles_glTexImage2D(rtarget, leveln, format, nw, nh, border, format, type, (pot) ? ndata : NULL);
                     if (!pot && pixels) gles_glTexSubImage2D(rtarget, leveln, 0, 0, nww, nhh, format, type, ndata);
                 }
-                if (ndata != pixels) free(ndata);
+                if (ndata != pixels) je_free(ndata);
             }
             /*if (bound && bound->mipmap_need && !bound->mipmap_auto && (globals4es.automipmap!=3))
                 gles_glTexParameteri( rtarget, GL_GENERATE_MIPMAP, GL_FALSE );*/
@@ -2047,9 +2049,9 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
     if ((target == GL_TEXTURE_2D) && globals4es.texcopydata &&
         ((globals4es.texstream && !bound->streamed) || !globals4es.texstream)) {
         if (bound->data)
-            bound->data = realloc(bound->data, width * height * 4);
+            bound->data = je_realloc(bound->data, width * height * 4);
         else
-            bound->data = malloc(width * height * 4);
+            bound->data = je_malloc(width * height * 4);
         if (datab) {
             if (!pixel_convert(pixels, &bound->data, width, height, format, type, GL_RGBA, GL_UNSIGNED_BYTE, 0,
                                glstate->texture.unpack_align))
@@ -2059,7 +2061,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
         }
     }
     if (pixels != datab) {
-        free(pixels);
+        je_free(pixels);
     }
     // update max bound to be sure "sampler" is applied
     if (glstate->bound_changed < glstate->texture.active + 1) glstate->bound_changed = glstate->texture.active + 1;
@@ -2132,7 +2134,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
         int imgWidth, pixelSize, dstWidth;
         pixelSize = pixel_sizeof(format, type);
         imgWidth = ((glstate->texture.unpack_row_length) ? glstate->texture.unpack_row_length : width) * pixelSize;
-        GLubyte* dst = (GLubyte*)malloc(width * height * pixelSize);
+        GLubyte* dst = (GLubyte*)je_malloc(width * height * pixelSize);
         pixels = (GLvoid*)dst;
         dstWidth = width * pixelSize;
         const GLubyte* src = (GLubyte*)datab;
@@ -2197,14 +2199,14 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                                    glstate->texture.unpack_align)) {
                     SHUT_LOGD("LIBGL: Error in pixel_convert while glTexSubImage2D\n");
                 }
-                if (pixels != pix2 && pixels != old) free(pixels);
+                if (pixels != pix2 && pixels != old) je_free(pixels);
                 pixels = pix2;
                 format = bound->format;
                 type = bound->type;
             }
         }
     }
-    if (old != pixels && old != datab) free(old);
+    if (old != pixels && old != datab) je_free(old);
 
     if (bound->shrink || bound->useratio) {
         // special case for width/height == 1
@@ -2212,7 +2214,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
         if (height == 1) height += (yoffset % 2);
         if ((width == 1) || (height == 1)) {
             // nothing to do...
-            if (pixels != datab) free((GLvoid*)pixels);
+            if (pixels != datab) je_free((GLvoid*)pixels);
             return;
         }
         // ok, now standard cases....
@@ -2225,7 +2227,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
             pixel_scale(pixels, &old, width, height, newwidth, newheight, format, type);
             width = newwidth;
             height = newheight;
-            if (old != pixels && pixels != datab) free(pixels);
+            if (old != pixels && pixels != datab) je_free(pixels);
             pixels = old;
         } else {
             xoffset /= 2 * bound->shrink;
@@ -2238,7 +2240,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                     pixel_halfscale(pixels, &old, width, height, format, type);
                 else
                     pixel_quarterscale(pixels, &old, width, height, format, type);
-                if (old != pixels && pixels != datab) free(pixels);
+                if (old != pixels && pixels != datab) je_free(pixels);
                 pixels = old;
                 width = nlevel(width, toshrink);
                 height = nlevel(height, toshrink);
@@ -2277,7 +2279,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                 if (pixels) {
                     GLvoid* out = ndata;
                     pixel_doublescale(ndata, &out, nw, nh, format, type);
-                    if (out != ndata && ndata != pixels) free(ndata);
+                    if (out != ndata && ndata != pixels) je_free(ndata);
                     ndata = out;
                 }
                 nw <<= 1;
@@ -2287,7 +2289,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                 --leveln;
                 gles_glTexSubImage2D(rtarget, leveln, xx, yy, nw, nh, format, type, ndata);
             }
-            if (ndata != pixels) free(ndata);
+            if (ndata != pixels) je_free(ndata);
         }
         // check if max_level is set... and calculate higher level mipmap
         int genmipmap = 0;
@@ -2301,7 +2303,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                 if (pixels) {
                     GLvoid* out = ndata;
                     pixel_halfscale(ndata, &out, nw, nh, format, type);
-                    if (out != ndata && ndata != pixels) free(ndata);
+                    if (out != ndata && ndata != pixels) je_free(ndata);
                     ndata = out;
                 }
                 nw = nlevel(nw, 1);
@@ -2311,7 +2313,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
                 ++leveln;
                 gles_glTexSubImage2D(rtarget, leveln, xx, yy, nw, nh, format, type, ndata);
             }
-            if (ndata != pixels) free(ndata);
+            if (ndata != pixels) je_free(ndata);
         }
     }
 
@@ -2328,7 +2330,7 @@ void old_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffse
             SHUT_LOGD("LIBGL: Error on pixel_convert while TEXCOPY in glTexSubImage2D\n");
     }
 
-    if (pixels != datab) free((GLvoid*)pixels);
+    if (pixels != datab) je_free((GLvoid*)pixels);
 }
 
 void APIENTRY_GL4ES gl4es_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width,
@@ -2419,9 +2421,9 @@ void APIENTRY_GL4ES gl4es_glTexSubImage2D(GLenum target, GLint level, GLint xoff
             return;
         }
 
-        temp_pixels = (GLubyte*)malloc(total_dst);
+        temp_pixels = (GLubyte*)je_malloc(total_dst);
         if (!temp_pixels) {
-            SHUT_LOGD("LIBGL: malloc failed in glTexSubImage2D (bytes=%zu)\n", total_dst);
+            SHUT_LOGD("LIBGL: je_malloc failed in glTexSubImage2D (bytes=%zu)\n", total_dst);
             return;
         }
 
@@ -2441,7 +2443,7 @@ void APIENTRY_GL4ES gl4es_glTexSubImage2D(GLenum target, GLint level, GLint xoff
     LOAD_GLES2(glTexSubImage2D);
     gles_glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (const GLvoid*)pixels_src);
 
-    if (temp_pixels) free(temp_pixels);
+    if (temp_pixels) je_free(temp_pixels);
 }
 
 // 1d stubs

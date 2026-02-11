@@ -9,6 +9,8 @@
 #include "matvec.h"
 #include "logs.h"
 
+#include <jemalloc/jemalloc.h>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG(a) a
@@ -74,7 +76,7 @@ void bind_stipple_tex() {
 GLfloat *gen_stipple_tex_coords(GLfloat *vert, GLushort *sindices, modeinit_t *modes, int stride, int length, GLfloat* noalloctex) {
     DBG(SHUT_LOGD("Generate stripple tex (stride=%d, noalloctex=%p) length=%d:", stride, noalloctex, length);)
     // generate our texture coords
-    GLfloat *tex = noalloctex?noalloctex:(GLfloat *)malloc(modes[length-1].ilen * 4 * sizeof(GLfloat));
+    GLfloat *tex = noalloctex?noalloctex:(GLfloat *)je_malloc(modes[length-1].ilen * 4 * sizeof(GLfloat));
     GLfloat *texPos = tex;
     GLfloat *vertPos = vert;
 
