@@ -762,7 +762,7 @@ int get_or_add_glsl_version(std::string& glsl) {
         glsl = replace_line_starting_with(glsl, "#version", "#version 460 compatibility\n");
         glsl_version = 460;
 	}
-    LOG_D("GLSL version: %d",glsl_version)
+    //LOG_D("GLSL version: %d",glsl_version)
     return glsl_version;
 }
 
