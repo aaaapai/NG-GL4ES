@@ -2,6 +2,7 @@
 extern "C" {
 #endif
 #include "../gles.h"
+#include <jemalloc/jemalloc.h>
 
 #ifndef GLESWRAP_H
 #define GLESWRAP_H

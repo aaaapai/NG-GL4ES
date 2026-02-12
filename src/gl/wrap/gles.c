@@ -3,6 +3,8 @@
 #include "../loader.h"
 #include "skips.h"
 
+#include <jemalloc/jemalloc.h>
+
 // emulation of 'glTexParameteri' (for internal use only)
 void gles_glTexParameteri(glTexParameteri_ARG_EXPAND)
 {

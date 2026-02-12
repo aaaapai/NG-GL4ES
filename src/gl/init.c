@@ -26,6 +26,8 @@
 #include "envvars.h"
 #include "config.h"
 
+#include <jemalloc/jemalloc.h>
+
 #if defined(__EMSCRIPTEN__)
 #define NO_INIT_CONSTRUCTOR
 #endif

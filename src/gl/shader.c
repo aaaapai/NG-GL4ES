@@ -12,6 +12,7 @@
 #include "glsl/glsl_for_es.h"
 #include <ctype.h>
 #include <string.h>
+#include <jemalloc/jemalloc.h>
 
 // #define DEBUG
 #ifdef DEBUG

@@ -11,6 +11,8 @@
 #include "logs.h"
 #include "render.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a

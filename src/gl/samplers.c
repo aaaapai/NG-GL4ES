@@ -12,6 +12,8 @@
 #include "texture.h"
 #include "../../include/khash.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a

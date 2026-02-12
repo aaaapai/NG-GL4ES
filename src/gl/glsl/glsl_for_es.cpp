@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include "../../../version.h"
+#include <jemalloc/jemalloc.h>
 
 extern "C"
 {
@@ -717,6 +718,21 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
                 "const mat3 rotInverse = mat3(rot[0][0], rot[1][0], rot[2][0], rot[0][1], rot[1][1], rot[2][1], "
                 "rot[0][2], rot[1][2], rot[2][2]);");
 
+
+   /*if (shaderType == GL_VERTEX_SHADER) {
+        replace_all(ret, "attribute", "in");
+        replace_all(ret, "varying", "out");
+     } else if (shaderType == GL_FRAGMENT_SHADER) {
+        replace_all(ret, "varying", "in");
+  	}*/
+	
+    replace_all(ret, "texture2D", "texture");
+
+    replace_all(ret, "vec3 worldPosDiff", "vec4 worldPosDiff");
+    replace_all(ret, "vec3[3](vWorldPos[0] - vWorldPos[1]", "vec4[3](vWorldPos[0] - vWorldPos[1]");
+    replace_all(ret, "vec3 reflection;", "vec3 reflection=vec3(0,0,0);");
+    replace_all(ret, "#error ", "// #error ");
+  
     // GI_TemporalFilter injection
     inject_temporal_filter(ret);
 
@@ -739,10 +755,14 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
 int get_or_add_glsl_version(std::string& glsl) {
     int glsl_version = getGLSLVersion(glsl.c_str());
     if (glsl_version == -1) {
-        glsl_version = 140;
-        glsl.insert(0, "#version 140\n");
-    }
-    // LOGD("GLSL version: %d",glsl_version)
+        glsl_version = 460;
+        glsl.insert(0, "#version 460 compatibility\n");
+    } else if (glsl_version < 460) {
+        // force upgrade glsl version
+        glsl = replace_line_starting_with(glsl, "#version", "#version 460 compatibility\n");
+        glsl_version = 460;
+	}
+    //LOG_D("GLSL version: %d",glsl_version)
     return glsl_version;
 }
 

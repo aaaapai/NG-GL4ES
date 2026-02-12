@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ng_gl4es)
 
-#if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+set(CMAKE_ANDROID_LD "lld")
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTOSupported OUTPUT LTOError)
     if (LTOSupported)
@@ -36,22 +40,20 @@ set(SPIRV_CROSS_CLI            OFF CACHE BOOL "Disable CLI binary" FORCE)
 set(SPIRV_CROSS_STATIC         ON  CACHE BOOL "Prefer static libs" FORCE)
 set(SPIRV_CROSS_ENABLE_UTIL    OFF  CACHE BOOL "Disable util" FORCE)
 
-add_subdirectory(3rdparty/glslang)
-add_subdirectory(3rdparty/SPIRV-Cross)
-
 enable_language(CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto -mllvm -polly-run-inliner -mllvm -polly-run-dce -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -stdlib=libc++ -Wno-unicode-whitespace -Wno-format -Wno-unused-function -Wno-vla-cxx-extension -DNO_GBM -DDEFAULT_ES=3 -DNOX11 -Wno-typedef-redefinition -Wno-dangling-else -funwind-tables -fvisibility=hidden -pthread")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DNO_GBM -DDEFAULT_ES=3 -fvisibility=hidden")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -pipe -integrated-as -mllvm -polly -mllvm -polly-vectorizer=stripmine -mllvm -polly-invariant-load-hoisting -mllvm -polly-run-inliner -mllvm -polly-run-dce -mllvm -polly-invariant-load-hoisting -flto -mllvm -polly-run-inliner -mllvm -polly-run-dce -fwhole-program-vtables -fdata-sections -ffunction-sections -fmerge-all-constants -mllvm -polly-detect-keep-going -mllvm -polly-ast-use-context -march=armv8-a+simd -Wall -Wextra -ferror-limit=0 -Wno-return-type -Wno-unused-parameter -Wno-c++98-compat -Wno-c++98-compat-pedantic -DGLM_FORCE_INTRINSICS -Wno-unicode-whitespace -Wno-format -Wno-unused-function -DNO_GBM -DDEFAULT_ES=3 -Wno-typedef-redefinition -Wno-dangling-else -funwind-tables -fvisibility=hidden -pthread")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -flto -O3 -Wl,--strip-all -Wl,-O3 -Wl,--gc-sections -Wl,--as-needed -fvisibility=hidden")
 
 if(ANDROID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11")
@@ -59,7 +61,12 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include )
 
+add_subdirectory(3rdparty/glslang)
+add_subdirectory(3rdparty/SPIRV-Cross)
+
 set(C_SRC_FILES
+    src/egl/egl.c
+    src/egl/lookup.c
     src/gl/string_utils.c
     src/gl/cJSON.c
     src/gl/config.c
@@ -127,7 +134,6 @@ set(C_SRC_FILES
     src/gl/wrap/gl4eswraps.c
     src/gl/wrap/gles.c
     src/gl/wrap/glstub.c
-    src/gl/wrap/glesnative.cpp
     src/gl/math/matheval.c
     src/glx/hardext.c
     src/glx/lookup.c
@@ -144,6 +150,7 @@ endif()
 set(CPP_SRC_FILES
     src/gl/glsl/glsl_for_es.cpp
     src/gl/getter.cpp
+    src/gl/wrap/glesnative.cpp
 )
 
 set(SRC_FILES ${CPP_SRC_FILES} ${C_SRC_FILES})
@@ -171,6 +178,7 @@ if(ANDROID)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
         android
         log
+        # ${CMAKE_SOURCE_DIR}/src/libjemalloc.so
     )
 else()
     # Nothing to link
@@ -181,6 +189,6 @@ target_include_directories(ng_gl4es PUBLIC
     ${CMAKE_SOURCE_DIR}/include
 )
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    LINK_FLAGS "-Wl,--strip-all"
-)
+ target_link_options(${CMAKE_PROJECT_NAME} PRIVATE 
+     "LINKER:--version-script=${CMAKE_SOURCE_DIR}/src/ngg-version.script"
+ )

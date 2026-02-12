@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <sstream>
+#include <jemalloc/jemalloc.h>
 
 extern "C"
 {
@@ -1036,6 +1037,9 @@ extern "C"
             break;
         case GL_CONTEXT_PROFILE_MASK:
             *params = GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+            break;
+        case GL_MAX_VERTEX_IMAGE_UNIFORMS:
+            *params = 4;
             break;
         default:
             errorGL();

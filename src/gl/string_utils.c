@@ -4,6 +4,8 @@
 
 #include "string_utils.h"
 
+#include <jemalloc/jemalloc.h>
+
 const char* AllSeparators = " \t\n\r.,;()[]{}-<>+*/%&\\\"'^$=!:?";
 
 char* gl4es_resize_if_needed(char* pBuffer, int *size, int addsize);
