@@ -192,7 +192,6 @@ void APIENTRY_GL4ES gl4es_glBindBuffer(GLenum target, GLuint buffer) {
 }
 
 void APIENTRY_GL4ES gl4es_glBufferData(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage) {
-
     DBG(SHUT_LOGD("glBufferData(%s, %zi, %p, %s)\n", PrintEnum(target), size, data, PrintEnum(usage));)
     if (!buffer_target(target)) {
         errorShim(GL_INVALID_ENUM);
@@ -204,12 +203,6 @@ void APIENTRY_GL4ES gl4es_glBufferData(GLenum target, GLsizeiptr size, const GLv
         LOGE("Warning, null buffer for target=0x%04X for glBufferData\n", target);
         return;
     }
-
-    if (buff && buff->immutable) {
-        errorShim(GL_INVALID_OPERATION);
-        return;
-    }
-
     if (target == GL_ARRAY_BUFFER) VaoSharedClear(glstate->vao);
 
     int go_real = 0;
@@ -743,146 +736,6 @@ void APIENTRY_GL4ES gl4es_glFlushMappedBufferRange(GLenum target, GLintptr offse
         gles_glBufferSubData(buff->type, buff->offset + offset, length,
                              (void*)((uintptr_t)buff->data + buff->offset + offset));
     }
-}
-
-void APIENTRY_GL4ES gl4es_glBufferStorage(GLenum target, GLsizeiptr size, const void* data, GLbitfield flags) {
-    DBG(SHUT_LOGD("glBufferStorage(%s, %zd, %p, 0x%x)\n", PrintEnum(target), size, data, flags);)
-    
-    if (!buffer_target(target)) {
-        errorShim(GL_INVALID_ENUM);
-        return;
-    }
-    
-    // 验证flags有效性
-    GLbitfield valid_flags = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT | 
-                             GL_MAP_PERSISTENT_BIT_EXT | GL_MAP_COHERENT_BIT_EXT |
-                             GL_DYNAMIC_STORAGE_BIT_EXT | GL_CLIENT_STORAGE_BIT_EXT;
-    
-    if (flags & ~valid_flags) {
-        errorShim(GL_INVALID_VALUE);
-        return;
-    }
-    
-    // 验证持久映射需要写或读权限
-    if ((flags & GL_MAP_PERSISTENT_BIT_EXT) && !(flags & (GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT))) {
-        errorShim(GL_INVALID_VALUE);
-        return;
-    }
-    
-    // 获取或创建buffer对象
-    glbuffer_t* buff = getbuffer_buffer(target);
-    if (buff == NULL) {
-        // 如果没有现有buffer，创建新的
-        GLuint new_buffer;
-        gl4es_glGenBuffers(1, &new_buffer);
-        gl4es_glBindBuffer(target, new_buffer);
-        buff = getbuffer_buffer(target);
-        if (buff == NULL) {
-            errorShim(GL_OUT_OF_MEMORY);
-            return;
-        }
-    }
-    
-    // 检查是否已初始化
-    if (buff->data != NULL || buff->size != 0 || buff->real_buffer != 0) {
-        errorShim(GL_INVALID_OPERATION);  // 不可变存储只能分配一次
-        return;
-    }
-    
-    // 设置buffer属性
-    buff->size = size;
-    buff->immutable = 1;
-    buff->flags = flags;
-    buff->mapped = 0;
-    buff->persistent = (flags & GL_MAP_PERSISTENT_BIT_EXT) ? 1 : 0;
-    buff->coherent = (flags & GL_MAP_COHERENT_BIT_EXT) ? 1 : 0;
-    
-    // 分配内存
-    buff->data = malloc(size);
-    if (buff->data == NULL && size > 0) {
-        errorShim(GL_OUT_OF_MEMORY);
-        buff->size = 0;
-        buff->immutable = 0;
-        return;
-    }
-    
-    // 初始化数据
-    if (data != NULL) {
-        memcpy(buff->data, data, size);
-    } else {
-        // OpenGL规范：未初始化的数据是未定义的，这里可以选择清零或保留未初始化
-        memset(buff->data, 0, size);  // 清零是一种合理的实现
-    }
-    
-    // 创建真实buffer对象
-    if (globals4es.usegles && !globals4es.nobuffer) {
-        LOAD_GLES(glGenBuffers);
-        LOAD_GLES(glBindBuffer);
-        LOAD_GLES(glBufferData);
-        LOAD_GLES(glBufferStorage);  // 如果GLES支持的话
-        
-        if (buff->real_buffer == 0) {
-            gles_glGenBuffers(1, &buff->real_buffer);
-        }
-        
-        bindBuffer(buff->type, buff->real_buffer);
-        
-        // 尝试使用GLES的glBufferStorage，如果不支持则回退到glBufferData
-        if (gles_glBufferStorage) {
-            gles_glBufferStorage(buff->type, size, buff->data, flags);
-        } else {
-            GLenum usage = GL_STATIC_DRAW;
-            // 根据flags选择合适的usage
-            if (flags & GL_DYNAMIC_STORAGE_BIT_EXT) {
-                usage = GL_DYNAMIC_DRAW;
-            }
-            if (flags & GL_MAP_WRITE_BIT_EXT) {
-                usage = GL_STREAM_DRAW;  // 或合适的映射用途
-            }
-            gles_glBufferData(buff->type, size, buff->data, usage);
-        }
-    }
-    
-    noerrorShim();
-}
-
-// 辅助函数：检查buffer是否为不可变存储
-int isBufferImmutable(GLenum target) {
-    glbuffer_t* buff = getbuffer_buffer(target);
-    return buff ? buff->immutable : 0;
-}
-
-// 辅助函数：获取buffer的持久映射指针
-void* APIENTRY_GL4ES gl4es_glMapPersistentBuffer(GLenum target, GLbitfield access) {
-    DBG(SHUT_LOGD("glMapPersistentBuffer(%s, 0x%x)\n", PrintEnum(target), access);)
-    
-    if (!buffer_target(target)) {
-        errorShim(GL_INVALID_ENUM);
-        return NULL;
-    }
-    
-    glbuffer_t* buff = getbuffer_buffer(target);
-    if (buff == NULL || !buff->immutable || !buff->persistent) {
-        errorShim(GL_INVALID_OPERATION);
-        return NULL;
-    }
-    
-    // 检查访问权限
-    if ((access & GL_MAP_READ_BIT_EXT) && !(buff->flags & GL_MAP_READ_BIT_EXT)) {
-        errorShim(GL_INVALID_OPERATION);
-        return NULL;
-    }
-    if ((access & GL_MAP_WRITE_BIT_EXT) && !(buff->flags & GL_MAP_WRITE_BIT_EXT)) {
-        errorShim(GL_INVALID_OPERATION);
-        return NULL;
-    }
-    
-    buff->mapped = 1;
-    buff->access = access;
-    buff->persistent_mapped = 1;
-    
-    noerrorShim();
-    return buff->data;
 }
 
 void APIENTRY_GL4ES gl4es_glCopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset,
