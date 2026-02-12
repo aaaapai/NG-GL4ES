@@ -178,7 +178,7 @@ if(ANDROID)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
         android
         log
-        ${CMAKE_SOURCE_DIR}/src/libjemalloc.so
+        # ${CMAKE_SOURCE_DIR}/src/libjemalloc.so
     )
 else()
     # Nothing to link
