@@ -13,13 +13,13 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
     endif()
 
-    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-        add_compile_options(-g0 -O3 -ffunction-sections -fdata-sections)
-        add_link_options(-Wl,--gc-sections)
-    elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-        add_compile_options(/O2 /GL)
-    endif()
-#endif()
+#     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+#         add_compile_options(-g0 -O3 -ffunction-sections -fdata-sections)
+#         add_link_options(-Wl,--gc-sections)
+#     elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+#         add_compile_options(/O2 /GL)
+#     endif()
+# endif()
 
 # glslang & SPIRV-Cross
 
