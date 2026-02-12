@@ -719,12 +719,12 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
                 "rot[0][2], rot[1][2], rot[2][2]);");
 
 
-   if (shaderType == GL_VERTEX_SHADER) {
+   /*if (shaderType == GL_VERTEX_SHADER) {
         replace_all(ret, "attribute", "in");
         replace_all(ret, "varying", "out");
      } else if (shaderType == GL_FRAGMENT_SHADER) {
         replace_all(ret, "varying", "in");
-  	}
+  	}*/
 	
     replace_all(ret, "texture2D", "texture");
 
