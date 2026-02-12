@@ -149,7 +149,7 @@ extern "C"
 #define DEFINE_RAW(lib, name) static name##_PTR lib##_##name = NULL
 #define LOAD_RAW(lib, name, ...)                                                                                       \
     {                                                                                                                  \
-        static bool first = true;                                                                                      \
+        static thread_local bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -161,7 +161,7 @@ extern "C"
 
 #define LOAD_RAW_3(lib, name, fnc1, fnc2, ...)                                                                         \
     {                                                                                                                  \
-        static bool first = true;                                                                                      \
+        static thread_local bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -176,7 +176,7 @@ extern "C"
 
 #define LOAD_RAW_SILENT(lib, name, ...)                                                                                \
     {                                                                                                                  \
-        static bool first = true;                                                                                      \
+        static thread_local bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -187,7 +187,7 @@ extern "C"
 
 #define LOAD_RAW_ALT(lib, alt, name, ...)                                                                              \
     {                                                                                                                  \
-        static bool first = true;                                                                                      \
+        static thread_local bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -207,7 +207,7 @@ extern "C"
     DEFINE_RAW(lib, name);                                                                                             \
     LOAD_RAW_ALT(lib, alt, name, proc_address(lib, #name))
 
-#define LOAD_GLES(name) LOAD_LIB(gles, name)
+#define LOAD_GLES(name) LOAD_GLES2(name)
 #define LOAD_GLES2(name) LOAD_LIB(gles, name)
 #define LOAD_GLES3(name) LOAD_LIB(gles, name)
 #define LOAD_GLES_OR_FPE(name) LOAD_LIB_ALT(gles, fpe, name)
@@ -233,9 +233,10 @@ extern "C"
     DEFINE_RAW(gles, name);                                                                                            \
     { LOAD_RAW(gles, name, proc_address(gles, #name "EXT")); }
 
-#define LOAD_GLES2_OR_OES(name)                                                                                        \
+/*#define LOAD_GLES2_OR_OES(name)                                                                                        \
     DEFINE_RAW(gles, name);                                                                                            \
-    { LOAD_RAW_SILENT(gles, name, proc_address(gles, #name)); }
+    { LOAD_RAW_SILENT(gles, name, proc_address(gles, #name)); }*/
+  #define LOAD_GLES2_OR_OES(name) LOAD_GLES2(name)
 
 #else // defined(AMIGAOS4) || defined(NOEGL)
 
@@ -266,14 +267,16 @@ extern "C"
         LOAD_RAW(gles, name, ((origin ? origin : egl_eglGetProcAddress(#name "EXT"))));                                \
     }
 
-#define LOAD_GLES2_OR_OES(name)                                                                                        \
+/*#define LOAD_GLES2_OR_OES(name)                                                                                        \
     DEFINE_RAW(gles, name);                                                                                            \
     {                                                                                                                  \
         LOAD_EGL(eglGetProcAddress);                                                                                   \
         LOAD_RAW_SILENT(                                                                                               \
             gles, name,                                                                                                \
             ((hardext.esversion == 1) ? ((void*)egl_eglGetProcAddress(#name "OES")) : ((void*)dlsym(gles, #name))));   \
-    }
+    }*/
+   #define LOAD_GLES2_OR_OES(name) LOAD_GLES2(name)
+
 #endif // defined(AMIGAOS4) || defined(NOEGL)
 
 #endif // _GL4ES_LOADER_H_
