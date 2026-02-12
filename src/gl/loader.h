@@ -149,7 +149,7 @@ extern "C"
 #define DEFINE_RAW(lib, name) static name##_PTR lib##_##name = NULL
 #define LOAD_RAW(lib, name, ...)                                                                                       \
     {                                                                                                                  \
-        static thread_local bool first = true;                                                                                      \
+        static bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -161,7 +161,7 @@ extern "C"
 
 #define LOAD_RAW_3(lib, name, fnc1, fnc2, ...)                                                                         \
     {                                                                                                                  \
-        static thread_local bool first = true;                                                                                      \
+        static bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -176,7 +176,7 @@ extern "C"
 
 #define LOAD_RAW_SILENT(lib, name, ...)                                                                                \
     {                                                                                                                  \
-        static thread_local bool first = true;                                                                                      \
+        static bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
@@ -187,7 +187,7 @@ extern "C"
 
 #define LOAD_RAW_ALT(lib, alt, name, ...)                                                                              \
     {                                                                                                                  \
-        static thread_local bool first = true;                                                                                      \
+        static bool first = true;                                                                                      \
         if (first) {                                                                                                   \
             first = false;                                                                                             \
             if (lib != NULL) {                                                                                         \
