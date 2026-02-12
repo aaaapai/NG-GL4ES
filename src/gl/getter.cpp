@@ -1038,6 +1038,9 @@ extern "C"
         case GL_CONTEXT_PROFILE_MASK:
             *params = GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
             break;
+        case GL_MAX_VERTEX_IMAGE_UNIFORMS:
+            *params = 4;
+            break;
         default:
             errorGL();
             gles_glGetIntegerv(pname, params);
