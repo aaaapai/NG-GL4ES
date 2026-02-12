@@ -1092,6 +1092,11 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
                             &tmpsize); // no fallback possible if device does not support 3D textures
     }
 
+    const char* GLESUseShaderNonConstantGlobalInitialzers = "#extension GL_EXT_shader_non_constant_global_initializers : enable\n";
+    Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, 1), GLESUseShaderNonConstantGlobalInitialzers, Tmp, &tmpsize);
+    ++headline;
+    Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline-1), "#define GL4ES\n", Tmp, &tmpsize);
+
     int derivatives = (strstr(pBuffer, "dFdx(") || strstr(pBuffer, "dFdy(") || strstr(pBuffer, "fwidth(")) ? 1 : 0;
     const char* GLESUseDerivative = "#extension GL_OES_standard_derivatives : enable\n";
     // complete fake value... A better thing should be use....
