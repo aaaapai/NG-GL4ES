@@ -10,6 +10,8 @@
 #include "shader_hacks.h"
 #include "logs.h"
 
+#include <jemalloc/jemalloc.h>
+
 typedef struct {
     const char* glname;
     const char* name;
@@ -390,7 +392,7 @@ char gl4es_VA[MAX_VATTRIB][32] = {0};
 char* ConvertShaderBuiltInVariableOnly(const char* pEntry, int isVertex, shaderconv_need_t* need,
                                        int doInsertDefinitions) {
     int tmpsize = strlen(pEntry) * 2 + 500;
-    char* Tmp = (char*)calloc(1, tmpsize);
+    char* Tmp = (char*)je_calloc(1, tmpsize);
     strcpy(Tmp, pEntry);
 
     int headline = 3;
@@ -1004,14 +1006,14 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
         char* pHacked = ShaderHacks(pBuffer);
         // preproc first
         pBuffer = preproc(pHacked, comments, globals4es.shadernogles, &exts, &versionString);
-        if (pHacked != pEntry && pHacked != pBuffer) free(pHacked);
+        if (pHacked != pEntry && pHacked != pBuffer) je_free(pHacked);
         // now comment all line starting with precision...
         if (strstr(pBuffer, "\nprecision")) {
             int sz = strlen(pBuffer);
             pBuffer = InplaceReplace(pBuffer, &sz, "\nprecision", "\n//precision");
         }
         // should do something with the extension list...
-        if (exts.ext) free(exts.ext);
+        if (exts.ext) je_free(exts.ext);
     }
 
     static shaderconv_need_t dummy_need = {0};
@@ -1050,7 +1052,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
             (wanthighp) ? "highp" : "mediump");
 
     int tmpsize = strlen(pBuffer) * 2 + strlen(GLESFullHeader) + 100;
-    char* Tmp = (char*)calloc(1, tmpsize);
+    char* Tmp = (char*)je_calloc(1, tmpsize);
     strcpy(Tmp, pBuffer);
 
     // and now change the version header, and add default precision
@@ -1813,8 +1815,8 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t* need, i
     }
     // clean preproc'd source
     if(versionString != NULL)
-    free(versionString);
-    if (pEntry != pBuffer) free(pBuffer);
+    je_free(versionString);
+    if (pEntry != pBuffer) je_free(pBuffer);
     return Tmp;
 }
 
