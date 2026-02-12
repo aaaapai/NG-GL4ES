@@ -772,9 +772,9 @@ void redoShader(GLuint shader, shaderconv_need_t* need) {
     if (!glshader->converted) return;
     // test, if no changes, no need to reconvert & recompile...
     if (memcmp(&glshader->need, need, sizeof(shaderconv_need_t)) == 0) return;
-    free(glshader->converted);
+    // free(glshader->converted);
     memcpy(&glshader->need, need, sizeof(shaderconv_need_t));
-    if (is_direct_shader(glshader->source))
+    /*if (is_direct_shader(glshader->source))
         glshader->converted = strdup(glshader->source);
     else {
         int glsl_version = getGLSLVersion(glshader->source);
@@ -799,7 +799,7 @@ void redoShader(GLuint shader, shaderconv_need_t* need) {
     gles_glShaderSource(
         shader, 1, (const GLchar* const*)((glshader->converted) ? (&glshader->converted) : (&glshader->source)), NULL);
     // recompile...
-    gl4es_glCompileShader(glshader->id);
+    gl4es_glCompileShader(glshader->id);*/
 }
 
 void APIENTRY_GL4ES gl4es_glGetShaderSource(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* source) {
