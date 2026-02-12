@@ -134,7 +134,6 @@ set(C_SRC_FILES
     src/gl/wrap/gl4eswraps.c
     src/gl/wrap/gles.c
     src/gl/wrap/glstub.c
-    src/gl/wrap/glesnative.cpp
     src/gl/math/matheval.c
     src/glx/hardext.c
     src/glx/lookup.c
@@ -151,6 +150,7 @@ endif()
 set(CPP_SRC_FILES
     src/gl/glsl/glsl_for_es.cpp
     src/gl/getter.cpp
+    src/gl/wrap/glesnative.cpp
 )
 
 set(SRC_FILES ${CPP_SRC_FILES} ${C_SRC_FILES})
