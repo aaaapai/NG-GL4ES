@@ -114,7 +114,7 @@ __attribute__((constructor(101)))
 void initialize_gl4es() {
     NGGDirectory = (char*)GetEnvVar("NGG_DIR_PATH");
     if (!NGGDirectory || strlen(NGGDirectory) == 0) {
-        NGGDirectory = je_malloc(strlen(DEFAULT_NGG_DIRECTORY_PATH) + 1);
+        NGGDirectory = malloc(strlen(DEFAULT_NGG_DIRECTORY_PATH) + 1);
         strcpy(NGGDirectory, DEFAULT_NGG_DIRECTORY_PATH);
     }
 

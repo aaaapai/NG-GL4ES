@@ -68,7 +68,7 @@ void fpe_disposeCache(fpe_cache_t* cache, int freeprog) {
             if(m->glprogram)
                 gl4es_glDeleteProgram(m->glprogram->id);
         }
-        je_free(m);
+        free(m);
     )
     kh_destroy(fpecachelist, cache);
 }
@@ -81,7 +81,7 @@ fpe_fpe_t *fpe_GetCache(fpe_cache_t *cur, fpe_state_t *state, int fixed) {
     if(k != kh_end(cur)) {
         return kh_value(cur, k);
     } else {
-        fpe_fpe_t *n = (fpe_fpe_t*)je_calloc(1, sizeof(fpe_fpe_t));
+        fpe_fpe_t *n = (fpe_fpe_t*)calloc(1, sizeof(fpe_fpe_t));
         memcpy(&n->state, state, sizeof(fpe_state_t));
         k = kh_put(fpecachelist, cur, &n->state, &r);
         kh_value(cur, k) = n;
@@ -148,26 +148,26 @@ void fpe_readPSA()
         return;
     }
     for (int i=0; i<n; ++i) {
-        psa_t *p = (psa_t*)je_calloc(1, sizeof(psa_t));
+        psa_t *p = (psa_t*)calloc(1, sizeof(psa_t));
         if(fread(&p->state, sizeof(p->state), 1, f)!=1) {
-            je_free(p);
+            free(p);
             fclose(f);
             return;
         }
         if(fread(&p->format, sizeof(p->format), 1, f)!=1) {
-            je_free(p);
+            free(p);
             fclose(f);
             return;
         }
         if(fread(&p->size, sizeof(p->size), 1, f)!=1) {
-            je_free(p);
+            free(p);
             fclose(f);
             return;
         }
-        p->prog = je_malloc(p->size);
+        p->prog = malloc(p->size);
         if(fread(p->prog, p->size, 1, f)!=1) {
-            je_free(p->prog);
-            je_free(p);
+            free(p->prog);
+            free(p);
             fclose(f);
             return;
         }
@@ -234,7 +234,7 @@ void fpe_InitPSA(const char* name)
 {
     if(psa)
         return; // already inited
-    psa = (gl4es_psa_t*)je_calloc(1, sizeof(gl4es_psa_t));
+    psa = (gl4es_psa_t*)calloc(1, sizeof(gl4es_psa_t));
     psa->cache = kh_init(psalist);
     psa_name = strdup(name);
 }
@@ -246,14 +246,14 @@ void fpe_FreePSA()
     
     psa_t *m;
     kh_foreach_value(psa->cache, m, 
-        je_free(m->prog);
-        je_free(m);
+        free(m->prog);
+        free(m);
     )
     kh_destroy(psalist, psa->cache);
 
-    je_free(psa);
+    free(psa);
     psa = NULL;
-    je_free(psa_name);
+    free(psa_name);
     psa_name = NULL;
 }
 
@@ -280,13 +280,13 @@ void fpe_AddProgramPSA(GLuint program, fpe_state_t* state)
     if(state->vertex_prg_enable || state->fragment_prg_enable)
         return;
     psa->dirty = 1;
-    psa_t *p = (psa_t*)je_calloc(1, sizeof(psa_t));
+    psa_t *p = (psa_t*)calloc(1, sizeof(psa_t));
     memcpy(&p->state, state, sizeof(p->state));
 
     int l = gl4es_getProgramBinary(program, &p->size, &p->format, &p->prog);
     if(l==0) { // there was an error...
-        je_free(p->prog);
-        je_free(p);
+        free(p->prog);
+        free(p);
         return;
     }
     // add program
@@ -294,9 +294,9 @@ void fpe_AddProgramPSA(GLuint program, fpe_state_t* state)
     khint_t k = kh_put(psalist, psa->cache, &p->state, &ret);
     if(!ret) {
         psa_t *p2 = kh_value(psa->cache, k);
-        je_free(p2->prog);
+        free(p2->prog);
         p2->prog = NULL;
-        je_free(p2);
+        free(p2);
     }
     kh_value(psa->cache, k) = p;
     // all done

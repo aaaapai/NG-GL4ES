@@ -554,7 +554,7 @@ void draw_renderlist(renderlist_t *list) {
             fpe_glEnableClientState(GL_COLOR_ARRAY);
             if (glstate->enable.color_sum && (list->secondary) && hardext.esversion==1 && !list->use_glstate) {
                 if(!list->final_colors) {
-                    list->final_colors=(GLfloat*)je_malloc(list->len * 4 * sizeof(GLfloat));
+                    list->final_colors=(GLfloat*)malloc(list->len * 4 * sizeof(GLfloat));
                     if (indices) {
                         for (int i=0; i<list->ilen; i++)
                             for (int j=0; j<4; j++) {
@@ -632,7 +632,7 @@ void draw_renderlist(renderlist_t *list) {
             modeinit_t tmp; tmp.mode_init = list->mode_init; tmp.ilen=list->ilen?list->ilen:list->len;
             list->tex[stipple_tmu] = gen_stipple_tex_coords(list->vert, list->indices, list->mode_inits?list->mode_inits:&tmp, list->vert_stride, list->mode_inits?list->mode_init_len:1, (list->use_glstate)?(list->vert+8+stipple_tmu*4):NULL);
         }
-        #define RS(A, len) if(glstate->texgenedsz[A]<len) {je_free(glstate->texgened[A]); glstate->texgened[A]=je_malloc(4*sizeof(GLfloat)*len); glstate->texgenedsz[A]=len; } use_texgen[A]=1
+        #define RS(A, len) if(glstate->texgenedsz[A]<len) {free(glstate->texgened[A]); glstate->texgened[A]=malloc(4*sizeof(GLfloat)*len); glstate->texgenedsz[A]=len; } use_texgen[A]=1
         // cannot use list->maxtex because some TMU can be using TexGen or point sprites...
         if(hardext.esversion==1) {
             for (int a=0; a<hardext.maxtex; a++) {
@@ -745,7 +745,7 @@ void draw_renderlist(renderlist_t *list) {
                 if (glstate->polygon_mode == GL_LINE && list->mode_init>=GL_TRIANGLES) {
                     int ilen = list->ilen;
                     if(!list->ind_lines) {
-                        GLushort *ind_line = list->ind_lines = (GLushort*)je_malloc(sizeof(GLushort)*ilen*4+2);
+                        GLushort *ind_line = list->ind_lines = (GLushort*)malloc(sizeof(GLushort)*ilen*4+2);
                         modeinit_t tmp; tmp.mode_init = list->mode_init; tmp.ilen=list->ilen;
                         int k = fill_lineIndices(list->mode_inits?list->mode_inits:&tmp, list->mode_inits?list->mode_init_len:1, list->mode, indices, list->ind_lines);
                         list->ind_line = k;
@@ -792,7 +792,7 @@ void draw_renderlist(renderlist_t *list) {
                 int len = list->len;
                 if ((glstate->polygon_mode == GL_LINE) && (list->mode_init>=GL_TRIANGLES)) {
                     if(!list->ind_lines) {
-                        GLushort *ind_line = list->ind_lines = (GLushort*)je_malloc(sizeof(GLushort)*len*4+2);
+                        GLushort *ind_line = list->ind_lines = (GLushort*)malloc(sizeof(GLushort)*len*4+2);
                         modeinit_t tmp; tmp.mode_init = list->mode_init; tmp.ilen=len;
                         int k = fill_lineIndices(list->mode_inits?list->mode_inits:&tmp, list->mode_inits?list->mode_init_len:1, list->mode, NULL, list->ind_lines);
                         list->ind_line = k;
@@ -832,8 +832,8 @@ void draw_renderlist(renderlist_t *list) {
         #undef TEXTURE
 
         if (stipple) {
-            if(!list->use_glstate)   //TODO: avoid that je_malloc/je_free...
-                je_free(list->tex[stipple_tmu]);
+            if(!list->use_glstate)   //TODO: avoid that malloc/free...
+                free(list->tex[stipple_tmu]);
             list->tex[stipple_tmu]=NULL;
             LOAD_GLES(glActiveTexture);
             if(glstate->gleshard->active!=stipple_tmu)

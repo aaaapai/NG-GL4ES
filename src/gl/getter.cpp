@@ -91,7 +91,7 @@ extern "C"
 
     void BuildExtensionsList() {
         if (!glstate->extensions) {
-            glstate->extensions = (GLubyte*)je_malloc(5000); // arbitrary size...
+            glstate->extensions = (GLubyte*)malloc(5000); // arbitrary size...
             char* extensions = (char*)glstate->extensions;
             strcpy(extensions,
                    "GL_EXT_abgr "
@@ -259,12 +259,12 @@ extern "C"
             }
             // and now split in array of individual extensions
             // TODO: is all this better be moved in glstate?
-            glstate->extensions_list = (GLubyte**)je_calloc(glstate->num_extensions, sizeof(GLubyte*));
+            glstate->extensions_list = (GLubyte**)calloc(glstate->num_extensions, sizeof(GLubyte*));
             p = extensions;
             for (int i = 0; i < glstate->num_extensions; i++) {
                 char* p2 = strchr(p, ' ');
                 int sz = p2 - p;
-                glstate->extensions_list[i] = (GLubyte*)je_calloc(sz + 1, sizeof(GLubyte));
+                glstate->extensions_list[i] = (GLubyte*)calloc(sz + 1, sizeof(GLubyte));
                 strncpy((char*)glstate->extensions_list[i], p, sz);
                 while (*p2 == ' ')
                     ++p2;
@@ -286,7 +286,7 @@ extern "C"
             str++;
         }
         int len = str - start;
-        char* result = (char*)je_malloc(len + 1);
+        char* result = (char*)malloc(len + 1);
         if (result) {
             strncpy(result, start, len);
             result[len] = '\0';

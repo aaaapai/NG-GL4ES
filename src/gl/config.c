@@ -11,7 +11,7 @@
 static cJSON *config_json = NULL;
 
 void config_refresh() {
-    char* path = je_malloc(strlen(NGGDirectory) + strlen(CONFIG_FILE_PATH) + 1);
+    char* path = malloc(strlen(NGGDirectory) + strlen(CONFIG_FILE_PATH) + 1);
     strcpy(path, NGGDirectory);
     strcat(path, CONFIG_FILE_PATH);
 
@@ -25,7 +25,7 @@ void config_refresh() {
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    char *file_content = (char *)je_malloc(file_size + 1);
+    char *file_content = (char *)malloc(file_size + 1);
     if (file_content == NULL) {
         SHUT_LOGE("Unable to allocate memory for file content");
         fclose(file);
@@ -41,8 +41,8 @@ void config_refresh() {
         SHUT_LOGE("Error parsing config JSON: %s", cJSON_GetErrorPtr());
     }
 
-    je_free(file_content);
-    je_free(path);
+    free(file_content);
+    free(path);
 }
 
 int config_get_int(char* name) {

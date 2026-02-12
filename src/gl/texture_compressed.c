@@ -124,7 +124,7 @@ GLvoid *uncompressDXTc(GLsizei width, GLsizei height, GLenum format, GLsizei ima
         return (GLvoid*)data;
     }
     // alloc memory
-    GLvoid *pixels = je_malloc(((width+3)&~3)*((height+3)&~3)*pixelsize);
+    GLvoid *pixels = malloc(((width+3)&~3)*((height+3)&~3)*pixelsize);
     // uncompress loop
     int blocksize;
     switch (format) {
@@ -242,11 +242,11 @@ void APIENTRY_GL4ES gl4es_glCompressedTexImage2D(GLenum target, GLint level, GLe
                 if (nw<4) nw = 4;
                 if (nh<4) nh = 4;
                 tmp = uncompressDXTc(nw, nh, internalformat, imageSize, transparent0, &simpleAlpha, &complexAlpha, datab);
-                pixels = je_malloc(4*width*height);
+                pixels = malloc(4*width*height);
                 // crop
                 for (int y=0; y<height; y++)
                     memcpy((char*)pixels+y*width*4, (char*)tmp+y*nw*4, width*4);
-                je_free(tmp);
+                free(tmp);
             } else {
                 pixels = uncompressDXTc(width, height, internalformat, imageSize, transparent0, &simpleAlpha, &complexAlpha, datab);
             }
@@ -308,7 +308,7 @@ void APIENTRY_GL4ES gl4es_glCompressedTexImage2D(GLenum target, GLint level, GLe
                 if(half) {  // half can be null if no data...
                     pixel_halfscale(ndata, &out, nww, nhh, GL_RGBA, GL_UNSIGNED_BYTE);
                     if (out != ndata && ndata!=pixels)
-                        je_free(ndata);
+                        free(ndata);
                     ndata = out;
                 }
                 nww = nlevel(nww, 1);
@@ -318,7 +318,7 @@ void APIENTRY_GL4ES gl4es_glCompressedTexImage2D(GLenum target, GLint level, GLe
                 ++leveln;
                 gl4es_glTexImage2D(target, leveln, new_intformat, nww, nhh, border, format, type, out);
                 if(out!=ndata)
-                    je_free(out);
+                    free(out);
             }
             bound->mipmap_auto = 1;
         }
@@ -326,9 +326,9 @@ void APIENTRY_GL4ES gl4es_glCompressedTexImage2D(GLenum target, GLint level, GLe
         if (oldalign!=1) 
             gl4es_glPixelStorei(GL_UNPACK_ALIGNMENT, oldalign);
         if (half!=pixels)
-            je_free(half);
+            free(half);
         if (pixels!=datab)
-            je_free(pixels);
+            free(pixels);
     } else {
         LOAD_GLES(glCompressedTexImage2D);
         bound->alpha = 1;
@@ -381,11 +381,11 @@ void APIENTRY_GL4ES gl4es_glCompressedTexSubImage2D(GLenum target, GLint level, 
             if (nw<4) nw = 4;
             if (nh<4) nh = 4;
             tmp = uncompressDXTc(nw, nh, format, imageSize, transparent0, &simpleAlpha, &complexAlpha, datab);
-            pixels = je_malloc(4*width*height);
+            pixels = malloc(4*width*height);
             // crop
             for (int y=0; y<height; y++)
                 memcpy((char*)pixels+y*width*4, (char*)tmp+y*nw*4, width*4);
-            je_free(tmp);
+            free(tmp);
         } else {
             pixels = uncompressDXTc(width, height, format, imageSize, transparent0, &simpleAlpha, &complexAlpha, datab);
         }
@@ -404,9 +404,9 @@ void APIENTRY_GL4ES gl4es_glCompressedTexSubImage2D(GLenum target, GLint level, 
         gl4es_glTexSubImage2D(target, level, xoffset, yoffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, half);
         #endif
         if (half!=pixels)
-            je_free(half);
+            free(half);
         if (pixels!=datab)
-            je_free(pixels);
+            free(pixels);
     } else {
         gles_glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, datab);
     }
@@ -440,7 +440,7 @@ void APIENTRY_GL4ES gl4es_glGetCompressedTexImage(GLenum target, GLint lod, GLvo
         datab = (char*)datab + (uintptr_t)pack->data;
 
     // alloc the memory for source image and grab the file
-    GLuint *src = (GLuint*)je_malloc(width*height*4);
+    GLuint *src = (GLuint*)malloc(width*height*4);
     gl4es_glGetTexImage(target, lod, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)src);
     GLuint tmp[4*4]; //this is the 4x4 block
     for (int y = 0; y < h; y+=4)
@@ -460,7 +460,7 @@ void APIENTRY_GL4ES gl4es_glGetCompressedTexImage(GLenum target, GLint lod, GLvo
             stb_compress_dxt_block((unsigned char*)datab, (const unsigned char*)tmp, ralpha, STB_DXT_NORMAL);
             datab = (char*)datab + 8*(ralpha+1);
     }
-    je_free(src);
+    free(src);
 
     glstate->vao->unpack = unpack;
     glstate->vao->pack = pack;

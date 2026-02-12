@@ -162,7 +162,7 @@ char* fpe_binary(int x, int s) {
 const char* const* fpe_VertexShader(shaderconv_need_t* need, fpe_state_t* state) {
     // vertex is first called, so 1st time init is only here
     if (!shad_cap) shad_cap = 1024;
-    if (!shad) shad = (char*)je_malloc(shad_cap);
+    if (!shad) shad = (char*)malloc(shad_cap);
     // state can be NULL, so provide a 0 default
     fpe_state_t default_state = {0};
     int is_default = !!need;
@@ -865,7 +865,7 @@ const char* const* fpe_VertexShader(shaderconv_need_t* need, fpe_state_t* state)
 const char* const* fpe_FragmentShader(shaderconv_need_t* need, fpe_state_t* state) {
     // state can be NULL, so provide a 0 default
     if(!shad_cap) shad_cap = 1024;
-    if(!shad) shad = (char*)je_malloc(shad_cap);
+    if(!shad) shad = (char*)malloc(shad_cap);
     fpe_state_t default_state = {0};
     int is_default = !need;
     if(!state) state = &default_state;
@@ -1475,7 +1475,7 @@ const char* const* fpe_CustomVertexShader(const char* initial, fpe_state_t* stat
     int planes = state->plane;
     char buff[1024];
     if (!shad_cap) shad_cap = 1024;
-    if (!shad) shad = (char*)je_malloc(shad_cap);
+    if (!shad) shad = (char*)malloc(shad_cap);
     int headline = gl4es_getline_for(initial, "main");
     if (headline) --headline;
 
@@ -1540,7 +1540,7 @@ const char* const* fpe_CustomVertexShader(const char* initial, fpe_state_t* stat
 const char* const* fpe_CustomFragmentShader(const char* initial, fpe_state_t* state) {
     // the shader is unconverted yet!
     if (!shad_cap) shad_cap = 1024;
-    if (!shad) shad = (char*)je_malloc(shad_cap);
+    if (!shad) shad = (char*)malloc(shad_cap);
 
     int planes = state->plane;
     int alpha_test = state->alphatest;
@@ -1617,7 +1617,7 @@ const char* const* fpe_CustomFragmentShader(const char* initial, fpe_state_t* st
 #ifdef GL4ES_COMPILE_FOR_USE_IN_SHARED_LIB
 void fpe_shader_reset_internals() {
     if (shad) {
-        je_free(shad);
+        free(shad);
         shad = NULL;
     }
     shad_cap = 0;

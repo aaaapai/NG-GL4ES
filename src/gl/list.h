@@ -262,14 +262,14 @@ renderlist_t* NewDrawStage(renderlist_t* l, GLenum m);
 renderlist_t* GetFirst(renderlist_t* list);
 
 #define alloc_sublist(n, cap) \
-    (GLfloat *)je_malloc(n * sizeof(GLfloat) * cap)
+    (GLfloat *)malloc(n * sizeof(GLfloat) * cap)
 
 #define realloc_sublist(ref, n, cap) \
     if (ref)                         \
-        ref = (GLfloat *)je_realloc(ref, n * sizeof(GLfloat) * cap)
+        ref = (GLfloat *)realloc(ref, n * sizeof(GLfloat) * cap)
 
 #define realloc_merger_sublist(ref, n, cap) \
-        ref = (GLfloat *)je_realloc(ref, n * sizeof(GLfloat) * cap)
+        ref = (GLfloat *)realloc(ref, n * sizeof(GLfloat) * cap)
 
 renderlist_t *alloc_renderlist();
 renderlist_t *extend_renderlist(renderlist_t *list);

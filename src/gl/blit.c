@@ -210,7 +210,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
         LOAD_GLES2(glUniform1i);
         LOAD_GLES2(glUseProgram);
 
-        glstate->blit = (glesblit_t*)je_malloc(sizeof(glesblit_t));
+        glstate->blit = (glesblit_t*)malloc(sizeof(glesblit_t));
         memset(glstate->blit, 0, sizeof(glesblit_t));
 
         GLint success;
@@ -226,7 +226,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
             char log[400];
             gles_glGetShaderInfoLog(glstate->blit->pixelshader, 399, NULL, log);
             SHUT_LOGE("Failed to produce blit fragment shader.\n%s", log);
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
     
@@ -241,7 +241,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
             char log[400];
             gles_glGetShaderInfoLog(glstate->blit->pixelshader_alpha, 399, NULL, log);
             SHUT_LOGE("Failed to produce blit with alpha fragment shader.\n%s", log);
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
     
@@ -256,7 +256,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
             char log[400];
             gles_glGetShaderInfoLog(glstate->blit->vertexshader, 399, NULL, log);
             SHUT_LOGE("Failed to produce blit vertex shader.\n%s", log);
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
     
@@ -271,7 +271,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
             char log[400];
             gles_glGetShaderInfoLog(glstate->blit->vertexshader_alpha, 399, NULL, log);
             SHUT_LOGE("Failed to produce blit with alpha vertex shader.\n%s", log);
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
 
@@ -285,7 +285,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
         if( !success )
         {
             SHUT_LOGE("Failed to link blit program.\n");
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
         GLuint oldprog = glstate->gleshard->program;
@@ -302,7 +302,7 @@ void gl4es_blitTexture_gles2(GLuint texture,
         if( !success )
         {
             SHUT_LOGE("Failed to link blit program.\n");
-            je_free(glstate->blit);
+            free(glstate->blit);
             glstate->blit = NULL;
         }
         gles_glUseProgram(glstate->blit->program_alpha);

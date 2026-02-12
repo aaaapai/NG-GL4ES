@@ -106,8 +106,8 @@ void tex_setup_texcoord(GLuint len, int changes, GLuint itarget, vertexattrib_t*
     if (changes) {
         // first convert to GLfloat, without normalization
         if (glstate->helper_texlen[texunit] < len) {
-            if (glstate->helper_tex[texunit]) je_free(glstate->helper_tex[texunit]);
-            glstate->helper_tex[texunit] = je_malloc(4 * sizeof(GLfloat) * len);
+            if (glstate->helper_tex[texunit]) free(glstate->helper_tex[texunit]);
+            glstate->helper_tex[texunit] = malloc(4 * sizeof(GLfloat) * len);
             glstate->helper_texlen[texunit] = len;
         }
         copy_gl_pointer_tex_noalloc(glstate->helper_tex[texunit], ptr, 4, 0, len);
@@ -146,7 +146,7 @@ gltexture_t* gl4es_getTexture(GLenum target, GLuint texture) {
     if (k == kh_end(list)) {
         LOAD_GLES(glGenTextures);
         k = kh_put(tex, list, texture, &ret);
-        tex = kh_value(list, k) = je_malloc(sizeof(gltexture_t));
+        tex = kh_value(list, k) = malloc(sizeof(gltexture_t));
         memset(tex, 0, sizeof(gltexture_t));
         tex->texture = texture;
         if (texture)
@@ -424,13 +424,13 @@ void APIENTRY_GL4ES gl4es_glDeleteTextures(GLsizei n, const GLuint* textures) {
 #endif
 #if 1
                 kh_del(tex, list, k);
-                if (tex->data) je_free(tex->data);
-                je_free(tex);
+                if (tex->data) free(tex->data);
+                free(tex);
 #else
                 tex->glname = tex->texture;
                 tex->streamed = false;
                 tex->streamingID = -1;
-                if (tex->data) je_free(tex->data);
+                if (tex->data) free(tex->data);
                 tex->data = NULL;
 #endif
             }
@@ -456,7 +456,7 @@ void APIENTRY_GL4ES gl4es_glGenTextures(GLsizei n, GLuint* textures) {
         gltexture_t* tex = NULL;
         if (k == kh_end(list)) {
             k = kh_put(tex, list, textures[i], &ret);
-            tex = kh_value(list, k) = je_malloc(sizeof(gltexture_t));
+            tex = kh_value(list, k) = malloc(sizeof(gltexture_t));
             memset(tex, 0, sizeof(gltexture_t));
             tex->texture = textures[i];
             tex->glname = textures[i];

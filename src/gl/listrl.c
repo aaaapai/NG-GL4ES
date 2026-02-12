@@ -251,7 +251,7 @@ void FASTMATH rlSecondary3f(renderlist_t *list, GLfloat r, GLfloat g, GLfloat b)
     if (list->secondary == NULL) {
         if(list->use_glstate) {
             if(!glstate->merger_secondary)
-                glstate->merger_secondary = (GLfloat*)je_malloc(sizeof(GLfloat)*4*glstate->merger_cap);
+                glstate->merger_secondary = (GLfloat*)malloc(sizeof(GLfloat)*4*glstate->merger_cap);
             list->secondary = glstate->merger_secondary;
         } else {
             list->secondary = alloc_sublist(4, list->cap);
@@ -287,7 +287,7 @@ void rlMaterialfv(renderlist_t *list, GLenum face, GLenum pname, const GLfloat *
     k = kh_get(material, map, key);
     if (k == kh_end(map)) {
         k = kh_put(material, map, key, &ret);
-        m = kh_value(map, k) = je_malloc(sizeof(rendermaterial_t));
+        m = kh_value(map, k) = malloc(sizeof(rendermaterial_t));
     } else {
         m = kh_value(map, k);
     }
@@ -317,7 +317,7 @@ void rlLightfv(renderlist_t *list, GLenum which, GLenum pname, const GLfloat * p
     k = kh_get(light, map, key);
     if (k == kh_end(map)) {
         k = kh_put(light, map, key, &ret);
-        m = kh_value(map, k) = je_malloc(sizeof(renderlight_t));
+        m = kh_value(map, k) = malloc(sizeof(renderlight_t));
     } else {
         m = kh_value(map, k);
     }
@@ -350,7 +350,7 @@ void rlTexGenfv(renderlist_t *list, GLenum coord, GLenum pname, const GLfloat * 
     k = kh_get(texgen, map, key);
     if (k == kh_end(map)) {
         k = kh_put(texgen, map, key, &ret);
-        m = kh_value(map, k) = je_malloc(sizeof(rendertexgen_t));
+        m = kh_value(map, k) = malloc(sizeof(rendertexgen_t));
     } else {
         m = kh_value(map, k);
     }
@@ -369,7 +369,7 @@ void rlMultiTexCoordCommon(renderlist_t* list, int tmu) {
                 list->tex[tmu] = glstate->merger_master+4+4+tmu*4;
             else {
                 if(!glstate->merger_tex[tmu-2])
-                    glstate->merger_tex[tmu-2] = (GLfloat*)je_malloc(sizeof(GLfloat)*4*glstate->merger_cap);
+                    glstate->merger_tex[tmu-2] = (GLfloat*)malloc(sizeof(GLfloat)*4*glstate->merger_cap);
                 list->tex[tmu] = glstate->merger_tex[tmu-2];
             }
         } else {
@@ -466,10 +466,10 @@ void rlPushCall(renderlist_t *list, packed_call_t *data) {
     call_list_t *cl = &list->calls;
     if (!cl->calls) {
         cl->cap = DEFAULT_CALL_LIST_CAPACITY;
-        cl->calls = je_malloc(DEFAULT_CALL_LIST_CAPACITY * sizeof(void*));
+        cl->calls = malloc(DEFAULT_CALL_LIST_CAPACITY * sizeof(void*));
     } else if (list->calls.len == list->calls.cap) {
         cl->cap += DEFAULT_CALL_LIST_CAPACITY;
-        cl->calls = je_realloc(cl->calls, cl->cap * sizeof(void*));
+        cl->calls = realloc(cl->calls, cl->cap * sizeof(void*));
     }
     cl->calls[cl->len++] = data;
 }
@@ -508,7 +508,7 @@ void rlTexEnvfv(renderlist_t *list, GLenum target, GLenum pname, const GLfloat *
     k = kh_get(texenv, map, key);
     if (k == kh_end(map)) {
         k = kh_put(texenv, map, key, &ret);
-        m = kh_value(map, k) = je_malloc(sizeof(rendertexenv_t));
+        m = kh_value(map, k) = malloc(sizeof(rendertexenv_t));
     } else {
         m = kh_value(map, k);
     }

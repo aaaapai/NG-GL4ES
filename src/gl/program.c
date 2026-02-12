@@ -38,7 +38,7 @@ void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GL
         DBG(SHUT_LOGD("Target shader:\n%s\n", glprogram->last_frag->converted))
         int len = strlen(name);
         int tlen = len + 32;
-        char* targetPattern = je_malloc(sizeof(char) * tlen);
+        char* targetPattern = malloc(sizeof(char) * tlen);
         if (!targetPattern) {
             DBG(fprintf(stderr, "Memory allocation failed for targetPattern\n"));
             return;
@@ -58,7 +58,7 @@ void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GL
         char* searchStart = glprogram->last_frag->converted;
         while (regexec(&regex, searchStart, 1, pmatch, 0) == 0) {
             size_t matchLen = pmatch[0].rm_eo - pmatch[0].rm_so;
-            origin = (char*)je_malloc(matchLen + 1);
+            origin = (char*)malloc(matchLen + 1);
             if (!origin) {
                 fprintf(stderr, "Memory allocation failed\n");
                 break;
@@ -67,7 +67,7 @@ void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GL
             origin[matchLen] = '\0';
 
             size_t resultLen = strlen(origin) + 30; // "layout (location = )" + colorNumber + null terminator
-            result = (char*)je_malloc(resultLen);
+            result = (char*)malloc(resultLen);
             if (!result) {
                 fprintf(stderr, "Memory allocation failed\n");
                 free(origin);
@@ -81,7 +81,7 @@ void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GL
                 size_t suffixLen = strlen(temp + matchLen);
                 size_t newLen = prefixLen + strlen(result) + suffixLen + 1;
 
-                char* newConverted = (char*)je_malloc(newLen);
+                char* newConverted = (char*)malloc(newLen);
                 if (!newConverted) {
                     fprintf(stderr, "Memory allocation failed\n");
                     free(origin);
@@ -148,7 +148,7 @@ void VISIBLE glBindFragDataLocation(GLuint program, GLuint colorNumber, const GL
     khash_t(attribloclist)* attribloc = glprogram->attribloc;
     khint_t k = kh_get(attribloclist, attribloc, colorNumber);
     if (k == kh_end(attribloc)) {
-        attribloc_t* new_attribloc = (attribloc_t*)je_malloc(sizeof(attribloc_t));
+        attribloc_t* new_attribloc = (attribloc_t*)malloc(sizeof(attribloc_t));
         new_attribloc->index = colorNumber;
         new_attribloc->real_index = location;
         new_attribloc->name = strdup(name);
@@ -191,7 +191,7 @@ void APIENTRY_GL4ES gl4es_glAttachShader(GLuint program, GLuint shader) {
     // add shader reference to program
     if (glprogram->attach_cap == glprogram->attach_size) {
         glprogram->attach_cap += 4;
-        glprogram->attach = (GLuint*)je_realloc(glprogram->attach, sizeof(GLuint) * glprogram->attach_cap);
+        glprogram->attach = (GLuint*)realloc(glprogram->attach, sizeof(GLuint) * glprogram->attach_cap);
     }
     glprogram->attach[glprogram->attach_size++] = glshader->id;
     glshader->attached++;
@@ -227,7 +227,7 @@ void APIENTRY_GL4ES gl4es_glBindAttribLocation(GLuint program, GLuint index, con
             attribloc = kh_value(attribloclist, k);
         } else {
             k = kh_put(attribloclist, attribloclist, index, &ret);
-            attribloc = kh_value(attribloclist, k) = je_malloc(sizeof(attribloc_t));
+            attribloc = kh_value(attribloclist, k) = malloc(sizeof(attribloc_t));
             memset(attribloc, 0, sizeof(attribloc_t));
             attribloc->real_index = -1;
             attribloc->index = index;
@@ -271,7 +271,7 @@ GLuint APIENTRY_GL4ES gl4es_glCreateProgram(void) {
     program_t* glprogram = NULL;
     if (k == kh_end(programs)) {
         k = kh_put(programlist, programs, program, &ret);
-        glprogram = kh_value(programs, k) = (program_t*)je_calloc(1, sizeof(program_t));
+        glprogram = kh_value(programs, k) = (program_t*)calloc(1, sizeof(program_t));
     } else {
         glprogram = kh_value(programs, k);
         if (glprogram->attribloc) {
@@ -684,7 +684,7 @@ static void fill_program(program_t* glprogram) {
     int uniform_cache = 0;
     GLint size = 0;
     GLenum type = 0;
-    GLchar* name = (char*)je_malloc(maxsize);
+    GLchar* name = (char*)malloc(maxsize);
     int tu_idx = 0;
     for (int i = 0; i < n; i++) {
         gles_glGetActiveUniform(glprogram->id, i, maxsize, NULL, &size, &type, name);
@@ -696,10 +696,10 @@ static void fill_program(program_t* glprogram) {
             if (id != -1) {
                 for (int j = 0; j < size; j++) {
                     k = kh_put(uniformlist, uniforms, id, &ret);
-                    gluniform = kh_value(uniforms, k) = je_malloc(sizeof(uniform_t));
+                    gluniform = kh_value(uniforms, k) = malloc(sizeof(uniform_t));
                     memset(gluniform, 0, sizeof(uniform_t));
                     if (j) {
-                        gluniform->name = je_malloc(strlen(name) + 1 + 5);
+                        gluniform->name = malloc(strlen(name) + 1 + 5);
                         sprintf(gluniform->name, "%s[%d]", name, j);
                     } else
                         gluniform->name = strdup(name);
@@ -741,7 +741,7 @@ static void fill_program(program_t* glprogram) {
     // reset uniform cache
     if (glprogram->cache.cap < uniform_cache) {
         glprogram->cache.cap = uniform_cache;
-        glprogram->cache.cache = je_malloc(glprogram->cache.cap);
+        glprogram->cache.cache = malloc(glprogram->cache.cap);
     }
     memset(glprogram->cache.cache, 0, glprogram->cache.cap);
     // Maybe Sampler uniform should not be initialized to 0, but to -1, to be sure the value is initialized?
@@ -756,7 +756,7 @@ static void fill_program(program_t* glprogram) {
     // Grab all Attrib
     gles_glGetProgramiv(glprogram->id, GL_ACTIVE_ATTRIBUTES, &n);
     gles_glGetProgramiv(glprogram->id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxsize);
-    name = (char*)je_malloc(maxsize);
+    name = (char*)malloc(maxsize);
     for (int i = 0; i < n; i++) {
         DBG(e2 = gles_glGetError());
         DBG(if (e2 == GL_NO_ERROR)) {
@@ -770,7 +770,7 @@ static void fill_program(program_t* glprogram) {
                     glattribloc = kh_value(glprogram->attribloc, k);
                     if (glattribloc->name) free(glattribloc->name);
                 } else {
-                    glattribloc = kh_value(glprogram->attribloc, k) = je_malloc(sizeof(attribloc_t));
+                    glattribloc = kh_value(glprogram->attribloc, k) = malloc(sizeof(attribloc_t));
                 }
                 memset(glattribloc, 0, sizeof(attribloc_t));
                 glattribloc->name = strdup(name);
@@ -829,7 +829,7 @@ int gl4es_getProgramBinary(GLuint program, int* length, GLenum* format, void** b
     gles_glGetProgramiv(glprogram->id, GL_PROGRAM_BINARY_LENGTH_OES, &l);
     if (!l) return 0;
 
-    *binary = je_malloc(l);
+    *binary = malloc(l);
     gles_glGetProgramBinary(glprogram->id, l, length, format, *binary);
 
     return (*length);
@@ -877,7 +877,7 @@ void APIENTRY_GL4ES gl4es_glLinkProgram(GLuint program) {
     }
     // create one vertex shader if needed!
     if (!glprogram->last_vert) {
-        glprogram->default_need = (shaderconv_need_t*)je_malloc(sizeof(shaderconv_need_t));
+        glprogram->default_need = (shaderconv_need_t*)malloc(sizeof(shaderconv_need_t));
         memcpy(glprogram->default_need, &needs, sizeof(shaderconv_need_t));
         glprogram->default_vertex = 1;
         GLenum vtx = gl4es_glCreateShader(GL_VERTEX_SHADER);
@@ -887,7 +887,7 @@ void APIENTRY_GL4ES gl4es_glLinkProgram(GLuint program) {
     }
     // create one fragment shader if needed!
     if (!glprogram->last_frag) {
-        glprogram->default_need = (shaderconv_need_t*)je_malloc(sizeof(shaderconv_need_t));
+        glprogram->default_need = (shaderconv_need_t*)malloc(sizeof(shaderconv_need_t));
         memcpy(glprogram->default_need, &needs, sizeof(shaderconv_need_t));
         glprogram->default_fragment = 1;
         GLenum vtx = gl4es_glCreateShader(GL_FRAGMENT_SHADER);

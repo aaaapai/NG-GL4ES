@@ -501,7 +501,7 @@ static char* ShaderHacks_1(char* shader, char* Tmp, int* tmpsize) {
     for (int i = 0; i < sizeof(gl4es_hacks_1) / sizeof(gl4es_hacks_1[0]); i += 2)
         if (strstr(Tmp, gl4es_hacks_1[i])) {
             if (Tmp == shader) {
-                Tmp = (char*)je_malloc(*tmpsize);
+                Tmp = (char*)malloc(*tmpsize);
                 strcpy(Tmp, shader);
             } // hacking!
             Tmp = gl4es_inplace_replace_simple(Tmp, tmpsize, gl4es_hacks_1[i], gl4es_hacks_1[i + 1]);
@@ -517,7 +517,7 @@ static char* ShaderHacks_2_1(char* shader, char* Tmp, int* tmpsize, int i) {
     if ((uintptr_t)p > (uintptr_t)m) return Tmp; // main is before, aborting...
     // ok, instance found, insert main line...
     if (Tmp == shader) {
-        Tmp = (char*)je_malloc(*tmpsize);
+        Tmp = (char*)malloc(*tmpsize);
         strcpy(Tmp, shader);
         m = strstr(Tmp, gl4es_sign_2_main);
     } // hacking!
@@ -546,7 +546,7 @@ char* ShaderHacks(char* shader) {
         int n = gl4es_hacks[i].n;
         if (strstr(Tmp, f)) {
             if (Tmp == shader) {
-                Tmp = (char*)je_malloc(tmpsize);
+                Tmp = (char*)malloc(tmpsize);
                 strcpy(Tmp, shader);
             } // hacking!
             for (int j = 0; j < n; j += 2) {

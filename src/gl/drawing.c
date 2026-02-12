@@ -97,7 +97,7 @@ renderlist_t* arrays_to_renderlist(renderlist_t* list, GLenum mode, GLsizei skip
     } else {
         if (!globals4es.novaocache && glstate->vao != glstate->defaultvao) {
             // prepare a vao cache object
-            list->shared_arrays = glstate->vao->shared_arrays = (int*)je_malloc(sizeof(int));
+            list->shared_arrays = glstate->vao->shared_arrays = (int*)malloc(sizeof(int));
             *glstate->vao->shared_arrays = 2; // already shared between glstate & list
 #define G2(AA, A, B)                                                                                                   \
     glstate->vao->B.enabled = glstate->vao->vertexattrib[AA].enabled;                                                  \
@@ -258,7 +258,7 @@ static renderlist_t* arrays_add_renderlist(renderlist_t* a, GLenum mode, GLsizei
     if (!a->mode_inits) list_add_modeinit(a, a->mode_init);
     if (ilen_a || ilen_b || mode_needindices(a->mode) || mode_needindices(mode) ||
         (a->mode != mode && (a->mode == GL_QUADS || mode == GL_QUADS))) {
-        // alloc or je_realloc a->indices first...
+        // alloc or realloc a->indices first...
         ilen_b = indices_getindicesize(mode, ((indices) ? ilen_b : len_b));
         prepareadd_renderlist(a, ilen_b);
         // then append b
@@ -534,7 +534,7 @@ void APIENTRY_GL4ES gl4es_glDrawRangeElements(GLenum mode, GLuint start, GLuint 
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
         for (int i = 0; i < count; i++)
@@ -568,7 +568,7 @@ void APIENTRY_GL4ES gl4es_glDrawRangeElements(GLenum mode, GLuint start, GLuint 
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
         for (int i = 0; i < count; i++)
@@ -584,7 +584,7 @@ void APIENTRY_GL4ES gl4es_glDrawRangeElements(GLenum mode, GLuint start, GLuint 
         return;
     } else {
         glDrawElementsCommon(mode, 0, count, end + 1, sindices, iindices, 1);
-        if (need_free) je_free(sindices);
+        if (need_free) free(sindices);
     }
 }
 AliasExport(void, glDrawRangeElements, ,
@@ -649,7 +649,7 @@ void APIENTRY_GL4ES gl4es_glDrawElements(GLenum mode, GLsizei count, GLenum type
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
 
@@ -682,7 +682,7 @@ void APIENTRY_GL4ES gl4es_glDrawElements(GLenum mode, GLsizei count, GLenum type
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
         normalize_indices_us(sindices, &max, &min, count);
@@ -697,7 +697,7 @@ void APIENTRY_GL4ES gl4es_glDrawElements(GLenum mode, GLsizei count, GLenum type
     } else {
         glDrawElementsCommon(mode, 0, count, 0, sindices, iindices, 1);
         if (need_free) {
-            je_free(sindices);
+            free(sindices);
             wantBufferIndex(old_index);
         }
     }
@@ -780,8 +780,8 @@ void APIENTRY_GL4ES gl4es_glDrawArrays(GLenum mode, GLint first, GLsizei count) 
             if ((indcnt < realcount) || (indfirst != realfirst)) {
                 if (indcnt < realcount) {
                     indcnt = realcount;
-                    if (indices) je_free(indices);
-                    indices = (GLushort*)je_malloc(sizeof(GLushort) * (indcnt * 3 / 2));
+                    if (indices) free(indices);
+                    indices = (GLushort*)malloc(sizeof(GLushort) * (indcnt * 3 / 2));
                 }
                 indfirst = realfirst;
                 GLushort* p = indices;
@@ -890,8 +890,8 @@ void APIENTRY_GL4ES gl4es_glMultiDrawArrays(GLenum mode, const GLint* firsts, co
                 if ((indcnt < realcount) || (indfirst != realfirst)) {
                     if (indcnt < realcount) {
                         indcnt = realcount;
-                        if (indices) je_free(indices);
-                        indices = (GLushort*)je_malloc(sizeof(GLushort) * (indcnt * 3 / 2));
+                        if (indices) free(indices);
+                        indices = (GLushort*)malloc(sizeof(GLushort) * (indcnt * 3 / 2));
                     }
                     indfirst = realfirst;
                     GLushort* p = indices;
@@ -1044,9 +1044,9 @@ void internal_glDrawElementsBaseVertex_gles30(GLenum mode, GLsizei count, GLenum
         GLuint old_index = wantBufferIndex(0);
         glDrawElementsCommon(mode, 0, count, 0, sindices, iindices, 1);
         if (iindices) {
-            je_free(iindices);
+            free(iindices);
         } else {
-            je_free(sindices);
+            free(sindices);
         }
         wantBufferIndex(old_index);
     }
@@ -1210,9 +1210,9 @@ void internal_glMultiDrawElementsBaseVertex_gles30(GLenum mode, const GLsizei* c
             glDrawElementsCommon(mode, 0, count, 0, sindices, iindices, 1);
 
             if (iindices) {
-                je_free(iindices);
+                free(iindices);
             } else {
-                je_free(sindices);
+                free(sindices);
             }
             wantBufferIndex(old_index);
         }
@@ -1370,9 +1370,9 @@ void APIENTRY_GL4ES gl4es_glDrawRangeElementsBaseVertex(GLenum mode, GLuint star
             GLuint old_index = wantBufferIndex(0);
             glDrawElementsCommon(mode, 0, count, end + basevertex + 1, sindices, iindices, 1);
             if (iindices)
-                je_free(iindices);
+                free(iindices);
             else
-                je_free(sindices);
+                free(sindices);
             wantBufferIndex(old_index);
         }
     }
@@ -1452,8 +1452,8 @@ void APIENTRY_GL4ES gl4es_glDrawArraysInstanced(GLenum mode, GLint first, GLsize
             if ((indcnt < realcount) || (indfirst != realfirst)) {
                 if (indcnt < realcount) {
                     indcnt = realcount;
-                    if (indices) je_free(indices);
-                    indices = (GLushort*)je_malloc(sizeof(GLushort) * (indcnt * 3 / 2));
+                    if (indices) free(indices);
+                    indices = (GLushort*)malloc(sizeof(GLushort) * (indcnt * 3 / 2));
                 }
                 indfirst = realfirst;
                 GLushort* p = indices;
@@ -1538,7 +1538,7 @@ void APIENTRY_GL4ES gl4es_glDrawElementsInstanced(GLenum mode, GLsizei count, GL
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
         normalize_indices_us(sindices, &max, &min, count);
@@ -1564,7 +1564,7 @@ void APIENTRY_GL4ES gl4es_glDrawElementsInstanced(GLenum mode, GLsizei count, GL
 
         if (!need_free) {
             GLushort* tmp = sindices;
-            sindices = (GLushort*)je_malloc(count * sizeof(GLushort));
+            sindices = (GLushort*)malloc(count * sizeof(GLushort));
             memcpy(sindices, tmp, count * sizeof(GLushort));
         }
         normalize_indices_us(sindices, &max, &min, count);
@@ -1580,7 +1580,7 @@ void APIENTRY_GL4ES gl4es_glDrawElementsInstanced(GLenum mode, GLsizei count, GL
     } else {
         glDrawElementsCommon(mode, 0, count, 0, sindices, iindices, primcount);
         if (need_free) {
-            je_free(sindices);
+            free(sindices);
             wantBufferIndex(old_index);
         }
     }
@@ -1688,9 +1688,9 @@ void APIENTRY_GL4ES gl4es_glDrawElementsInstancedBaseVertex(GLenum mode, GLsizei
             GLuint old_index = wantBufferIndex(0);
             glDrawElementsCommon(mode, 0, count, 0, sindices, iindices, primcount);
             if (iindices)
-                je_free(iindices);
+                free(iindices);
             else
-                je_free(sindices);
+                free(sindices);
             wantBufferIndex(old_index);
         }
     }
