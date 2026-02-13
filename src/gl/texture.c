@@ -18,6 +18,8 @@
 #include "pixel.h"
 #include "raster.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a

@@ -129,6 +129,8 @@ int main() {
 #include <string.h>
 #include <limits.h>
 
+#include <jemalloc/jemalloc.h>
+
 /* compiler specific configuration */
 
 #if UINT_MAX == 0xffffffffu

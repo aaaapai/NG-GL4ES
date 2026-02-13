@@ -13,6 +13,7 @@
 #include "shaderconv.h"
 #include "fpe_shader.h"
 #include "string_utils.h"
+#include <jemalloc/jemalloc.h>
 
 // #define DEBUG
 #ifdef DEBUG

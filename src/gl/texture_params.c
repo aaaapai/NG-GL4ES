@@ -17,6 +17,8 @@
 #include "pixel.h"
 #include "raster.h"
 
+#include <jemalloc/jemalloc.h>
+
 KHASH_MAP_IMPL_INT(tex, gltexture_t*);
 
 // #define DEBUG

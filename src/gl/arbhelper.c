@@ -1,4 +1,5 @@
 #include "arbhelper.h"
+#include <jemalloc/jemalloc.h>
 
 #include "../config.h"
 

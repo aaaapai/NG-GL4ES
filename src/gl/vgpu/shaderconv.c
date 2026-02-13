@@ -21,6 +21,8 @@ int NO_OPERATOR_VALUE = 9999;
 #include <ctype.h>
 #include <stdbool.h>
 
+#include <jemalloc/jemalloc.h>
+
 // ������������������ȡ���������飨���� mat2, mat3, mat4, vec2, vec3, vec4 ���͵Ĵ�����
 int parse_floats_from_string(const char* str, GLfloat* outValues, int maxCount) {
     int count = 0;
@@ -887,7 +889,7 @@ char* ReplaceModOperator(char* source, int* sourceLength) {
         // Insert the new string
         source = InplaceReplaceByIndex(source, sourceLength, startIndex, endIndex, replacementString);
 
-        // Free all the temporary strings
+        // free all the temporary strings
         free(leftOperand);
         free(rightOperand);
         free(replacementString);

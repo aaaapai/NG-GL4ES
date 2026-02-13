@@ -6,6 +6,8 @@
 // MAX_TEX
 #include "../config.h"
 
+#include <jemalloc/jemalloc.h>
+
 // ARBCONV_DBG_RE - resolve* error ArbConverter debug logs
 #ifdef DEBUG
 #define ARBCONV_DBG_RE(...) SHUT_LOGD(__VA_ARGS__);

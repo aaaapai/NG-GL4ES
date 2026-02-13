@@ -12,6 +12,8 @@
 #include "render.h"
 #include "fpe.h"
 
+#include <jemalloc/jemalloc.h>
+
 /* return 1 if failed, 2 if succeed */
 typedef struct array2vbo_s {
     uintptr_t   real_base;
