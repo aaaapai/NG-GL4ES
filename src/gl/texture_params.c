@@ -179,6 +179,9 @@ void APIENTRY_GL4ES gl4es_glBindTexture(GLenum target, GLuint texture) {
                   PrintEnum(target), texture, glstate->texture.active, glstate->texture.client, glstate->list.active,
                   glstate->list.compiling, glstate->list.pending);)
     if (target == GL_TEXTURE_BUFFER || target == GL_TEXTURE_3D) {
+        if (target == GL_TEXTURE_3D) {
+            glstate->texture.bound[glstate->texture.active][ENABLED_TEX3D] = gl4es_getTexture(target, texture);
+        }
         LOAD_GLES(glBindTexture);
         realize_active();
         gles_glBindTexture(target, texture);
@@ -227,6 +230,16 @@ void APIENTRY_GL4ES gl4es_glBindTexture(GLenum target, GLuint texture) {
         }
     }
 }
+
+void APIENTRY_GL4ES gl4es_glBindImageTexture(GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer,
+                                             GLenum access, GLenum format) {
+    noerrorShim();
+    DBG(SHUT_LOGD("glBindImageTexture(%u, %u, %d, %d, %d, %s, %s)\n", unit, texture, level, layered, layer,
+                  PrintEnum(access), PrintEnum(format)););
+    LOAD_GLES3(glBindImageTexture);
+    gles_glBindImageTexture(unit, texture, level, layered, layer, access, format);
+}
+
 int is_mipmap_needed(glsampler_t* sampler) {
     switch (sampler->min_filter) {
     case GL_NEAREST_MIPMAP_NEAREST:
@@ -411,7 +424,11 @@ void APIENTRY_GL4ES gl4es_glDeleteTextures(GLsizei n, const GLuint* textures) {
                         glstate->actual_tex2d[a] = 0;
                         found = 1;
                     }
-                    if (found) glstate->bound_changed = a + 1;
+                    if (found) {
+                        glstate->bound_changed = a + 1;
+                        if (glstate->fpe_state && glstate->fpe_bound_changed < a + 1)
+                            glstate->fpe_bound_changed = a + 1;
+                    }
                 }
                 gles_glDeleteTextures(1, &tex->glname);
                 // check if renderbuffer where associeted
@@ -969,6 +986,8 @@ void realize_textures(int drawing) {
 
 // Direct wrapper
 AliasExport(void, glBindTexture, , (GLenum target, GLuint texture));
+AliasExport(void, glBindImageTexture, ,
+            (GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format));
 AliasExport(void, glGenTextures, , (GLsizei n, GLuint* textures));
 AliasExport(void, glDeleteTextures, , (GLsizei n, const GLuint* textures));
 AliasExport(void, glTexParameteri, , (GLenum target, GLenum pname, GLint param));

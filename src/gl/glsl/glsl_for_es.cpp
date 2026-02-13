@@ -23,6 +23,11 @@ extern "C"
 }
 
 // #define DEBUG
+#ifdef DEBUG
+#define DBG(a) a
+#else
+#define DBG(a)
+#endif
 
 std::string GLSLtoGLSLES(const char* glsl_code, GLenum glsl_type, unsigned int essl_version, unsigned int glsl_version,
                          int& return_code);
@@ -689,7 +694,7 @@ vec4 GI_TemporalFilter() {
 
 void inject_ngg_macro_definition(std::string& glslCode) {
     std::string macro_definitions = "\n#define NGG_NGG\n"
-                                    "#define NGG_NGG_VERSION " xstr(MAJOR) xstr(MINOR) xstr(REVISION) xstr(PATCH) "\n";
+                                    "#define NGG_NGG_VERSION " xstr(MAJOR) xstr(MINOR) xstr(REVISION) "\n";
 
     size_t versionPos = glslCode.rfind("#version");
     size_t insertionPos = 0;
@@ -807,21 +812,21 @@ std::vector<unsigned int> glsl_to_spirv(GLenum shader_type, int glsl_version, co
     TBuiltInResource TBuiltInResource_resources = InitResources();
 
     if (!shader.parse(&TBuiltInResource_resources, glsl_version, true, EShMsgDefault)) {
-        // LOGD("glslang: GLSL Compiling ERROR: \n%s", shader.getInfoLog());
+        DBG(SHUT_LOGD("glslang: GLSL Compiling ERROR: \n%s", shader.getInfoLog());)
         errc = -1;
         return {};
     }
-    // LOGD("GLSL Compiled.")
+    DBG(SHUT_LOGD("GLSL Compiled to SPIRV.");)
 
     glslang::TProgram program;
     program.addShader(&shader);
 
     if (!program.link(EShMsgDefault)) {
-        // LOGD("Shader Linking ERROR: %s", program.getInfoLog())
+        DBG(SHUT_LOGD("glslang: GLSL Linking ERROR: \n%s", program.getInfoLog());)
         errc = -1;
         return {};
     }
-    // LOGD("Shader Linked." )
+    DBG(SHUT_LOGD("GLSL Linked.");)
     std::vector<unsigned int> spirv_code;
     glslang::SpvOptions spvOptions;
     spvOptions.disableOptimizer = false;
@@ -836,19 +841,19 @@ std::string spirv_to_essl(std::vector<unsigned int> spirv, unsigned int essl_ver
     spvc_compiler compiler_glsl = nullptr;
     spvc_compiler_options options = nullptr;
     spvc_resources resources = nullptr;
-//    const spvc_reflected_resource* list = nullptr;
+    //    const spvc_reflected_resource* list = nullptr;
     const char* result = nullptr;
-//    size_t count;
+    //    size_t count;
 
     const SpvId* p_spirv = spirv.data();
     size_t word_count = spirv.size();
 
-    // LOGD("spirv_code.size(): %d", spirv.size())
+    DBG(SHUT_LOGD("spirv_code.size(): %d", spirv.size()))
     spvc_context_create(&context);
     spvc_context_parse_spirv(context, p_spirv, word_count, &ir);
     spvc_context_create_compiler(context, SPVC_BACKEND_GLSL, ir, SPVC_CAPTURE_MODE_TAKE_OWNERSHIP, &compiler_glsl);
     spvc_compiler_create_shader_resources(compiler_glsl, &resources);
-//    spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_UNIFORM_BUFFER, &list, &count);
+    //    spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_UNIFORM_BUFFER, &list, &count);
     spvc_compiler_create_compiler_options(compiler_glsl, &options);
     spvc_compiler_options_set_uint(options, SPVC_COMPILER_OPTION_GLSL_VERSION,
                                    essl_version >= 300 ? essl_version : 300);
@@ -857,7 +862,7 @@ std::string spirv_to_essl(std::vector<unsigned int> spirv, unsigned int essl_ver
     spvc_compiler_compile(compiler_glsl, &result);
 
     if (!result) {
-        printf("Error: unexpected error in spirv-cross.");
+        DBG(SHUT_LOGD("Error: unexpected error in spirv-cross."));
         errc = -1;
         return "";
     }
@@ -874,7 +879,7 @@ static bool glslang_inited = false;
 std::string GLSLtoGLSLES_2(const char* glsl_code, GLenum glsl_type, unsigned int essl_version, int& return_code) {
     bool atomicCounterEmulated = false;
     std::string correct_glsl_str = preprocess_glsl(glsl_code, glsl_type, &atomicCounterEmulated);
-    // LOGD("Firstly converted GLSL:\n%s", correct_glsl_str.c_str())
+    DBG(SHUT_LOGD("Firstly converted GLSL:\n%s", correct_glsl_str.c_str()))
     int glsl_version = get_or_add_glsl_version(correct_glsl_str);
 
     if (!glslang_inited) {
@@ -886,6 +891,7 @@ std::string GLSLtoGLSLES_2(const char* glsl_code, GLenum glsl_type, unsigned int
     std::vector<unsigned int> spirv_code = glsl_to_spirv(glsl_type, glsl_version, s, errc);
     if (errc != 0) {
         return_code = -1;
+        DBG(SHUT_LOGD("Error compiling GLSL to SPIR-V: %d", errc))
         return "";
     }
     errc = 0;
@@ -903,7 +909,7 @@ std::string GLSLtoGLSLES_2(const char* glsl_code, GLenum glsl_type, unsigned int
     essl = processOutColorLocations(essl);
     essl = forceSupporterOutput(essl);
 
-    // LOGD("Originally GLSL to GLSL ES Complete: \n%s", essl.c_str())
+    DBG(SHUT_LOGD("Originally GLSL to GLSL ES Complete: \n%s", essl.c_str()))
     return_code = errc;
     if (return_code == 0) {
         return_code = atomicCounterEmulated ? 1 : 0;

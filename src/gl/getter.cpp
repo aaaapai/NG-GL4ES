@@ -179,6 +179,8 @@ extern "C"
                    "GL_ARB_texture_swizzle "
                    "GL_ARB_compatibility "
                    "GL_ARB_draw_buffers_blend "
+                   "GL_ARB_shader_image_load_store "
+                   "GL_EXT_shader_image_load_store "
                    //"GL_ARB_separate_shader_objects "
                    //                "GL_EXT_blend_logic_op "
             );
@@ -569,7 +571,7 @@ extern "C"
             *params = 1024;
             break;
         case GL_MAX_TEXTURE_IMAGE_UNITS:
-            *params = hardext.maxteximage;
+            *params = hardext.maxteximage * TEXTURE_IMAGE_MAGNIFICATION; // Cheating a bit
             break;
         case GL_MAX_MODELVIEW_STACK_DEPTH:
             *params = MAX_STACK_MODELVIEW;
@@ -1039,6 +1041,12 @@ extern "C"
         case GL_CONTEXT_PROFILE_MASK:
             *params = GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
             break;
+        case GL_MAX_IMAGE_UNITS: {
+            int es_params = 16;
+            gles_glGetIntegerv(pname, &es_params);
+            *params = es_params * TEXTURE_IMAGE_MAGNIFICATION;
+            break;
+        }
         case GL_MAX_VERTEX_IMAGE_UNIFORMS:
             *params = 4;
             break;

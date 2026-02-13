@@ -758,20 +758,24 @@ static void* swizzle_texture(GLsizei width, GLsizei height, GLenum* format, GLen
             //    convert = 1;
             break;
         case GL_DEPTH_COMPONENT16:
-        case GL_DEPTH_COMPONENT24:
-        case GL_DEPTH_COMPONENT32:
-        case GL_DEPTH_COMPONENT32F:
             check = 0;
-            // if (hardext.depthtex) {
-            //     if (dest_type == GL_UNSIGNED_BYTE) {
+            *format = dest_format = GL_DEPTH_COMPONENT;
+            dest_type = GL_UNSIGNED_SHORT;
+            break;
+        case GL_DEPTH_COMPONENT24:
+            check = 0;
             *format = dest_format = GL_DEPTH_COMPONENT;
             dest_type = GL_UNSIGNED_INT;
-            //       convert = 1;
-            //    }
-            //    check = 0;
-            //}
-            // else
-            //    convert = 1;
+            break;
+        case GL_DEPTH_COMPONENT32:
+            check = 0;
+            *format = dest_format = GL_DEPTH_COMPONENT;
+            dest_type = GL_UNSIGNED_INT;
+            break;
+        case GL_DEPTH_COMPONENT32F:
+            check = 0;
+            *format = dest_format = GL_DEPTH_COMPONENT;
+            dest_type = GL_FLOAT;
             break;
         case GL_STENCIL_INDEX8:
             check = 0;
@@ -1466,10 +1470,10 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
             } else {
                 errorGL();
                 DBG(SHUT_LOGD("gles_glTexImage2D(%d, %d, %s, %d, %d, %d, %s, %s, 0x%x)\n", GL_TEXTURE_2D, 0,
-                              PrintEnum(bound->format), bound->nwidth, bound->nheight, 0, PrintEnum(bound->format),
-                              PrintEnum(bound->type), NULL);)
-                gles_glTexImage2D(GL_TEXTURE_2D, 0, bound->format, bound->nwidth, bound->nheight, 0, bound->format,
-                                  bound->type, NULL);
+                              PrintEnum(bound->internalformat), bound->nwidth, bound->nheight, 0,
+                              PrintEnum(bound->format), PrintEnum(bound->type), NULL);)
+                gles_glTexImage2D(GL_TEXTURE_2D, 0, bound->internalformat, bound->nwidth, bound->nheight, 0,
+                                  bound->format, bound->type, NULL);
                 DBG(CheckGLError(1);)
             }
         }
@@ -1834,6 +1838,15 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
     and format is not GL_RGBA.
     */
 
+    // Guard against illegal GLES combos like format=RGBA with single/dual channel internalformat.
+    if ((format == GL_RGBA || format == GL_BGRA) &&
+        (internalformat == GL_R || internalformat == GL_RED || internalformat == GL_R8 ||
+         internalformat == GL_R8_SNORM || internalformat == GL_R16F || internalformat == GL_R32F ||
+         internalformat == GL_RG || internalformat == GL_RG8 || internalformat == GL_RG8_SNORM ||
+         internalformat == GL_RG16F || internalformat == GL_RG32F)) {
+        internalformat = GL_RGBA;
+    }
+
     int limitednpot = 0;
     {
         GLsizei nheight = (hardext.npot == 3) ? height : npot(height);
@@ -1979,7 +1992,7 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     }
                     if (width == 1 && height == 1) { // create a manual mipmap just in case_state
                         gles_glTexSubImage2D(rtarget, level, 1, 1, width, height, format, type, pixels);
-                        gles_glTexImage2D(rtarget, 1, format, 1, 1, 0, format, type, pixels);
+                        gles_glTexImage2D(rtarget, 1, internalformat, 1, 1, 0, format, type, pixels);
                     }
                 }
 #endif
@@ -2005,7 +2018,8 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     nww <<= 1;
                     nhh <<= 1;
                     --leveln;
-                    gles_glTexImage2D(rtarget, leveln, format, nww, nhh, border, format, type, (pot) ? ndata : NULL);
+                    gles_glTexImage2D(rtarget, leveln, internalformat, nww, nhh, border, format, type,
+                                      (pot) ? ndata : NULL);
                     if (!pot && pixels) gles_glTexSubImage2D(rtarget, leveln, 0, 0, nw, nh, format, type, ndata);
                 }
                 if (ndata != pixels) free(ndata);
@@ -2031,7 +2045,8 @@ void APIENTRY_GL4ES gl4es_glTexImage2D(GLenum target, GLint level, GLint interna
                     nww = nlevel(nww, 1);
                     nhh = nlevel(nhh, 1);
                     ++leveln;
-                    gles_glTexImage2D(rtarget, leveln, format, nw, nh, border, format, type, (pot) ? ndata : NULL);
+                    gles_glTexImage2D(rtarget, leveln, internalformat, nw, nh, border, format, type,
+                                      (pot) ? ndata : NULL);
                     if (!pot && pixels) gles_glTexSubImage2D(rtarget, leveln, 0, 0, nww, nhh, format, type, ndata);
                 }
                 if (ndata != pixels) free(ndata);

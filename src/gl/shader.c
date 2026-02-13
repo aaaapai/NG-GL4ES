@@ -182,7 +182,7 @@ char* replace_version_line(const char* text) {
 
     const char* line_start = text;
     const char* p = text;
-    const char* replace_str = "#version 150 compatibility\n";
+    const char* replace_str = "#version 330 compatibility\n";
     size_t replace_len = strlen(replace_str);
 
     while (*p) {
@@ -213,7 +213,7 @@ char* replace_version_line(const char* text) {
     return strdup(text);
 }
 
-char* replace_version_line_460(const char* text) {
+char* replace_version_line_460(char* text) {
     const char* new_version = "#version 460\n";
     if (!text || !new_version) return NULL;
 
@@ -678,9 +678,11 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
                     // bool isBSL = first_three_lines_contains_BSL(glshader->source);
                     bool isBuiltInVariableConverted = is_glsl_builtin_converted(glshader->source);
                     remove_before_version(glshader->source);
-                    char* convertedSource =
-                        ConvertShaderBuiltInVariableOnly(glshader->source, glshader->type == GL_VERTEX_SHADER ? 1 : 0,
-                                                         &glshader->need, isBuiltInVariableConverted ? 0 : 1);
+                    char* convertedSource = glshader->source;
+                    if (!isBuiltInVariableConverted)
+                        convertedSource = ConvertShaderBuiltInVariableOnly(
+                            convertedSource, glshader->type == GL_VERTEX_SHADER ? 1 : 0, &glshader->need,
+                            isBuiltInVariableConverted ? 0 : 1);
                     free(glshader->source);
                     if (glshader->type == GL_FRAGMENT_SHADER) {
                         if (contains_glFragColor(glshader->source)) {
