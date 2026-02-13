@@ -15,3 +15,4 @@ cmake_build () {
 }
 
 cmake_build arm64-v8a
+cmake_build x86_64
