@@ -60,7 +60,7 @@ if(ANDROID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOX11")
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/3rdparty/glslang ${CMAKE_SOURCE_DIR}/3rdparty/glslang/Include)
+include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/3rdparty/glslang ${CMAKE_SOURCE_DIR}/3rdparty/glslang/Include ${CMAKE_SOURCE_DIR}/3rdparty/glslang/SPIRV ${CMAKE_SOURCE_DIR}/3rdparty/glslang/Public ${CMAKE_SOURCE_DIR}/3rdparty/glslang/MachineIndependent)
 
 add_subdirectory(3rdparty/glslang)
 add_subdirectory(3rdparty/SPIRV-Cross)
