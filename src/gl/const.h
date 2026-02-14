@@ -574,9 +574,9 @@ extern "C" {
 #define GL_MAP_PERSISTENT_BIT             0x00000040
 #define GL_QUERY_BUFFER_BINDING_AMD       0x9193
 #define GL_COPY_READ_BUFFER_BINDING       0x8F36
-//#define GL_COPY_READ_BUFFER               GL_COPY_READ_BUFFER_BINDING
+#define GL_COPY_READ_BUFFER              0x8F36
 #define GL_COPY_WRITE_BUFFER_BINDING      0x8F37
-//#define GL_COPY_WRITE_BUFFER              GL_COPY_WRITE_BUFFER_BINDING
+#define GL_COPY_WRITE_BUFFER               0x8F37
 
 
 /* Framebuffers */
@@ -945,6 +945,9 @@ extern "C" {
 #define GL_FUNC_REVERSE_SUBTRACT                        0x800B
 #define GL_MIN                                          0x8007
 #define GL_MAX                                          0x8008
+
+#define GL_FOG_COORD                      0x8451
+#define GL_FOG_COORD_SRC 0x8450
 
 #endif // _GL4ES_CONST_H_
 #ifdef __cplusplus
