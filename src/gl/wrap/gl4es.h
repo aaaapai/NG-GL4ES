@@ -33,7 +33,7 @@ void APIENTRY_GL4ES gl4es_glDrawRangeElements(GLenum mode,GLuint start,GLuint en
 // color
 void APIENTRY_GL4ES gl4es_glColor3f(GLfloat r, GLfloat g, GLfloat b);
 void APIENTRY_GL4ES gl4es_glColor3fv(GLfloat *c);
-void APIENTRY_GL4ES gl4es_glColor4fv(GLfloat *c);
+void APIENTRY_GL4ES gl4es_glColor4fv(const GLfloat *c);
 void APIENTRY_GL4ES gl4es_glIndexfv(const GLfloat *c);
 void APIENTRY_GL4ES gl4es_glSecondaryColor3fv(const GLfloat *v);
 
@@ -70,7 +70,7 @@ void APIENTRY_GL4ES gl4es_glLoadMatrixd(const GLdouble *m);
 void APIENTRY_GL4ES gl4es_glMultMatrixd(const GLdouble *m);
 
 // normal
-void APIENTRY_GL4ES gl4es_glNormal3fv(GLfloat *v);
+void APIENTRY_GL4ES gl4es_glNormal3fv(const GLfloat *v);
 
 // fog (defined in fog.c)
 void APIENTRY_GL4ES gl4es_glFogCoordd(GLdouble coord);
@@ -100,10 +100,10 @@ void APIENTRY_GL4ES gl4es_glTexCoord4fv(GLfloat *t);
 void APIENTRY_GL4ES gl4es_glMultiTexCoord1f(GLenum target, GLfloat s);
 void APIENTRY_GL4ES gl4es_glMultiTexCoord1fv(GLenum target, GLfloat *t);
 void APIENTRY_GL4ES gl4es_glMultiTexCoord2f(GLenum target, GLfloat s, GLfloat t);
-void APIENTRY_GL4ES gl4es_glMultiTexCoord2fv(GLenum target, GLfloat *t);
+void APIENTRY_GL4ES gl4es_glMultiTexCoord2fv(GLenum target, const GLfloat *t);
 void APIENTRY_GL4ES gl4es_glMultiTexCoord3f(GLenum target, GLfloat s, GLfloat t, GLfloat r);
 void APIENTRY_GL4ES gl4es_glMultiTexCoord3fv(GLenum target, GLfloat *t);
-void APIENTRY_GL4ES gl4es_glMultiTexCoord4fv(GLenum target, GLfloat *t);
+void APIENTRY_GL4ES gl4es_glMultiTexCoord4fv(GLenum target, const GLfloat *t);
 
 void APIENTRY_GL4ES gl4es_glGetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params);
 
@@ -125,9 +125,9 @@ void APIENTRY_GL4ES gl4es_glTranslated(GLdouble x, GLdouble y, GLdouble z);
 // vertex
 void APIENTRY_GL4ES gl4es_glVertex2f(GLfloat x, GLfloat y);
 void APIENTRY_GL4ES gl4es_glVertex2fv(GLfloat *v);
-void APIENTRY_GL4ES gl4es_glVertex3fv(GLfloat *v);
+void APIENTRY_GL4ES gl4es_glVertex3fv(const GLfloat *v);
 void APIENTRY_GL4ES gl4es_glVertex3f(GLfloat r, GLfloat g, GLfloat b);
-void APIENTRY_GL4ES gl4es_glVertex4fv(GLfloat *v);
+void APIENTRY_GL4ES gl4es_glVertex4fv(const GLfloat *v);
 
 // OES wrappers
 
