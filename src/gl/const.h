@@ -244,10 +244,10 @@ extern "C" {
 #define GL_EXP                            0x0800
 #define GL_EXP2                           0x0801
 #define GL_FOG_COORDINATE_SOURCE          0x8450
-#define GL_FOG_COORD_SRC                  GL_FOG_COORDINATE_SOURCE
+//#define GL_FOG_COORD_SRC                  GL_FOG_COORDINATE_SOURCE
 #define GL_FRAGMENT_DEPTH                 0x8452
 #define GL_FOG_COORDINATE                 0x8451
-#define GL_FOG_COORD                      GL_FOG_COORDINATE
+//#define GL_FOG_COORD                      GL_FOG_COORDINATE
 #define GL_CURRENT_FOG_COORD              0x8453
 #define GL_FOG_COORD_ARRAY_TYPE           0x8454
 #define GL_FOG_COORD_ARRAY_STRIDE         0x8455
@@ -574,9 +574,9 @@ extern "C" {
 #define GL_MAP_PERSISTENT_BIT             0x00000040
 #define GL_QUERY_BUFFER_BINDING_AMD       0x9193
 #define GL_COPY_READ_BUFFER_BINDING       0x8F36
-#define GL_COPY_READ_BUFFER               GL_COPY_READ_BUFFER_BINDING
+//#define GL_COPY_READ_BUFFER               GL_COPY_READ_BUFFER_BINDING
 #define GL_COPY_WRITE_BUFFER_BINDING      0x8F37
-#define GL_COPY_WRITE_BUFFER              GL_COPY_WRITE_BUFFER_BINDING
+//#define GL_COPY_WRITE_BUFFER              GL_COPY_WRITE_BUFFER_BINDING
 
 
 /* Framebuffers */
@@ -606,7 +606,7 @@ extern "C" {
 #define GL_TEXTURE_DEPTH_TYPE             0x8C16
 #define GL_UNSIGNED_NORMALIZED            0x8C17
 #define GL_FRAMEBUFFER_BINDING            0x8CA6
-#define GL_DRAW_FRAMEBUFFER_BINDING       GL_FRAMEBUFFER_BINDING
+//#define GL_DRAW_FRAMEBUFFER_BINDING       GL_FRAMEBUFFER_BINDING
 #define GL_RENDERBUFFER_BINDING           0x8CA7
 #define GL_READ_FRAMEBUFFER               0x8CA8
 #define GL_DRAW_FRAMEBUFFER               0x8CA9
