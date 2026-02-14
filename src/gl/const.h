@@ -7,8 +7,8 @@ extern "C" {
 
 #include <GL/gl.h>
 
-#include <GLES/glext.h>
-#include <GLES/gl2ext.h>
+#include "gles.h"
+
 
 #endif // _GL4ES_CONST_H_
 #ifdef __cplusplus
