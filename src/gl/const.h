@@ -7,7 +7,8 @@ extern "C" {
 
 #include <GL/gl.h>
 
-#define GL_HALF_FLOAT_OES                                       0x8D61
+#include <GLES/glext.h>
+#include <GLES/gl2ext.h>
 
 #endif // _GL4ES_CONST_H_
 #ifdef __cplusplus
