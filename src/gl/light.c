@@ -6,6 +6,8 @@
 #include "matrix.h"
 #include "matvec.h"
 
+#include <jemalloc/jemalloc.h>
+
 void APIENTRY_GL4ES gl4es_glLightModelf(GLenum pname, GLfloat param) {
 //printf("%sglLightModelf(%04X, %.2f)\n", (state.list.compiling)?"list":"", pname, param);
     ERROR_IN_BEGIN

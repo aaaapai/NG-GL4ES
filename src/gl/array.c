@@ -5,6 +5,7 @@
 #include "glcase.h"
 #include "light.h"
 #include "state.h"
+#include <jemalloc/jemalloc.h>
 
 GLvoid *copy_gl_array(const GLvoid *src,
                       GLenum from, GLsizei width, GLsizei stride,

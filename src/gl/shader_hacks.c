@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "string_utils.h"
 
+#include <jemalloc/jemalloc.h>
+
 typedef struct hack_s {
     char* sign;
     int n;

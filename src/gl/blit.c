@@ -16,6 +16,8 @@
 #include "../glx/streaming.h"
 #endif
 
+#include <jemalloc/jemalloc.h>
+
 // hacky viewport temporary changes
 void pushViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void popViewport();

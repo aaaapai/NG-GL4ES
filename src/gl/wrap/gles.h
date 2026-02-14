@@ -3,6 +3,7 @@ extern "C"
 {
 #endif
 #include "../gles.h"
+#include <jemalloc/jemalloc.h>
 
 #ifndef GLESWRAP_H
 #define GLESWRAP_H
@@ -6877,6 +6878,24 @@ extern "C"
         glPushCall((void*)packed_data);                                                                                \
     }
 #endif
+#ifndef direct_glTexImage3D
+#define push_glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, data) { \
+    glTexImage3D_PACKED *packed_data = malloc(sizeof(glTexImage3D_PACKED)); \
+    packed_data->format = glTexImage3D_FORMAT; \
+    packed_data->func = gl4es_glTexImage3D; \
+    packed_data->args.a1 = (GLenum)target; \
+    packed_data->args.a2 = (GLint)level; \
+    packed_data->args.a3 = (GLint)internalformat; \
+    packed_data->args.a4 = (GLsizei)width; \
+    packed_data->args.a5 = (GLsizei)height; \
+    packed_data->args.a6 = (GLsizei)depth; \
+    packed_data->args.a7 = (GLint)border; \
+    packed_data->args.a8 = (GLenum)format; \
+    packed_data->args.a9 = (GLenum)type; \
+    packed_data->args.a10 = (GLvoid *)data; \
+    glPushCall((void *)packed_data); \
+}
+#endif
 #ifndef direct_glTexParameterf
 #define push_glTexParameterf(target, pname, param)                                                                     \
     {                                                                                                                  \
@@ -6986,6 +7005,25 @@ extern "C"
         packed_data->args.a11 = (GLvoid*)data;                                                                         \
         glPushCall((void*)packed_data);                                                                                \
     }
+#endif
+#ifndef direct_glTexSubImage3D
+#define push_glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data) { \
+    glTexSubImage3D_PACKED *packed_data = malloc(sizeof(glTexSubImage3D_PACKED)); \
+    packed_data->format = glTexSubImage3D_FORMAT; \
+    packed_data->func = gl4es_glTexSubImage3D; \
+    packed_data->args.a1 = (GLenum)target; \
+    packed_data->args.a2 = (GLint)level; \
+    packed_data->args.a3 = (GLint)xoffset; \
+    packed_data->args.a4 = (GLint)yoffset; \
+    packed_data->args.a5 = (GLint)zoffset; \
+    packed_data->args.a6 = (GLsizei)width; \
+    packed_data->args.a7 = (GLsizei)height; \
+    packed_data->args.a8 = (GLsizei)depth; \
+    packed_data->args.a9 = (GLenum)format; \
+    packed_data->args.a10 = (GLenum)type; \
+    packed_data->args.a11 = (GLvoid *)data; \
+    glPushCall((void *)packed_data); \
+}
 #endif
 #ifndef direct_glTranslatef
 #define push_glTranslatef(x, y, z)                                                                                     \

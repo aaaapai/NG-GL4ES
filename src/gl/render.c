@@ -4,6 +4,8 @@
 #include "init.h"
 #include "matrix.h"
 
+#include <jemalloc/jemalloc.h>
+
 void push_hit() {
     // push current hit to hit list, and re-init current hit
     if (glstate->selectbuf.hit) {

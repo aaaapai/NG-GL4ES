@@ -894,7 +894,7 @@ char* ReplaceModOperator(char* source, int* sourceLength) {
         // Insert the new string
         source = InplaceReplaceByIndex(source, sourceLength, startIndex, endIndex, replacementString);
 
-        // Free all the temporary strings
+        // free all the temporary strings
         free(leftOperand);
         free(rightOperand);
         free(replacementString);

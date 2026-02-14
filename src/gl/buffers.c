@@ -13,6 +13,8 @@
 #include "init.h"
 #include "loader.h"
 
+#include <jemalloc/jemalloc.h>
+
 // #define DEBUG
 #ifdef DEBUG
 #define DBG(a) a

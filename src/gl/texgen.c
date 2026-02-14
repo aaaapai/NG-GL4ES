@@ -7,6 +7,7 @@
 #include "loader.h"
 #include "matrix.h"
 #include "matvec.h"
+#include <jemalloc/jemalloc.h>
 
 //extern void* eglGetProcAddress(const char*);
 

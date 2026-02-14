@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "debug.h"
 #include "logs.h"
+#include <jemalloc/jemalloc.h>
 
 //#define DEBUG
 #ifdef DEBUG

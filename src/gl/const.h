@@ -4,6 +4,9 @@ extern "C" {
 #ifndef _GL4ES_CONST_H_
 #define _GL4ES_CONST_H_
 
+
+#include <GL/gl.h>
+
 #define GL_QUADS      7
 #define GL_QUAD_STRIP 8
 #define GL_POLYGON    9
