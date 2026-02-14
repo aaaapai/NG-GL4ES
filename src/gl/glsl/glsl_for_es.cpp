@@ -724,14 +724,14 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
                 "rot[0][2], rot[1][2], rot[2][2]);");
 
 
-   /*if (shaderType == GL_VERTEX_SHADER) {
+   if (shaderType == GL_VERTEX_SHADER) {
         replace_all(ret, "attribute", "in");
         replace_all(ret, "varying", "out");
      } else if (shaderType == GL_FRAGMENT_SHADER) {
         replace_all(ret, "varying", "in");
-  	}*/
+  	}
 	
-    //replace_all(ret, "texture2D", "texture");
+    replace_all(ret, "texture2D", "texture");
 
     replace_all(ret, "vec3 worldPosDiff", "vec4 worldPosDiff");
     replace_all(ret, "vec3[3](vWorldPos[0] - vWorldPos[1]", "vec4[3](vWorldPos[0] - vWorldPos[1]");
@@ -762,7 +762,11 @@ int get_or_add_glsl_version(std::string& glsl) {
     if (glsl_version == -1) {
         glsl_version = 460;
         glsl.insert(0, "#version 460 compatibility\n");
-    }
+    } else if (glsl_version < 460) {
+        // force upgrade glsl version
+        glsl = replace_line_starting_with(glsl, "#version", "#version 460 compatibility\n");
+        glsl_version = 460;
+	}
     //LOG_D("GLSL version: %d",glsl_version)
     return glsl_version;
 }
