@@ -9,6 +9,8 @@
 #include "matvec.h"
 #include "logs.h"
 
+#include <jemalloc/jemalloc.h>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG(a) a

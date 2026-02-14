@@ -8,6 +8,7 @@
 #include "array.h"
 #include "logs.h"
 #include "matvec.h"
+#include <jemalloc/jemalloc.h>
 
 static inline map_state_t **get_map_pointer(GLenum target) {
     switch (target) {

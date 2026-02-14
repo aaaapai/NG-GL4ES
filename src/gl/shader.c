@@ -12,6 +12,7 @@
 #include "glsl/glsl_for_es.h"
 #include <ctype.h>
 #include <string.h>
+#include <jemalloc/jemalloc.h>
 
 // #define DEBUG
 #ifdef DEBUG
@@ -181,7 +182,7 @@ char* replace_version_line(const char* text) {
 
     const char* line_start = text;
     const char* p = text;
-    const char* replace_str = "#version 330 compatibility\n";
+    const char* replace_str = "#version 460 compatibility\n";
     size_t replace_len = strlen(replace_str);
 
     while (*p) {

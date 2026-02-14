@@ -7,6 +7,7 @@
 #include "init.h"
 #include "loader.h"
 #include "buffers.h"
+#include <jemalloc/jemalloc.h>
 
 // KH Map implementation
 KHASH_MAP_IMPL_INT(material, rendermaterial_t *);

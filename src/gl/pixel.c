@@ -7,6 +7,8 @@
 #include "glstate.h"
 #include "debug.h"
 
+#include <jemalloc/jemalloc.h>
+
 #ifdef __BIG_ENDIAN__
 #define GL_INT8_REV GL_UNSIGNED_INT_8_8_8_8
 #define GL_INT8 GL_UNSIGNED_INT_8_8_8_8_REV

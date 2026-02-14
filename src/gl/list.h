@@ -8,6 +8,8 @@
 #include "attributes.h"
 #include "gles.h"
 
+#include <jemalloc/jemalloc.h>
+
 typedef enum {
 	STAGE_NONE = 0,
 	STAGE_PUSH,

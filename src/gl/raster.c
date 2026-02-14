@@ -11,6 +11,8 @@
 #include "matvec.h"
 #include "pixel.h"
 
+#include <jemalloc/jemalloc.h>
+
 #undef min
 #undef max
 #define min(a, b)	((a)<b)?(a):(b)
@@ -35,11 +37,13 @@ void APIENTRY_GL4ES gl4es_glRasterPos3f(GLfloat x, GLfloat y, GLfloat z) {
     matrix_vector(modelview, transl, t);
     matrix_vector(projection, t, transl);
     GLfloat w2, h2;
+	if ((transl[0] * w2 + w2) >= 0 && (transl[1] * h2 + h2) >= 0 && transl[2] >= 0) {
     w2=glstate->raster.viewport.width/2.0f;
     h2=glstate->raster.viewport.height/2.0f;
     glstate->raster.rPos.x = transl[0]*w2+w2;
     glstate->raster.rPos.y = transl[1]*h2+h2;
     glstate->raster.rPos.z = transl[2];
+	}
 }
 #if !defined(NO_EGL) && !defined(NOX11)
 void refreshMainFBO();
@@ -53,9 +57,11 @@ void APIENTRY_GL4ES gl4es_glWindowPos3f(GLfloat x, GLfloat y, GLfloat z) {
 			return;
 		} else gl4es_flush();
 
+	if (x >= 0 && y >= 0 && z >= 0) {
     glstate->raster.rPos.x = x;
     glstate->raster.rPos.y = y;
     glstate->raster.rPos.z = z;	
+	}
 }
 
 void APIENTRY_GL4ES gl4es_glViewport(GLint x, GLint y, GLsizei width, GLsizei height) {
@@ -83,10 +89,12 @@ void APIENTRY_GL4ES gl4es_glViewport(GLint x, GLint y, GLsizei width, GLsizei he
 			return;
 		}
 		gles_glViewport(x, y, width, height);
+		if (x >= 0 && y >= 0 && width >= 0 && height >= 0) {
 		glstate->raster.viewport.x = x;
 		glstate->raster.viewport.y = y;
 		glstate->raster.viewport.width = width;
 		glstate->raster.viewport.height = height;
+		}
 #if !defined(NO_EGL) && !defined(NOX11)
 		if(!globals4es.usefbo && !globals4es.usefb && glstate->fbo.fbo_draw->id==0) {
 			// check if underlying EGL surface change dimension, and reflect that to main fbo size
@@ -124,10 +132,12 @@ void APIENTRY_GL4ES gl4es_glScissor(GLint x, GLint y, GLsizei width, GLsizei hei
 		if (glstate->raster.bm_drawing) bitmap_flush();
     	LOAD_GLES(glScissor);
 		gles_glScissor(x, y, width, height);
+		if (x >= 0 && y >= 0 && width >= 0 && height >= 0) {
 		glstate->raster.scissor.x = x;
 		glstate->raster.scissor.y = y;
 		glstate->raster.scissor.width = width;
 		glstate->raster.scissor.height = height;
+		}
 	}
 }
 
@@ -396,11 +406,11 @@ void APIENTRY_GL4ES gl4es_glBitmap(GLsizei width, GLsizei height, GLfloat xorig,
 		memcpy(l->bitmap, bitmap, sz);
 		return;
 	}
-    if ((!width && !height) || (bitmap==0)) {
-		glstate->raster.rPos.x += xmove;
-		glstate->raster.rPos.y += ymove;
-        return;
-    }
+    if (((!width && !height) || (bitmap==0)) && glstate->raster.rPos.x + xmove >= 0 && glstate->raster.rPos.y + ymove >= 0) {
+		  glstate->raster.rPos.x += xmove;
+		  glstate->raster.rPos.y += ymove;
+      return;
+	}
 
 	// get start/end of drawed pixel
 	float zoomx = glstate->raster.raster_zoomx;
@@ -493,8 +503,10 @@ void APIENTRY_GL4ES gl4es_glBitmap(GLsizei width, GLsizei height, GLfloat xorig,
     }
 
 	// finished, move...
+	if ((glstate->raster.rPos.x + xmove) >= 0 && (glstate->raster.rPos.y + ymove) >= 0) {
 	glstate->raster.rPos.x += xmove;
 	glstate->raster.rPos.y += ymove;
+	}
 	// draw in buffer...
 	glstate->raster.bm_drawing = 1;
 }
@@ -602,8 +614,10 @@ void render_raster_list(rasterlist_t* rast) {
 			glstate->raster.rPos.x-rast->xorig, glstate->raster.rPos.y-rast->yorig,
 			(rast->bitmap)?BLIT_ALPHA:BLIT_COLOR
 		);
+	if (glstate->raster.rPos.x + rast->xmove >= 0 && glstate->raster.rPos.y + rast->ymove >= 0) {
 	glstate->raster.rPos.x += rast->xmove;
 	glstate->raster.rPos.y += rast->ymove;
+	}
 }
 
 int map_pixelmap(GLenum map, int* wf, int** size, void** array) {

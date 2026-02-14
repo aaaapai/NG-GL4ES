@@ -5,6 +5,7 @@
 #include "glstate.h"
 #include "init.h"
 #include "matrix.h"
+#include <jemalloc/jemalloc.h>
 
 static inline void rlVertexCommon(renderlist_t *list, int idx, int l) {
     if(list->use_glstate) {

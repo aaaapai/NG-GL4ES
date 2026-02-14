@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <sstream>
+#include <jemalloc/jemalloc.h>
 
 extern "C"
 {
@@ -1046,6 +1047,9 @@ extern "C"
             *params = es_params * TEXTURE_IMAGE_MAGNIFICATION;
             break;
         }
+        case GL_MAX_VERTEX_IMAGE_UNIFORMS:
+            *params = 4;
+            break;
         default:
             errorGL();
             gles_glGetIntegerv(pname, params);

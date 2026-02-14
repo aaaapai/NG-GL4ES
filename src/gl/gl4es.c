@@ -27,6 +27,8 @@
 #include "logs.h"
 #include "config.h"
 
+#include <jemalloc/jemalloc.h>
+
 #ifdef _WIN32
 #ifdef _WINBASE_
 #define GSM_CAST(c) ((LPFILETIME)c)
@@ -922,7 +924,7 @@ void APIENTRY_GL4ES gl4es_glEndList(void) {
         }
     }
     if (glstate->list.compiling) {
-        // Free the previous list if it exist...
+        // free the previous list if it exist...
         free_renderlist(kh_value(lists, k));
         renderlist_t* l = kh_value(lists, k) = GetFirst(glstate->list.active);
         // set name

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <jemalloc/jemalloc.h>
 #include "cJSON.h"
 #include "logs.h"
 #include "gl4es.h"
