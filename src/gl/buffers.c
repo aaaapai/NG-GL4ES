@@ -211,7 +211,8 @@ void APIENTRY_GL4ES gl4es_glBufferData(GLenum target, GLsizeiptr size, const GLv
         go_real = 1;
 
     if (target == GL_UNIFORM_BUFFER || target == GL_COPY_WRITE_BUFFER || target == GL_COPY_READ_BUFFER ||
-        target == GL_TEXTURE_BUFFER || target == GL_PIXEL_PACK_BUFFER || target == GL_PIXEL_UNPACK_BUFFER || target == GL_DRAW_INDIRECT_BUFFER)
+        target == GL_TEXTURE_BUFFER || target == GL_PIXEL_PACK_BUFFER || target == GL_PIXEL_UNPACK_BUFFER ||
+        target == GL_DRAW_INDIRECT_BUFFER)
         go_real = 1;
 
     if (buff->real_buffer && !go_real) {
@@ -271,7 +272,8 @@ void APIENTRY_GL4ES gl4es_glNamedBufferData(GLuint buffer, GLsizeiptr size, cons
         go_real = 1;
 
     if (buff->type == GL_UNIFORM_BUFFER || buff->type == GL_COPY_WRITE_BUFFER || buff->type == GL_COPY_READ_BUFFER ||
-        buff->type == GL_TEXTURE_BUFFER || buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER || buff->type == GL_DRAW_INDIRECT_BUFFER)
+        buff->type == GL_TEXTURE_BUFFER || buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER ||
+        buff->type == GL_DRAW_INDIRECT_BUFFER)
         go_real = 1;
 
     if (buff->real_buffer && !go_real) {
@@ -354,7 +356,8 @@ void APIENTRY_GL4ES gl4es_glNamedBufferSubData(GLuint buffer, GLintptr offset, G
 
     if ((buff->type == GL_ARRAY_BUFFER || buff->type == GL_ELEMENT_ARRAY_BUFFER || buff->type == GL_UNIFORM_BUFFER ||
          buff->type == GL_COPY_WRITE_BUFFER || buff->type == GL_COPY_READ_BUFFER || buff->type == GL_TEXTURE_BUFFER ||
-         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER || buff->type == GL_DRAW_INDIRECT_BUFFER) &&
+         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER ||
+         buff->type == GL_DRAW_INDIRECT_BUFFER) &&
         buff->real_buffer) {
         LOAD_GLES(glBufferSubData);
         LOAD_GLES(glBindBuffer);
@@ -451,7 +454,7 @@ static void bufferGetParameteriv(glbuffer_t* buff, GLenum value, GLint* data) {
         data[0] = buff->usage;
         break;
     default:
-        SHUT_LOGD("[ERROR] bufferGetParameteriv Unexpected: %s", PrintEnum(value));
+        DBG(SHUT_LOGD("[ERROR] bufferGetParameteriv Unexpected: %s", PrintEnum(value));)
         errorShim(GL_INVALID_ENUM);
         /* TODO Error if something else */
     }
@@ -588,7 +591,8 @@ GLboolean APIENTRY_GL4ES gl4es_glUnmapNamedBuffer(GLuint buffer) {
     if (buff->real_buffer &&
         (buff->type == GL_ARRAY_BUFFER || buff->type == GL_ELEMENT_ARRAY_BUFFER || buff->type == GL_UNIFORM_BUFFER ||
          buff->type == GL_COPY_WRITE_BUFFER || buff->type == GL_COPY_READ_BUFFER || buff->type == GL_TEXTURE_BUFFER ||
-         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER || buff->type == GL_DRAW_INDIRECT_BUFFER) &&
+         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER ||
+         buff->type == GL_DRAW_INDIRECT_BUFFER) &&
         buff->mapped && (buff->access == GL_WRITE_ONLY || buff->access == GL_READ_WRITE)) {
         LOAD_GLES(glBufferSubData);
         LOAD_GLES(glBindBuffer);
@@ -599,7 +603,8 @@ GLboolean APIENTRY_GL4ES gl4es_glUnmapNamedBuffer(GLuint buffer) {
     if (buff->real_buffer &&
         (buff->type == GL_ARRAY_BUFFER || buff->type == GL_ELEMENT_ARRAY_BUFFER || buff->type == GL_UNIFORM_BUFFER ||
          buff->type == GL_COPY_WRITE_BUFFER || buff->type == GL_COPY_READ_BUFFER || buff->type == GL_TEXTURE_BUFFER ||
-         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER || buff->type == GL_DRAW_INDIRECT_BUFFER) &&
+         buff->type == GL_PIXEL_PACK_BUFFER || buff->type == GL_PIXEL_UNPACK_BUFFER ||
+         buff->type == GL_DRAW_INDIRECT_BUFFER) &&
         buff->mapped && buff->ranged && (buff->access & GL_MAP_WRITE_BIT_EXT) &&
         !(buff->access & GL_MAP_FLUSH_EXPLICIT_BIT_EXT)) {
         LOAD_GLES(glBufferSubData);
