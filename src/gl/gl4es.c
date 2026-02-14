@@ -614,20 +614,26 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
                 v = (GLfloat*)(((uintptr_t)p->pointer) + i * stride);
             else
                 v = ((GLfloat*)p->pointer) + i * size;
-            if (size == 3)
-                gl4es_glColor3fv(v);
-            else
-                gl4es_glColor4fv(v);
+            if (size == 3) {
+                const GLfloat* constv = v;
+                gl4es_glColor3fv(constv);
+            }else {
+                const GLfloat* constv = v;
+                gl4es_glColor4fv(constv);
+            }
         } else if (p->type == GL_UNSIGNED_BYTE) {
             GLubyte* b;
             if (stride)
                 b = (GLubyte*)(((uintptr_t)p->pointer) + i * stride);
             else
                 b = ((GLubyte*)p->pointer) + i * size;
-            if (size == 3)
-                gl4es_glColor3ubv(b);
-            else
-                gl4es_glColor4ubv(b);
+            if (size == 3) {
+                const GLfloat* constb = b;
+                gl4es_glColor3ubv(constb);
+            }else{
+                const GLfloat* constb = b;
+                gl4es_glColor4ubv(constb);
+            }
         } else {
             v = gl_pointer_index(p, i);
             GLfloat scale = 1.0f / gl_max_value(p->type);
@@ -638,7 +644,8 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
             for (int i = 0; i < size; i++) {
                 v[i] *= scale;
             }
-            gl4es_glColor4fv(v);
+            const GLfloat* constv = v;
+            gl4es_glColor4fv(constv);
         }
     }
     p = &vao->vertexattrib[ATT_SECONDARY];
@@ -650,7 +657,8 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
         for (int i = 0; i < p->size; i++) {
             v[i] *= scale;
         }
-        gl4es_glSecondaryColor3fv(v);
+        const GLfloat* constv = v;
+        gl4es_glSecondaryColor3fv(constv);
     }
     p = &vao->vertexattrib[ATT_NORMAL];
     if (p->enabled) {
@@ -665,7 +673,8 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
         } else {
             v = gl_pointer_index(p, i);
         }
-        gl4es_glNormal3fv(v);
+        const GLfloat* constv = v;
+        gl4es_glNormal3fv(constv);
     }
     p = &vao->vertexattrib[ATT_MULTITEXCOORD0];
     if (p->enabled) {
@@ -680,10 +689,14 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
         } else {
             v = gl_pointer_index(p, i);
         }
-        if (size < 4)
-            gl4es_glTexCoord2fv(v);
-        else
-            gl4es_glTexCoord4fv(v);
+        if (size < 4) {
+            const GLfloat* constv = v;
+            gl4es_glTexCoord2fv(constv);
+        }
+        else {
+            const GLfloat* constv = v;
+            gl4es_glTexCoord4fv(constv);
+        }
     }
     for (int a = 1; a < vao->maxtex; a++) {
         p = &vao->vertexattrib[ATT_MULTITEXCOORD0 + a];
@@ -699,10 +712,13 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
             } else {
                 v = gl_pointer_index(p, i);
             }
-            if (p->size < 4)
-                gl4es_glMultiTexCoord2fv(GL_TEXTURE0 + a, v);
-            else
-                gl4es_glMultiTexCoord4fv(GL_TEXTURE0 + a, v);
+            if (p->size < 4) {
+                const GLfloat* constv = v;
+                gl4es_glMultiTexCoord2fv(GL_TEXTURE0 + a, constv);
+            }else {
+                const GLfloat* constv = v;
+                gl4es_glMultiTexCoord4fv(GL_TEXTURE0 + a, constv);
+            }
         }
     }
     p = &vao->vertexattrib[ATT_VERTEX];
@@ -717,11 +733,14 @@ void APIENTRY_GL4ES gl4es_glArrayElement(GLint i) {
             v = gl_pointer_index(p, i);
         }
         if (p->size == 4) {
-            gl4es_glVertex4fv(v);
+            const GLfloat* constv = v;
+            gl4es_glVertex4fv(constv);
         } else if (p->size == 3) {
-            gl4es_glVertex3fv(v);
+            const GLfloat* constv = v;
+            gl4es_glVertex3fv(constv);
         } else {
-            gl4es_glVertex2fv(v);
+            const GLfloat* constv = v;
+            gl4es_glVertex2fv(constv);
         }
     }
 }
