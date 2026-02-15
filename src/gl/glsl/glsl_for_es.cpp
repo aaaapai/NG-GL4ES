@@ -740,9 +740,9 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
 
 	// remove "noperspective"
                 const char* str_np = "noperspective";
-                const SizeT len_np = strlen(str_np);
-                SizeT noperspectivePos = ret.find(str_np);
-                while (noperspectivePos != String::npos) {
+                const std::size_t len_np = strlen(str_np);
+                std::size_t noperspectivePos = ret.find(str_np);
+                while (noperspectivePos != std::string::npos) {
                     // + length of "\n"
                     ret = ret.replace(noperspectivePos, len_np, "");
                     noperspectivePos = ret.find(str_np);
