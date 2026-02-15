@@ -737,7 +737,17 @@ std::string preprocess_glsl(const std::string& glsl, GLenum shaderType, bool* at
     replace_all(ret, "vec3[3](vWorldPos[0] - vWorldPos[1]", "vec4[3](vWorldPos[0] - vWorldPos[1]");
     replace_all(ret, "vec3 reflection;", "vec3 reflection=vec3(0,0,0);");
     replace_all(ret, "#error ", "// #error ");
-  
+
+	// remove "noperspective"
+                const char* str_np = "noperspective";
+                const SizeT len_np = strlen(str_np);
+                SizeT noperspectivePos = ret.find(str_np);
+                while (noperspectivePos != String::npos) {
+                    // + length of "\n"
+                    ret = ret.replace(noperspectivePos, len_np, "");
+                    noperspectivePos = ret.find(str_np);
+				}
+
     // GI_TemporalFilter injection
     inject_temporal_filter(ret);
 
